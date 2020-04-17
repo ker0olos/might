@@ -1,0 +1,34 @@
+{
+  "name": "might-gui",
+  "version": "0.1.0",
+  "description": "A no-code solution for performing end-to-end tests",
+  "scripts": {
+    "build": "webpack --config webpack.config.prod.js --mode production",
+    "start": "webpack-dev-server --config webpack.config.dev.js --mode development"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ItsKerolos/might-gui.git"
+  },
+  "author": "Kerolos Zaki",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ItsKerolos/might-gui/issues"
+  },
+  "homepage": "https://github.com/ItsKerolos/might-gui#readme",
+  "dependencies": {
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.9.0",
+    "@babel/preset-env": "^7.9.5",
+    "@babel/preset-react": "^7.9.4",
+    "babel-loader": "^8.1.0",
+    "eslint-plugin-react": "^7.19.0",
+    "eslint-plugin-security": "^1.4.0",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.10.3"
+  }
+}
