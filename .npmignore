@@ -1,0 +1,17 @@
+.git
+.vscode
+.github
+.npmrc
+.todo
+.eslint*
+
+screenshots
+
+__might__
+
+might.*
+
+babel.config.js
+webpack.config.*.js
+
+src

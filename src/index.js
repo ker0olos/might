@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import App from './screens/app.js';
+
 const app = document.querySelector('#app');
 
-// show a loading screen until the promises resolve
-ReactDOM.render(<p started="true"/>, app);
+ReactDOM.render(<App/>, app);

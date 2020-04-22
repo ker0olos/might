@@ -1,1 +1,8 @@
 Performance Issues and Bugs:
+
+UI/UX:
+  ☐ drawing lines connecting mindmap elements
+
+  ☐ redraw smaller versions of the mindmap elements inside the minimap
+
+  ☐ scroll mindmap using the minimap  
