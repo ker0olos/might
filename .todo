@@ -5,4 +5,4 @@ UI/UX:
 
   ☐ redraw smaller versions of the mindmap elements inside the minimap
 
-  ☐ scroll mindmap using the minimap  
+  ☐ change the minimap indicator size to be based on current viewport no the mindmap

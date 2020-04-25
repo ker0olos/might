@@ -4,7 +4,11 @@ import { createStyle } from 'flcss';
 
 import getTheme from '../colors.js';
 
+import Minimap from '../components/minimap.js';
+
 const colors = getTheme();
+
+const mindMapRef = React.createRef();
 
 class Mindmap extends React.Component
 {
@@ -16,8 +20,8 @@ class Mindmap extends React.Component
   render()
   {
     return (
-      <div className={ styles.container }>
-
+      <div ref={ mindMapRef } className={ styles.container }>
+        <Minimap mindMapRef={ mindMapRef }/>
       </div>
     );
   }

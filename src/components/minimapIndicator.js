@@ -12,9 +12,10 @@ class MinimapIndicator extends React.Component
   {
     super();
 
+    // the '15' is margin of the wrapper
     this.state = {
-      x: 0,
-      y: 0
+      x: 15,
+      y: 15
     };
 
     this.onScroll = this.onScroll.bind(this);
@@ -45,7 +46,6 @@ class MinimapIndicator extends React.Component
 
   onScroll()
   {
-    
     const maxWidth = 260;
     const maxHeight = 157;
     
@@ -64,9 +64,11 @@ class MinimapIndicator extends React.Component
     const widthPercentage = this.mindMapElem.scrollLeft / mapWidth;
     const heightPercentage = this.mindMapElem.scrollTop / mapHeight;
 
+    // the '15' is margin of the wrapper
+    // the '2' is the size of the indicator's border
     this.setState({
-      x: (miniMapWidth - indicatorWidth - 2) * widthPercentage,
-      y: (miniMapHeight - indicatorHeight - 2) * heightPercentage
+      x: (miniMapWidth - indicatorWidth - 2) * widthPercentage + 15,
+      y: (miniMapHeight - indicatorHeight - 2) * heightPercentage + 15
     });
   }
 
