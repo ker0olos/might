@@ -46,21 +46,29 @@ class Minimap extends React.Component
     const miniMapWidth = Math.min(maxWidth, Math.max(window.innerWidth * 0.25, minWidth));
     const miniMapHeight = Math.min(maxHeight, Math.max(window.innerWidth * 0.15, minHeight));
 
-    const mapWidth = miniMapWidth * 10 -  window.innerWidth;
-    const mapHeight = miniMapHeight * 10 -  window.innerHeight;
+    const indicatorWidth = window.innerWidth / 10;
+    const indicatorHeight = window.innerHeight / 10;
 
     // the '15' is the element's margin
     let x = e.clientX - 15;
     let y = miniMapHeight - (window.innerHeight - e.clientY - 15);
 
+    // according to the indicator center
+    x = x + (indicatorWidth / 2);
+    y = y + (indicatorHeight / 2);
+    
     // minimal coordinates is 0, 0
     // maximal coordinates is minimap width, height
     x = Math.min(Math.max(x, 0), miniMapWidth);
     y = Math.min(Math.max(y, 0), miniMapHeight);
 
-    // normalize for mindmap size
-    x = Math.floor(mapWidth * ((x * 10) / (window.innerWidth + mapWidth)));
-    y = Math.floor(mapHeight * ((y * 10) / (window.innerHeight + mapHeight)));
+    // transform minimap positions to mindmap positions
+    x = x * 10;
+    y = y * 10;
+
+    // transform mindmap positions to scroll positions
+    x = x - window.innerWidth;
+    y = y - window.innerHeight;
 
     mindMapRef.parentElement.scrollTo({
       left: x,

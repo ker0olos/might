@@ -58,8 +58,8 @@ class MinimapIndicator extends React.Component
     const mapWidth = miniMapWidth * 10 -  window.innerWidth;
     const mapHeight = miniMapHeight * 10 -  window.innerHeight;
 
-    const indicatorWidth = miniMapWidth / 5;
-    const indicatorHeight = miniMapHeight / 5;
+    const indicatorWidth = window.innerWidth / 10;
+    const indicatorHeight = window.innerHeight / 10;
 
     const widthPercentage = this.mindMapElem.scrollLeft / mapWidth;
     const heightPercentage = this.mindMapElem.scrollTop / mapHeight;
@@ -89,14 +89,8 @@ const styles = createStyle({
 
     position: 'absolute',
 
-    maxWidth: 'calc(260px / 5)',
-    maxHeight: 'calc(157px / 5)',
-
-    minWidth: 'calc(180px / 5)',
-    minHeight: 'calc(104px / 5)',
-
-    width: 'calc(25vw / 5)',
-    height: 'calc(15vw / 5)',
+    width: 'calc(100vw / 10)',
+    height: 'calc(100vh / 10)',
 
     border: '1px solid',
     borderColor: colors.miniMapBorder
