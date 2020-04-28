@@ -6,6 +6,7 @@ export default function getTheme()
 
     blackBackground: '#000000',
     blackText: '#000000',
+    blackShadow: 'rgba(0, 0, 0, 0.25)',
 
     transparent: 'transparent',
 

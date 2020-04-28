@@ -16,7 +16,7 @@ class Minimap extends React.Component
   {
     super();
 
-    this.state= {
+    this.state = {
       x: 0,
       y: 0
     };
@@ -82,13 +82,19 @@ class Minimap extends React.Component
     return <div className={ styles.wrapper } onClick={ this.onClick }>
       <div className={ styles.container }>
         <MinimapIndicator x={ this.state.x } y={ this.state.y }/>
+
+        { this.props.children }
       </div>
     </div>;
   }
 }
 
 Minimap.propTypes = {
-  mindMapRef: PropTypes.object
+  mindMapRef: PropTypes.object,
+  children: PropTypes.oneOfType([
+    PropTypes.node,
+    PropTypes.arrayOf(PropTypes.node)
+  ])
 };
 
 const styles = createStyle({
@@ -113,7 +119,9 @@ const styles = createStyle({
     backgroundColor: colors.whiteBackground,
 
     width: '100%',
-    height: '100%'
+    height: '100%',
+
+    boxShadow: `${colors.blackShadow} 0 0 15px 5px`
   }
 });
 

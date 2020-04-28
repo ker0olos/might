@@ -20,7 +20,7 @@ class App extends React.Component
   {
     return (
       <div id='main' className={ styles.container }>
-        <TopBar/>
+        {/* <TopBar/> */}
         <Mindmap/>
       </div>
     );

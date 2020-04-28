@@ -1,6 +1,12 @@
 Performance Issues and Bugs:
 
 UI/UX:
-  ☐ drawing lines connecting mindmap elements
+  ☐ drawing items:
+    ☐ create 2 react classes (full & mini)
+      - mini is fork of full with /10 size and no details or text or any interactions
+      
+    ☐ use a react state to keep track of items
+      - use a array.map to show them for both maps full and mini
 
-  ☐ redraw smaller versions of the mindmap elements inside the minimap
+    ☐ figure out the structure of children
+      ☐ drawing lines connecting children to parent

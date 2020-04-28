@@ -85,9 +85,9 @@ class MinimapIndicator extends React.Component
 
 const styles = createStyle({
   container: {
-    backgroundColor: colors.whiteBackground,
-
     position: 'absolute',
+
+    backgroundColor: colors.transparent,
 
     width: 'calc(100vw / 10)',
     height: 'calc(100vh / 10)',
