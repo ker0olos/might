@@ -17,9 +17,7 @@ class Mindmap extends React.Component
     super();
 
     this.state = {
-      items: [
-
-      ]
+      items: []
     };
   }
 
@@ -55,7 +53,7 @@ class Mindmap extends React.Component
 
         <div className={ styles.container }>
           <div className={ styles.item }>
-
+            <div className={ styles.text }>Wait 5s</div>
           </div>
         </div>
 
@@ -84,15 +82,35 @@ const styles = createStyle({
     justifyContent: 'center',
     alignItems: 'center',
 
+    fontFamily: 'Noto Sans',
+    fontWeight: 700,
+
     width: '100%',
     height: '100%'
   },
 
   item: {
-    width: '150px',
-    height: '50px',
+    display: 'flex',
+    alignItems: 'center',
 
-    border: '1px solid blue'
+    width: '110px',
+    minHeight: '26px',
+
+    overflow: 'hidden',
+    userSelect: 'none',
+
+    borderRadius: '3px',
+    border: `${colors.mindmapItemAccent} 1px solid`
+  },
+
+  text: {
+    maxHeight: '45px',
+    
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+
+    fontSize: '10px',
+    margin: '5px 10px'
   }
 });
 

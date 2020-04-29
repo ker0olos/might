@@ -2,11 +2,15 @@ Performance Issues and Bugs:
 
 UI/UX:
   ☐ drawing items:
+    ☐ figure out the structure of children @critical 
+      ☐ drawing lines connecting children to parent
+
     ☐ create 2 react classes (full & mini)
       - mini is fork of full with /10 size and no details or text or any interactions
       
     ☐ use a react state to keep track of items
-      - use a array.map to show them for both maps full and mini
+      - use a array.map to render them in both maps
 
-    ☐ figure out the structure of children
-      ☐ drawing lines connecting children to parent
+  ☐ searching for tests using their titles for actions
+    - scrolls to the first result but highlight all results in both maps
+      
