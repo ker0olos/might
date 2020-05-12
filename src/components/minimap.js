@@ -90,7 +90,7 @@ class Minimap extends React.Component
 }
 
 Minimap.propTypes = {
-  mindMapRef: PropTypes.object,
+  mindMapRef: PropTypes.object.isRequired,
   children: PropTypes.oneOfType([
     PropTypes.node,
     PropTypes.arrayOf(PropTypes.node)

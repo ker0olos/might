@@ -1,9 +1,14 @@
+/* eslint-disable security/detect-object-injection */
+
 import React from 'react';
 
 import { createStyle } from 'flcss';
 
+// import { saveAs } from 'file-saver';
+
 import getTheme from '../colors.js';
 
+import TopBar from '../components/topBar.js';
 import Minimap from '../components/minimap.js';
 
 const colors = getTheme();
@@ -17,8 +22,12 @@ class Mindmap extends React.Component
     super();
 
     this.state = {
-      items: []
+      data: {},
+      familizedData: {}
     };
+
+    this.onFileSave = this.onFileSave.bind(this);
+    this.onFileLoad = this.onFileLoad.bind(this);
   }
 
   componentDidMount()
@@ -41,24 +50,195 @@ class Mindmap extends React.Component
       top: mapHeight / 2,
       behavior: 'auto'
     });
+
+    // REMOVE (test group)
+    // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]}]}').data);
+
+    // REMOVE (test group 2)
+    // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]}, {"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello Mars fkkf ekke kfke fke"}]}]}').data);
+
+    // REMOVE (one group)
+    // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 4","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"}]},{"title":"test search-bar input 5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"click"}]}]}').data);
+    
+    // REMOVE (one group 2)
+
+    // FIX rendering issue
+    this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 4","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"}]},{"title":"test search-bar input 4.5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"},{"action":"click"}]},{"title":"test search-bar input 5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"click"}]}]}').data);
+    
+    // REMOVE (three group)
+    // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 2","steps":[{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 3","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-button"},{"action":"click"}]},{"title":"test search-bar input 4","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"}]},{"title":"test search-bar input 5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"click"}]}]}').data);
+  }
+
+  /**
+  * @param { React.SyntheticEvent } e
+  */
+  onFileSave()
+  {
+    // TODO
+    // const blob = new Blob([ '{ "a": "b" }' ], { type: 'application/json;charset=utf-8' });
+
+    // saveAs(blob, 'might.gui.json');
+  }
+  
+  /**
+  * @param { React.SyntheticEvent } e
+  */
+  onFileLoad(e)
+  {
+    /**
+    * @type { File }
+    */
+    function readJSON(file)
+    {
+      return new Promise((resolve, reject) =>
+      {
+        const fr = new FileReader();
+
+        fr.onerror = () => reject(fr.error);
+        fr.onload = () => resolve(JSON.parse(fr.result));
+
+        fr.readAsText(file, 'utf8');
+      });
+    }
+    
+    /**
+    * @type { FileList }
+    */
+    const files = e.target.files;
+
+    readJSON(files[0]).then((file) => this.loadMap(file.data));
+  }
+
+  serializeStep(step)
+  {
+    if (step.action === 'wait')
+      return `Wait ${step.value}s`;
+    else if (step.action === 'select')
+      return `Select ${step.value}`;
+    else if (step.action === 'click')
+      return 'Click';
+    else if (step.action === 'type')
+      return `Type ${step.value}`;
+  }
+
+  /**
+  * @param { { title: string, steps: { action: string, value: string }[] }[] } data
+  */
+  loadMap(data)
+  {
+    const familizedData = {};
+
+    data.forEach((test, testIndex) =>
+    {
+      let parent;
+
+      test.steps.forEach((step, stepIndex) =>
+      {
+        const key = this.serializeStep(step);
+
+        if (stepIndex === 0)
+        {
+          if (familizedData[key] == undefined)
+            familizedData[key] = {
+              testIndex,
+              stepIndex,
+              ...step
+            };
+
+          parent = familizedData[key];
+        }
+        else
+        {
+          if (!parent.children)
+            parent.children = {};
+
+          const obj = parent.children;
+          
+          if (obj[key] === undefined)
+            obj[key] = {
+              testIndex,
+              stepIndex,
+              ...step
+            };
+
+          parent = obj[key];
+        }
+      });
+    });
+
+    this.setState({
+      data,
+      familizedData
+    });
   }
 
   render()
   {
-    return (
-      <div ref={ mindMapRef } className={ styles.wrapper }>
+    const handlePreLines = (children, index) =>
+    {
+      if (!children || children.length <= 1)
+        return <div/>;
 
-        <Minimap mindMapRef={ mindMapRef }>
-        </Minimap>
+      return <div className={ (index === 0) ? styles.reverseLines : styles.lines }>
 
-        <div className={ styles.container }>
-          <div className={ styles.item }>
-            <div className={ styles.text }>Wait 5s</div>
-          </div>
-        </div>
+        { (index > 0 && index < children.length - 1) ? <div className={ styles.vertical }/> : <div className={ styles.halfVertical }/> }
+        
+        <div className={ styles.horizontal }/>
 
+      </div>;
+    };
+    
+    const handlePostLines = (children) =>
+    {
+      if (!children)
+        return <div/>;
+
+      return <div className={ styles.horizontal }/>;
+    };
+
+    const handleItems = (children) =>
+    {
+      if (!children)
+        return <div/>;
+
+      const keys = Object.keys(children);
+
+      return <div className={ styles.column }>
+        {
+          keys.map((k, index) =>
+          {
+            return <div key={ index } className={ styles.row }>
+
+              { handlePreLines(keys, index) }
+
+              <div  className={ styles.item }>
+                <div className={ styles.text }>{ k }</div>
+              </div>
+
+              { handlePostLines(children[k].children) }
+
+              { handleItems(children[k].children) }
+            </div>;
+          })
+        }
+      </div>;
+    };
+
+    const a = <div ref={ mindMapRef } className={ styles.wrapper }>
+
+      <TopBar onFileSave={ this.onFileSave } onFileLoad={ this.onFileLoad }/>
+
+      <Minimap mindMapRef={ mindMapRef }>
+        {/* TODO ._. */}
+      </Minimap>
+
+      <div className={ styles.container }>
+        { handleItems(this.state.familizedData) }
       </div>
-    );
+
+    </div>;
+
+    return a;
   }
 }
 
@@ -89,18 +269,31 @@ const styles = createStyle({
     height: '100%'
   },
 
+  row: {
+    display: 'flex',
+    flexDirection: 'row'
+  },
+
+  column: {
+    display: 'flex',
+    flexDirection: 'column'
+  },
+
   item: {
     display: 'flex',
     alignItems: 'center',
 
-    width: '110px',
     minHeight: '26px',
+    width: '110px',
+    height: 'fit-content',
 
     overflow: 'hidden',
     userSelect: 'none',
 
+    margin: 'auto',
+
     borderRadius: '3px',
-    border: `${colors.mindmapItemAccent} 1px solid`
+    border: `${colors.accent} 1px solid`
   },
 
   text: {
@@ -111,6 +304,35 @@ const styles = createStyle({
 
     fontSize: '10px',
     margin: '5px 10px'
+  },
+
+  lines: {
+    display: 'flex'
+  },
+
+  reverseLines: {
+    extend: 'lines',
+    transform: 'rotateX(180deg)'
+  },
+
+  vertical: {
+    width: 0,
+    height: '100%',
+
+    border: `1px ${colors.accent} solid`
+  },
+
+  halfVertical: {
+    extend: 'vertical',
+    height: 'calc(50% - 1px)'
+  },
+
+  horizontal: {
+    height: 0,
+    width: '60px',
+
+    margin: 'auto',
+    border: `1px ${colors.accent} solid`
   }
 });
 

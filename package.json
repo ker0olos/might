@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/ItsKerolos/might-gui#readme",
   "dependencies": {
+    "file-saver": "^2.0.2",
     "flcss": "^0.1.0",
     "mdi-react": "^7.1.0",
     "prop-types": "^15.7.2",

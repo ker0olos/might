@@ -1,16 +1,25 @@
 Performance Issues and Bugs:
 
 UI/UX:
-  ☐ drawing items:
-    ☐ figure out the structure of children @critical 
+  ✔ drawing items: @done(20-05-13 00:26)
+    ✔ figure out the structure of children @critical @done(20-05-13 00:26)
       ☐ drawing lines connecting children to parent
 
-    ☐ create 2 react classes (full & mini)
-      - mini is fork of full with /10 size and no details or text or any interactions
+  ☐ create 2 react classes (full & mini)
+    - mini is fork of full with /10 size and no details or text or any interactions
       
-    ☐ use a react state to keep track of items
-      - use a array.map to render them in both maps
+  ✔ use a react state to keep track of items @done(20-05-13 00:26)
+    ☐ use a array.map to render them in both maps
 
   ☐ searching for tests using their titles for actions
     - scrolls to the first result but highlight all results in both maps
-      
+
+  ☐ keeping the same scroll position after a window resize
+
+  ☐ turn the app to electron @low 
+    - saving additional data about the gui state in disk
+      - can be saved inside map file for now
+    - loading the map file automatically at the start
+    - rendering screenshots of tests (normally the app won't have permission to read them from disk) 
+    - running tests inside the gui using core
+    

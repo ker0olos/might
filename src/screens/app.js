@@ -2,7 +2,6 @@ import React from 'react';
 
 import { createStyle } from 'flcss';
 
-import TopBar from '../components/topBar.js';
 import Mindmap from '../components/mindmap.js';
 
 import getTheme from '../colors.js';
@@ -20,7 +19,6 @@ class App extends React.Component
   {
     return (
       <div id='main' className={ styles.container }>
-        {/* <TopBar/> */}
         <Mindmap/>
       </div>
     );

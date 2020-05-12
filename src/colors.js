@@ -10,7 +10,7 @@ export default function getTheme()
 
     transparent: 'transparent',
 
-    mindmapItemAccent: '#888888',
+    accent: '#888888',
     miniMapBorder: 'red'
   };
 
