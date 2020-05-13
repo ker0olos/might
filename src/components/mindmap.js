@@ -276,7 +276,9 @@ const styles = createStyle({
 
   column: {
     display: 'flex',
-    flexDirection: 'column'
+    flexDirection: 'column',
+
+    alignItems: 'flex-start'
   },
 
   item: {
