@@ -61,12 +61,10 @@ class Mindmap extends React.Component
     // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 4","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"}]},{"title":"test search-bar input 5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"click"}]}]}').data);
     
     // REMOVE (one group 2)
+    // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 4","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"}]},{"title":"test search-bar input 4.5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"},{"action":"click"}]},{"title":"test search-bar input 5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"click"}]}]}').data);
 
-    // FIX rendering issue
-    this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 4","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"}]},{"title":"test search-bar input 4.5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"},{"action":"click"}]},{"title":"test search-bar input 5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"click"}]}]}').data);
-    
     // REMOVE (three group)
-    // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 2","steps":[{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 3","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-button"},{"action":"click"}]},{"title":"test search-bar input 4","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"}]},{"title":"test search-bar input 5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"click"}]}]}').data);
+    this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 2","steps":[{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 3","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-button"},{"action":"click"}]},{"title":"test search-bar input 4","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"}]},{"title":"test search-bar input 5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"click"}]}]}').data);
   }
 
   /**
@@ -196,7 +194,7 @@ class Mindmap extends React.Component
       return <div className={ styles.horizontal }/>;
     };
 
-    const handleItems = (children) =>
+    const handleItems = (children, continuation) =>
     {
       if (!children)
         return <div/>;
@@ -207,9 +205,9 @@ class Mindmap extends React.Component
         {
           keys.map((k, index) =>
           {
-            return <div key={ index } className={ styles.row }>
+            return <div key={ index } className={ (continuation) ? styles.row : styles.firstRow }>
 
-              { handlePreLines(keys, index) }
+              { (continuation) ? handlePreLines(keys, index) : undefined }
 
               <div  className={ styles.item }>
                 <div className={ styles.text }>{ k }</div>
@@ -217,7 +215,7 @@ class Mindmap extends React.Component
 
               { handlePostLines(children[k].children) }
 
-              { handleItems(children[k].children) }
+              { handleItems(children[k].children, true) }
             </div>;
           })
         }
@@ -233,7 +231,7 @@ class Mindmap extends React.Component
       </Minimap>
 
       <div className={ styles.container }>
-        { handleItems(this.state.familizedData) }
+        { handleItems(this.state.familizedData, false) }
       </div>
 
     </div>;
@@ -274,11 +272,19 @@ const styles = createStyle({
     flexDirection: 'row'
   },
 
+  firstRow: {
+    extend: 'row',
+    margin: '25px 0 !important'
+  },
+
   column: {
     display: 'flex',
     flexDirection: 'column',
 
-    alignItems: 'flex-start'
+    alignItems: 'flex-start',
+    '> *': {
+      margin: '4px 0'
+    }
   },
 
   item: {
@@ -318,15 +324,20 @@ const styles = createStyle({
   },
 
   vertical: {
+    position: 'relative',
+
+    top: '-4px',
     width: 0,
-    height: '100%',
+    height: 'calc(100% + 8px)',
 
     border: `1px ${colors.accent} solid`
   },
 
   halfVertical: {
     extend: 'vertical',
-    height: 'calc(50% - 1px)'
+
+    top: '-5px',
+    height: 'calc(50% + 4px)'
   },
 
   horizontal: {

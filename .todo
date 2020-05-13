@@ -1,4 +1,8 @@
 Performance Issues and Bugs:
+  ☐ test duplicated test steps
+    ☐ test with different titles
+
+  ☐ some items can exceed map size
 
 UI/UX:
   ✔ drawing items: @done(20-05-13 00:26)

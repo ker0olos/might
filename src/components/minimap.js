@@ -99,6 +99,7 @@ Minimap.propTypes = {
 
 const styles = createStyle({
   wrapper: {
+    zIndex: 1,
     position: 'absolute',
 
     bottom: 0,

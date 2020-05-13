@@ -44,6 +44,8 @@ TopBar.propTypes = {
 
 const styles = createStyle({
   container: {
+    zIndex: 1,
+
     display: 'flex',
     position: 'absolute',
     
