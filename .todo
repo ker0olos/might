@@ -5,20 +5,13 @@ Performance Issues and Bugs:
   ☐ some items can exceed map size
 
 UI/UX:
-  ✔ drawing items: @done(20-05-13 00:26)
-    ✔ figure out the structure of children @critical @done(20-05-13 00:26)
-      ☐ drawing lines connecting children to parent
-
-  ☐ create 2 react classes (full & mini)
-    - mini is fork of full with /10 size and no details or text or any interactions
-      
   ✔ use a react state to keep track of items @done(20-05-13 00:26)
-    ☐ use a array.map to render them in both maps
-
-  ☐ searching for tests using their titles for actions
+    ☐ create 2 react classes (full & mini) @critical
+      - mini is fork of full with /10 size and no details or text or any interactions
+      ☐ use a array.map to render them in both maps
+    
+  ☐ searching for tests using their titles for actions @low
     - scrolls to the first result but highlight all results in both maps
-
-  ☐ keeping the same scroll position after a window resize
 
   ☐ turn the app to electron @low 
     - saving additional data about the gui state in disk

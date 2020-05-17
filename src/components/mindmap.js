@@ -22,8 +22,15 @@ class Mindmap extends React.Component
     super();
 
     this.state = {
-      data: {},
-      familizedData: {}
+      /**
+      * @type { Array }
+      */
+      data: undefined,
+
+      /**
+      * @type { Array }
+      */
+      familizedData: undefined
     };
 
     this.onFileSave = this.onFileSave.bind(this);
@@ -57,6 +64,9 @@ class Mindmap extends React.Component
     // REMOVE (test group 2)
     // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]}, {"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello Mars fkkf ekke kfke fke"}]}]}').data);
 
+    // REMOVE (test group 3)
+    // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"},{"action":"click"}]}]}').data);
+
     // REMOVE (one group)
     // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 4","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"}]},{"title":"test search-bar input 5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"click"}]}]}').data);
     
@@ -64,7 +74,7 @@ class Mindmap extends React.Component
     // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 4","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"}]},{"title":"test search-bar input 4.5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"},{"action":"click"}]},{"title":"test search-bar input 5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"click"}]}]}').data);
 
     // REMOVE (three group)
-    this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 2","steps":[{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 3","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-button"},{"action":"click"}]},{"title":"test search-bar input 4","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"}]},{"title":"test search-bar input 5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"click"}]}]}').data);
+    this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"},{"action":"click"}]},{"title":"test search-bar input 2","steps":[{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 3","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-button"},{"action":"click"}]},{"title":"test search-bar input 4","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"}]},{"title":"test search-bar input 5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"click"}]}]}').data);
   }
 
   /**
@@ -126,23 +136,31 @@ class Mindmap extends React.Component
   {
     const familizedData = {};
 
+    // for each test in map
     data.forEach((test, testIndex) =>
     {
       let parent;
 
+      // for step in test
       test.steps.forEach((step, stepIndex) =>
       {
         const key = this.serializeStep(step);
 
+        // if the step is the first in the test
         if (stepIndex === 0)
         {
-          if (familizedData[key] == undefined)
+          // we use the serialized step string as an identifier
+          // to catch repeated steps
+          if (familizedData[key] === undefined)
             familizedData[key] = {
               testIndex,
               stepIndex,
               ...step
             };
+        
 
+          // set this step as the new parent
+          // going forward in a path until the last step in the test
           parent = familizedData[key];
         }
         else
@@ -172,27 +190,53 @@ class Mindmap extends React.Component
 
   render()
   {
-    const handlePreLines = (children, index) =>
+    const handlePreLines = (children, index, title) =>
     {
-      if (!children || children.length <= 1)
+      // if parent had no children
+      // or if only has one child (then the parent will connect
+      // with that child using a post-line only)
+      if (!children)
         return <div/>;
-
+        
+      {/* first child lines are reversed in direction */}
       return <div className={ (index === 0) ? styles.reverseLines : styles.lines }>
 
-        { (index > 0 && index < children.length - 1) ? <div className={ styles.vertical }/> : <div className={ styles.halfVertical }/> }
-        
-        <div className={ styles.horizontal }/>
+        {
+          // if there's only one child then not show any vertical lines
+          (children.length > 1) ?
+            // first and last child get half vertical lines
+            // all other children get full vertical lines
+            (index > 0 && index < children.length - 1)
+              ?
+              <div className={ styles.vertical }/> :
+              <div className={ styles.halfVertical }/> :
+            <div/>
+        }
+          
+        <div className={ styles.horizontal }>
+          <div title={ title } className={ styles.title }>{ title }</div>
+        </div>
 
       </div>;
     };
-    
+
     const handlePostLines = (children) =>
     {
-      if (!children)
+      // post lines are only drawn to connect to the pre-lines of the next step in the map
+      // that means that there need to be pre-lines
+      if (!children || children.length <= 1)
         return <div/>;
 
       return <div className={ styles.horizontal }/>;
     };
+
+    // using the familized data
+    // we render the steps in order
+    // with parent and children (nesting)
+
+    // this always for better UX since no repeated steps are rendered
+    // and the user can add new tests where-ever they need them without needing
+    // to copy steps from previous tests
 
     const handleItems = (children, continuation) =>
     {
@@ -205,17 +249,27 @@ class Mindmap extends React.Component
         {
           keys.map((k, index) =>
           {
+            const item = children[k];
+
+            let title;
+
+            // this step is the final step in a test
+            const markAsATest = this.state.data[item.testIndex].steps.length - 1 === item.stepIndex;
+
+            if (markAsATest)
+              title = this.state.data[item.testIndex].title;
+
             return <div key={ index } className={ (continuation) ? styles.row : styles.firstRow }>
 
-              { (continuation) ? handlePreLines(keys, index) : undefined }
+              { (continuation) ? handlePreLines(keys, index, title) : undefined }
 
               <div  className={ styles.item }>
                 <div className={ styles.text }>{ k }</div>
               </div>
 
-              { handlePostLines(children[k].children) }
+              { handlePostLines(Object.keys(item.children || {})) }
 
-              { handleItems(children[k].children, true) }
+              { handleItems(item.children, true) }
             </div>;
           })
         }
@@ -226,10 +280,12 @@ class Mindmap extends React.Component
 
       <TopBar onFileSave={ this.onFileSave } onFileLoad={ this.onFileLoad }/>
 
+      {/* Mini-map */}
       <Minimap mindMapRef={ mindMapRef }>
-        {/* TODO ._. */}
+        {/* TODO render the items in a mini versions */}
       </Minimap>
 
+      {/* Full-map */}
       <div className={ styles.container }>
         { handleItems(this.state.familizedData, false) }
       </div>
@@ -282,6 +338,7 @@ const styles = createStyle({
     flexDirection: 'column',
 
     alignItems: 'flex-start',
+
     '> *': {
       margin: '4px 0'
     }
@@ -292,6 +349,7 @@ const styles = createStyle({
     alignItems: 'center',
 
     minHeight: '26px',
+    maxHeight: '50px',
     width: '110px',
     height: 'fit-content',
 
@@ -315,20 +373,55 @@ const styles = createStyle({
   },
 
   lines: {
-    display: 'flex'
+    display: 'flex',
+    padding: '15px 0'
   },
 
   reverseLines: {
     extend: 'lines',
-    transform: 'rotateX(180deg)'
+    transform: 'rotateX(180deg)',
+
+    '> div': {
+      transform: 'rotateX(180deg)'
+    }
+  },
+
+  title: {
+    color: colors.accent,
+    fontSize: '11px',
+
+    userSelect: 'none',
+    overflow: 'hidden',
+
+    textAlign: 'center',
+    textOverflow: 'ellipsis',
+
+    minWidth: '60px',
+    maxWidth: '160px',
+    width: 'auto',
+
+    whiteSpace: 'nowrap',
+    margin: '0 0 5px 0'
+  },
+
+  horizontal: {
+    display: 'flex',
+    alignItems: 'flex-end',
+
+    height: 0,
+
+    padding: '0px 30px',
+    margin: 'auto',
+
+    border: `1px ${colors.accent} solid`
   },
 
   vertical: {
     position: 'relative',
 
-    top: '-4px',
+    top: 'calc(-5px + -15px)',
     width: 0,
-    height: 'calc(100% + 8px)',
+    height: 'calc(100% + 8px + 30px)',
 
     border: `1px ${colors.accent} solid`
   },
@@ -336,16 +429,8 @@ const styles = createStyle({
   halfVertical: {
     extend: 'vertical',
 
-    top: '-5px',
-    height: 'calc(50% + 4px)'
-  },
-
-  horizontal: {
-    height: 0,
-    width: '60px',
-
-    margin: 'auto',
-    border: `1px ${colors.accent} solid`
+    top: 'calc(-5px + -15px)',
+    height: 'calc(50% + 4px + 15px)'
   }
 });
 
