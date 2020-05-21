@@ -117,7 +117,15 @@ const styles = createStyle({
   },
 
   container: {
+    display: 'flex',
+    
+    justifyContent: 'center',
+    alignItems: 'center',
+
     backgroundColor: colors.whiteBackground,
+
+    fontFamily: 'Noto Sans',
+    fontWeight: 700,
 
     width: '100%',
     height: '100%',

@@ -1,15 +1,17 @@
 Performance Issues and Bugs:
-  ☐ test duplicated test steps
-    ☐ test with different titles
+  ☐ Further simplify and optimize the mindmap/minimap code @critical
+
+  ☐ test duplicated test steps (same test, same title twice in map.json)
+    ☐ test with different titles (same test, different titles)
 
   ☐ some items can exceed map size
 
 UI/UX:
-  ✔ use a react state to keep track of items @done(20-05-13 00:26)
-    ☐ create 2 react classes (full & mini) @critical
-      - mini is fork of full with /10 size and no details or text or any interactions
-      ☐ use a array.map to render them in both maps
-    
+  Management:
+    ☐ adding new test steps
+    ☐ deleting test steps
+    ☐ editing test steps
+
   ☐ searching for tests using their titles for actions @low
     - scrolls to the first result but highlight all results in both maps
 

@@ -8,12 +8,30 @@ import { createStyle } from 'flcss';
 
 import getTheme from '../colors.js';
 
-import TopBar from '../components/topBar.js';
-import Minimap from '../components/minimap.js';
+import TopBar from './topBar.js';
+import Minimap from './minimap.js';
+
+import Item from './item.js';
+
+import Horizontal from './horizontal.js';
+import Vertical from './vertical.js';
 
 const colors = getTheme();
 
 const mindMapRef = React.createRef();
+
+/**
+* @typedef { Object } FamilizedItem
+* @property { number } testIndex
+* @property { number } stepIndex
+* @property { string } action
+* @property { string } value
+* @property { FamilizedObject } children
+*/
+
+/**
+* @typedef { Object<string, FamilizedItem> } FamilizedObject
+*/
 
 class Mindmap extends React.Component
 {
@@ -28,7 +46,7 @@ class Mindmap extends React.Component
       data: undefined,
 
       /**
-      * @type { Array }
+      * @type { FamilizedObject }
       */
       familizedData: undefined
     };
@@ -59,7 +77,7 @@ class Mindmap extends React.Component
     });
 
     // REMOVE (test group)
-    // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]}]}').data);
+    // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World fj33j hfh3j jh3jhfj3jhfjh3jhfj3jhf jh3jhfj3jhf jh3jhfj3jhf jh3jhfj3jhf"}]}]}').data);
 
     // REMOVE (test group 2)
     // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]}, {"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello Mars fkkf ekke kfke fke"}]}]}').data);
@@ -68,13 +86,13 @@ class Mindmap extends React.Component
     // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"},{"action":"click"}]}]}').data);
 
     // REMOVE (one group)
-    // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 4","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"}]},{"title":"test search-bar input 5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"click"}]}]}').data);
-    
+    this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 4","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"}]},{"title":"test search-bar input 5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"click"}]}]}').data);
+
     // REMOVE (one group 2)
     // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 4","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"}]},{"title":"test search-bar input 4.5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"},{"action":"click"}]},{"title":"test search-bar input 5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"click"}]}]}').data);
 
     // REMOVE (three group)
-    this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"},{"action":"click"}]},{"title":"test search-bar input 2","steps":[{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 3","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-button"},{"action":"click"}]},{"title":"test search-bar input 4","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"}]},{"title":"test search-bar input 5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"click"}]}]}').data);
+    // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"},{"action":"click"}]},{"title":"test search-bar input 2","steps":[{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 3","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-button"},{"action":"click"}]},{"title":"test search-bar input 4","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"}]},{"title":"test search-bar input 5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"click"}]}]}').data);
   }
 
   /**
@@ -87,7 +105,7 @@ class Mindmap extends React.Component
 
     // saveAs(blob, 'might.gui.json');
   }
-  
+
   /**
   * @param { React.SyntheticEvent } e
   */
@@ -108,7 +126,7 @@ class Mindmap extends React.Component
         fr.readAsText(file, 'utf8');
       });
     }
-    
+
     /**
     * @type { FileList }
     */
@@ -134,17 +152,25 @@ class Mindmap extends React.Component
   */
   loadMap(data)
   {
+    /**
+    * @type { FamilizedObject }
+    */
     const familizedData = {};
 
     // for each test in map
     data.forEach((test, testIndex) =>
     {
+      /**
+      * @type { FamilizedObject }
+      */
       let parent;
 
       // for step in test
       test.steps.forEach((step, stepIndex) =>
       {
         const key = this.serializeStep(step);
+
+        const title = (stepIndex == test.steps.length - 1) ? test.title : undefined;
 
         // if the step is the first in the test
         if (stepIndex === 0)
@@ -153,11 +179,11 @@ class Mindmap extends React.Component
           // to catch repeated steps
           if (familizedData[key] === undefined)
             familizedData[key] = {
+              title,
               testIndex,
               stepIndex,
               ...step
             };
-        
 
           // set this step as the new parent
           // going forward in a path until the last step in the test
@@ -169,9 +195,10 @@ class Mindmap extends React.Component
             parent.children = {};
 
           const obj = parent.children;
-          
+
           if (obj[key] === undefined)
             obj[key] = {
+              title,
               testIndex,
               stepIndex,
               ...step
@@ -190,44 +217,49 @@ class Mindmap extends React.Component
 
   render()
   {
-    const handlePreLines = (children, index, title) =>
+    /**
+    * @param { string[] } children
+    * @param { number } index
+    * @param { string } title
+    * @param { 'mini' | 'full' } mode
+    */
+    const handlePreLines = (children, index, title, mode) =>
     {
       // if parent had no children
       // or if only has one child (then the parent will connect
       // with that child using a post-line only)
       if (!children)
         return <div/>;
-        
-      {/* first child lines are reversed in direction */}
-      return <div className={ (index === 0) ? styles.reverseLines : styles.lines }>
+
+      // first child lines are reversed in direction
+      return <div className={ (index === 0) ? styles.lines : styles.lines }>
 
         {
           // if there's only one child then not show any vertical lines
           (children.length > 1) ?
             // first and last child get half vertical lines
             // all other children get full vertical lines
-            (index > 0 && index < children.length - 1)
-              ?
-              <div className={ styles.vertical }/> :
-              <div className={ styles.halfVertical }/> :
+            <Vertical reverse={ index === 0 } half={ index === 0 || index === children.length - 1 } mode={ mode }/> :
             <div/>
         }
-          
-        <div className={ styles.horizontal }>
-          <div title={ title } className={ styles.title }>{ title }</div>
-        </div>
+
+        <Horizontal mode={ mode } title={ title }/>
 
       </div>;
     };
 
-    const handlePostLines = (children) =>
+    /**
+    * @param { string[] } children
+    * @param { 'mini' | 'full' } mode
+    */
+    const handlePostLines = (children, mode) =>
     {
       // post lines are only drawn to connect to the pre-lines of the next step in the map
       // that means that there need to be pre-lines
       if (!children || children.length <= 1)
         return <div/>;
 
-      return <div className={ styles.horizontal }/>;
+      return <Horizontal mode={ mode }/>;
     };
 
     // using the familized data
@@ -238,8 +270,14 @@ class Mindmap extends React.Component
     // and the user can add new tests where-ever they need them without needing
     // to copy steps from previous tests
 
-    const handleItems = (children, continuation) =>
+    /**
+    * @param { FamilizedObject } children
+    * @param { 'mini' | 'full' } mode
+    * @param { boolean } continuation
+    */
+    const handleItems = (children, mode, continuation) =>
     {
+      // nothing to be rendered
       if (!children)
         return <div/>;
 
@@ -247,52 +285,40 @@ class Mindmap extends React.Component
 
       return <div className={ styles.column }>
         {
-          keys.map((k, index) =>
+          keys.map((step, index) =>
           {
-            const item = children[k];
-
-            let title;
-
-            // this step is the final step in a test
-            const markAsATest = this.state.data[item.testIndex].steps.length - 1 === item.stepIndex;
-
-            if (markAsATest)
-              title = this.state.data[item.testIndex].title;
+            const item = children[step];
 
             return <div key={ index } className={ (continuation) ? styles.row : styles.firstRow }>
 
-              { (continuation) ? handlePreLines(keys, index, title) : undefined }
+              { (continuation) ? handlePreLines(keys, index, item.title, mode) : undefined }
 
-              <div  className={ styles.item }>
-                <div className={ styles.text }>{ k }</div>
-              </div>
+              <Item mode={ mode } step={ step }/>
 
-              { handlePostLines(Object.keys(item.children || {})) }
+              { handlePostLines(Object.keys(item.children || {}), mode) }
 
-              { handleItems(item.children, true) }
+              { handleItems(item.children, mode, true) }
             </div>;
           })
         }
       </div>;
     };
 
-    const a = <div ref={ mindMapRef } className={ styles.wrapper }>
+    return <div ref={ mindMapRef } className={ styles.wrapper }>
 
       <TopBar onFileSave={ this.onFileSave } onFileLoad={ this.onFileLoad }/>
 
       {/* Mini-map */}
       <Minimap mindMapRef={ mindMapRef }>
-        {/* TODO render the items in a mini versions */}
+        { handleItems(this.state.familizedData, 'mini', false) }
       </Minimap>
 
       {/* Full-map */}
       <div className={ styles.container }>
-        { handleItems(this.state.familizedData, false) }
+        { handleItems(this.state.familizedData, 'full', false) }
       </div>
 
     </div>;
-
-    return a;
   }
 }
 
@@ -312,7 +338,7 @@ const styles = createStyle({
 
   container: {
     display: 'flex',
-    
+
     justifyContent: 'center',
     alignItems: 'center',
 
@@ -337,100 +363,11 @@ const styles = createStyle({
     display: 'flex',
     flexDirection: 'column',
 
-    alignItems: 'flex-start',
-
-    '> *': {
-      margin: '4px 0'
-    }
-  },
-
-  item: {
-    display: 'flex',
-    alignItems: 'center',
-
-    minHeight: '26px',
-    maxHeight: '50px',
-    width: '110px',
-    height: 'fit-content',
-
-    overflow: 'hidden',
-    userSelect: 'none',
-
-    margin: 'auto',
-
-    borderRadius: '3px',
-    border: `${colors.accent} 1px solid`
-  },
-
-  text: {
-    maxHeight: '45px',
-    
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-
-    fontSize: '10px',
-    margin: '5px 10px'
+    alignItems: 'flex-start'
   },
 
   lines: {
-    display: 'flex',
-    padding: '15px 0'
-  },
-
-  reverseLines: {
-    extend: 'lines',
-    transform: 'rotateX(180deg)',
-
-    '> div': {
-      transform: 'rotateX(180deg)'
-    }
-  },
-
-  title: {
-    color: colors.accent,
-    fontSize: '11px',
-
-    userSelect: 'none',
-    overflow: 'hidden',
-
-    textAlign: 'center',
-    textOverflow: 'ellipsis',
-
-    minWidth: '60px',
-    maxWidth: '160px',
-    width: 'auto',
-
-    whiteSpace: 'nowrap',
-    margin: '0 0 5px 0'
-  },
-
-  horizontal: {
-    display: 'flex',
-    alignItems: 'flex-end',
-
-    height: 0,
-
-    padding: '0px 30px',
-    margin: 'auto',
-
-    border: `1px ${colors.accent} solid`
-  },
-
-  vertical: {
-    position: 'relative',
-
-    top: 'calc(-5px + -15px)',
-    width: 0,
-    height: 'calc(100% + 8px + 30px)',
-
-    border: `1px ${colors.accent} solid`
-  },
-
-  halfVertical: {
-    extend: 'vertical',
-
-    top: 'calc(-5px + -15px)',
-    height: 'calc(50% + 4px + 15px)'
+    display: 'flex'
   }
 });
 
