@@ -11,11 +11,13 @@ import ContextMenu from './contextMenu.js';
 
 const colors = getTheme();
 
+let clickTimestamp = 0;
+
 /**
 * @param { React.SyntheticEvent } e
 * @param { {} } mindmap
 * @param { 'mini' | 'full' } mode
-* @param {  number } testIndex
+* @param { number } testIndex
 * @param { number } stepIndex
 */
 const rightClick = (e, mindmap, mode, testIndex, stepIndex) =>
@@ -44,15 +46,28 @@ const rightClick = (e, mindmap, mode, testIndex, stepIndex) =>
 * @param { React.SyntheticEvent } e
 * @param { {} } mindmap
 * @param { 'mini' | 'full' } mode
-* @param {  number } testIndex
+* @param { number } testIndex
 * @param { number } stepIndex
 */
 const leftClick = (e, mindmap, mode, testIndex, stepIndex) =>
 {
-  // if (mode !== 'full')
-  //   return;
+  if (mode !== 'full')
+    return;
+  
+  const now = Date.now();
 
-  // TODO double click to open the edit dialogue
+  // NOTE: this a global check
+  // meaning it can be tricked if the user clicks 2 different items
+  // in that small time window.
+  // this can be fixed with some react hooks magic but it's not that big of an issue.
+
+  
+  // double click to open the edit dialogue (350ms window)
+  if ((now - clickTimestamp) <= 350)
+    mindmap.editStep(testIndex, stepIndex);
+
+  // update timestamp
+  clickTimestamp = now;
 };
 
 /**

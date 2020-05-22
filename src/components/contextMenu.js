@@ -29,8 +29,8 @@ const click = (e) =>
 */
 const ContextMenu = ({ x, y, actions }) =>
 {
-  // TODO before passing the x and y
-  // they should be checked against
+  // before passing the x and y
+  // they are checked against
   // the width and height of context menu and
   // the width and height of the viewport
 
