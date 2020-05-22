@@ -36,7 +36,7 @@ const styles = createStyle({
 
     backgroundColor: colors.accent,
 
-    height: '2px',
+    height: '1px',
 
     padding: '0 30px',
     margin: 'auto'

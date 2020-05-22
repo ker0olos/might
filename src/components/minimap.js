@@ -79,7 +79,11 @@ class Minimap extends React.Component
 
   render()
   {
-    return <div className={ styles.wrapper } onClick={ this.onClick }>
+    return <div
+      className={ styles.wrapper }
+      onClick={ this.onClick }
+      { ...this.props }
+    >
       <div className={ styles.container }>
         <MinimapIndicator x={ this.state.x } y={ this.state.y }/>
 

@@ -1,6 +1,7 @@
 /* eslint-disable security/detect-object-injection */
 
 import React from 'react';
+import ReactDOM from 'react-dom';
 
 import { createStyle } from 'flcss';
 
@@ -10,6 +11,8 @@ import getTheme from '../colors.js';
 
 import TopBar from './topBar.js';
 import Minimap from './minimap.js';
+
+import ContextMenu from './contextMenu.js';
 
 import Item from './item.js';
 
@@ -53,6 +56,14 @@ class Mindmap extends React.Component
 
     this.onFileSave = this.onFileSave.bind(this);
     this.onFileLoad = this.onFileLoad.bind(this);
+
+    this.onContextMenu = this.onContextMenu.bind(this);
+
+    this.addStepAt = this.addStepAt.bind(this);
+    this.addNewStep = this.addNewStep.bind(this);
+
+    this.deleteStep = this.deleteStep.bind(this);
+    this.editStep = this.editStep.bind(this);
   }
 
   componentDidMount()
@@ -77,7 +88,7 @@ class Mindmap extends React.Component
     });
 
     // REMOVE (test group)
-    // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World fj33j hfh3j jh3jhfj3jhfjh3jhfj3jhf jh3jhfj3jhf jh3jhfj3jhf jh3jhfj3jhf"}]}]}').data);
+    this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World fj33j hfh3j jh3jhfj3jhfjh3jhfj3jhf jh3jhfj3jhf jh3jhfj3jhf jh3jhfj3jhf"}]}]}').data);
 
     // REMOVE (test group 2)
     // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]}, {"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello Mars fkkf ekke kfke fke"}]}]}').data);
@@ -86,7 +97,7 @@ class Mindmap extends React.Component
     // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"},{"action":"click"}]}]}').data);
 
     // REMOVE (one group)
-    this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 4","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"}]},{"title":"test search-bar input 5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"click"}]}]}').data);
+    // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 4","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"}]},{"title":"test search-bar input 5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"click"}]}]}').data);
 
     // REMOVE (one group 2)
     // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 4","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"}]},{"title":"test search-bar input 4.5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"},{"action":"click"}]},{"title":"test search-bar input 5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"click"}]}]}').data);
@@ -215,6 +226,54 @@ class Mindmap extends React.Component
     });
   }
 
+  /**
+  * @param { React.SyntheticEvent } e
+  */
+  onContextMenu(e)
+  {
+    // prevent the native browser context menu from showing
+    e.preventDefault();
+
+    // mount the context menu
+    ReactDOM.render(<ContextMenu
+      x={ e.nativeEvent.pageX }
+      y={ e.nativeEvent.pageY }
+      actions={ [ { title: 'New', callback: this.addNewStep } ] }
+    />, document.querySelector('#contextMenu'));
+  }
+
+  /**
+  * @param { number } testIndex
+  * @param { number } stepIndex
+  */
+  addStepAt(testIndex, stepIndex)
+  {
+    // TODO
+  }
+
+  addNewStep()
+  {
+    // TODO add new step with stepIndex of "0" and a new testIndex
+  }
+
+  /**
+  * @param { number } testIndex
+  * @param { number } stepIndex
+  */
+  editStep(testIndex, stepIndex)
+  {
+    // TODO
+  }
+
+  /**
+  * @param { number } testIndex
+  * @param { number } stepIndex
+  */
+  deleteStep(testIndex, stepIndex)
+  {
+    // TODO
+  }
+ 
   render()
   {
     /**
@@ -237,6 +296,7 @@ class Mindmap extends React.Component
         {
           // if there's only one child then not show any vertical lines
           (children.length > 1) ?
+            // first line should be rotated upside down (reversed)
             // first and last child get half vertical lines
             // all other children get full vertical lines
             <Vertical reverse={ index === 0 } half={ index === 0 || index === children.length - 1 } mode={ mode }/> :
@@ -289,11 +349,11 @@ class Mindmap extends React.Component
           {
             const item = children[step];
 
-            return <div key={ index } className={ (continuation) ? styles.row : styles.firstRow }>
+            return <div key={ index } className={ styles.row }>
 
               { (continuation) ? handlePreLines(keys, index, item.title, mode) : undefined }
 
-              <Item mode={ mode } step={ step }/>
+              <Item mindmap={ this } mode={ mode } title={ step } testIndex={ item.testIndex } stepIndex={ item.stepIndex }/>
 
               { handlePostLines(Object.keys(item.children || {}), mode) }
 
@@ -309,12 +369,12 @@ class Mindmap extends React.Component
       <TopBar onFileSave={ this.onFileSave } onFileLoad={ this.onFileLoad }/>
 
       {/* Mini-map */}
-      <Minimap mindMapRef={ mindMapRef }>
+      <Minimap mindMapRef={ mindMapRef } onContextMenu={ this.onContextMenu }>
         { handleItems(this.state.familizedData, 'mini', false) }
       </Minimap>
 
       {/* Full-map */}
-      <div className={ styles.container }>
+      <div className={ styles.container } onContextMenu={ this.onContextMenu }>
         { handleItems(this.state.familizedData, 'full', false) }
       </div>
 
@@ -352,11 +412,6 @@ const styles = createStyle({
   row: {
     display: 'flex',
     flexDirection: 'row'
-  },
-
-  firstRow: {
-    extend: 'row',
-    margin: '25px 0 !important'
   },
 
   column: {

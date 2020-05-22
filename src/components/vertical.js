@@ -44,7 +44,7 @@ const styles = createStyle({
     backgroundColor: colors.accent,
 
     top: 0,
-    width: '2px',
+    width: '1px',
     height: '100%'
   },
 
@@ -52,33 +52,30 @@ const styles = createStyle({
     extend: 'container',
 
     top: 0,
-    width: '1px',
     height: '100%'
   },
 
   half: {
     extend: 'container',
-    height: 'calc(50% + 1px)'
+    height: '50%'
   },
 
   miniHalf: {
     extend: 'container',
 
-    width: '1px',
-    height: 'calc(50% + 1px)'
+    height: '50%'
   },
 
   reverse: {
     extend: 'container',
 
-    top: 'calc(50% - 1px)',
-    height: 'calc(50% + 1px)'
+    top: '50%',
+    height: '50%'
   },
 
   miniReverse: {
     extend: 'container',
 
-    width: '1px',
     top: '50%',
     height: '50%'
   }

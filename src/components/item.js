@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 
 import PropTypes from 'prop-types';
 
@@ -6,9 +7,63 @@ import { createStyle } from 'flcss';
 
 import getTheme from '../colors.js';
 
+import ContextMenu from './contextMenu.js';
+
 const colors = getTheme();
 
-const Item = ({ mode, step }) =>
+/**
+* @param { React.SyntheticEvent } e
+* @param { {} } mindmap
+* @param { 'mini' | 'full' } mode
+* @param {  number } testIndex
+* @param { number } stepIndex
+*/
+const rightClick = (e, mindmap, mode, testIndex, stepIndex) =>
+{
+  if (mode !== 'full')
+    return;
+
+  // prevent the native browser context menu and
+  // and the normal mindmap menu from showing
+  e.stopPropagation();
+  e.preventDefault();
+
+  // mount the context menu
+  ReactDOM.render(<ContextMenu
+    x={ e.nativeEvent.pageX }
+    y={ e.nativeEvent.pageY }
+    actions={ [
+      { title: 'New', callback: () => mindmap.addStepAt(testIndex, stepIndex + 1) },
+      { title: 'Edit', callback: () => mindmap.editStep(testIndex, stepIndex) },
+      { title: 'Delete', callback: () => mindmap.deleteStep(testIndex, stepIndex) }
+    ] }
+  />, document.querySelector('#contextMenu'));
+};
+
+/**
+* @param { React.SyntheticEvent } e
+* @param { {} } mindmap
+* @param { 'mini' | 'full' } mode
+* @param {  number } testIndex
+* @param { number } stepIndex
+*/
+const leftClick = (e, mindmap, mode, testIndex, stepIndex) =>
+{
+  // if (mode !== 'full')
+  //   return;
+
+  // TODO double click to open the edit dialogue
+};
+
+/**
+* @param { {
+*   mode: 'mini' | 'full',
+*   title: string
+*   testIndex: number
+*   stepIndex: number
+*  } } param0
+*/
+const Item = ({ mindmap, mode, title, testIndex, stepIndex }) =>
 {
   const s = {
     wrapper: (mode === 'full') ? styles.wrapper : styles.miniWrapper,
@@ -16,16 +71,23 @@ const Item = ({ mode, step }) =>
     text: (mode === 'full') ? styles.text : styles.miniText
   };
 
-  return <div className={ s.wrapper }>
+  return <div
+    className={ s.wrapper }
+    onClick={ (e) => leftClick(e, mindmap, mode, testIndex, stepIndex) }
+    onContextMenu={ (e) => rightClick(e, mindmap, mode, testIndex, stepIndex) }
+  >
     <div className={ s.container }>
-      <div className={ s.text }>{ step }</div>
+      <div className={ s.text }>{ title }</div>
     </div>
   </div>;
 };
 
 Item.propTypes = {
+  mindmap: PropTypes.object.isRequired,
   mode: PropTypes.string.isRequired,
-  step: PropTypes.string
+  title: PropTypes.string.isRequired,
+  testIndex: PropTypes.number.isRequired,
+  stepIndex: PropTypes.number.isRequired
 };
 
 const styles = createStyle({
@@ -92,8 +154,8 @@ const styles = createStyle({
     color: colors.transparent,
     maxHeight: 'unset',
     
-    fontSize: 'calc(10px / 10)',
-    margin: '1px 2px'
+    fontSize: '1px',
+    margin: '1px'
   }
 });
 

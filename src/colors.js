@@ -1,3 +1,16 @@
+/**
+* @param { string } color
+* @param { number } opacity
+*/
+export function opacity(color, opacity)
+{
+  const r = parseInt(color.slice(1, 3), 16);
+  const g = parseInt(color.slice(3, 5), 16);
+  const b = parseInt(color.slice(5, 7), 16);
+
+  return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+}
+
 export default function getTheme()
 {
   const light = {
@@ -6,7 +19,7 @@ export default function getTheme()
 
     blackBackground: '#000000',
     blackText: '#000000',
-    blackShadow: 'rgba(0, 0, 0, 0.25)',
+    blackShadow: opacity('#000000', 0.25),
 
     transparent: 'transparent',
 

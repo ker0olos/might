@@ -7,7 +7,7 @@ import DownloadIcon from 'mdi-react/DownloadOutlineIcon';
 
 import { createStyle } from 'flcss';
 
-import getTheme from '../colors.js';
+import getTheme, { opacity } from '../colors.js';
 
 const colors = getTheme();
 
@@ -49,7 +49,8 @@ const styles = createStyle({
     display: 'flex',
     position: 'absolute',
     
-    backgroundColor: colors.whiteBackground,
+    backgroundColor: opacity(colors.whiteBackground, 0.85),
+    backdropFilter: 'blur(3px)',
 
     top: 0,
     width: 'calc(100vw - 20px)',
@@ -67,6 +68,8 @@ const styles = createStyle({
   },
 
   button: {
+    opacity: 0.85,
+
     display: 'flex',
     alignItems: 'center',
 

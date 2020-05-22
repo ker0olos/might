@@ -1,6 +1,4 @@
 Performance Issues and Bugs:
-  ☐ Further simplify and optimize the mindmap/minimap code @critical
-
   ☐ test duplicated test steps (same test, same title twice in map.json)
     ☐ test with different titles (same test, different titles)
 
