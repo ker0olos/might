@@ -1,32 +1,52 @@
 import React from 'react';
+// import ReactDOM from 'react-dom';
 
-import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
 
 import { createStyle } from 'flcss';
 
 import getTheme, { opacity } from '../colors.js';
 
+import Select from './select.js';
+import Input from './input.js';
+
 const colors = getTheme();
 
-// TODO create 2 different react classes
-// - for a select element (following the UX wireframe)
-// - for a input element (following the UX wireframe)
+// const unmount = () =>
+// {
+//   ReactDOM.unmountComponentAtNode(document.querySelector('#dialogue'));
+// };
 
 const Dialogue = () =>
 {
-  //
+  // FIX incompatible with <Select/> focus logic
+  // unmount the dialogue (cancel) by pressing escape key
+  // useEffect(() =>
+  // {
+  //   window.addEventListener('keydown', (e) =>
+  //   {
+  //     if (e.key === 'Escape')
+  //       unmount();
+  //   });
+  // }, []);
+
+  const onChange = (newValue) =>
+  {
+    // TODO apply changes
+    console.log(newValue);
+  };
 
   return <div className={ styles.wrapper }>
     <div className={ styles.container }>
       <div className={ styles.title }>Action:</div>
 
       <div className={ styles.options }>
-
+        <Select defaultIndex={ 0 } options={ [ 'Option 1', 'Option 2', 'Option 3' ] } onChange={ onChange }/>
+        <Input/>
       </div>
 
       <div className={ styles.buttons }>
         <div className={ styles.button }>Apply</div>
-        <div className={ styles.button }>Cancel</div>
       </div>
     </div>
   </div>;
@@ -74,13 +94,17 @@ const styles = createStyle({
 
   title: {
     userSelect: 'none',
-    margin: '25px 15px'
+    margin: '25px 15px 10px 15px'
   },
 
   options: {
-    flexGrow: 1
-  },
+    flexGrow: 1,
 
+    '> div': {
+      margin: '15px'
+    }
+  },
+  
   buttons: {
     display: 'flex',
     userSelect: 'none'

@@ -13,11 +13,13 @@
   },
   "plugins": [
     "react",
+    "react-hooks",
     "security"
   ],
   "extends": [
     "eslint:recommended",
     "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
     "plugin:security/recommended"
   ],
   "parser": "babel-eslint",

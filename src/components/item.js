@@ -61,7 +61,6 @@ const leftClick = (e, mindmap, mode, testIndex, stepIndex) =>
   // in that small time window.
   // this can be fixed with some react hooks magic but it's not that big of an issue.
 
-  
   // double click to open the edit dialogue (350ms window)
   if ((now - clickTimestamp) <= 350)
     mindmap.editStep(testIndex, stepIndex);
