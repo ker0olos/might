@@ -11,7 +11,11 @@ import getTheme, { opacity } from '../colors.js';
 const colors = getTheme();
 
 /**
-* @param { { options: Array<string> } } param0
+* @param { {
+*    defaultIndex: number,
+*    options: Array<string>,
+*    onChange: (newValue: string) => void
+*  } } param0
 */
 const Select = ({ defaultIndex, options, onChange }) =>
 {
@@ -26,7 +30,7 @@ const Select = ({ defaultIndex, options, onChange }) =>
     setShown(true);
   };
 
-  const update = (opt) =>
+  const change = (opt) =>
   {
     setShown(false);
     setValue(opt);
@@ -47,7 +51,7 @@ const Select = ({ defaultIndex, options, onChange }) =>
       {
         options.map((opt, i) =>
         {
-          return <div key={ i } className={ styles.option } onClick={ ()  => update(opt) }>
+          return <div key={ i } className={ styles.option } onClick={ ()  => change(opt) }>
             { opt }
           </div>;
         })
@@ -131,9 +135,10 @@ const styles = createStyle({
     backgroundColor: colors.whiteBackground,
 
     top: '50px',
+    left: '-5px',
 
     minHeight: '40px',
-    width: '100%',
+    width: 'calc(100% + 10px)',
     height: 'fit-content',
 
     overflow: 'hidden',

@@ -21,10 +21,10 @@ export default function getTheme()
     blackText: '#000000',
     blackShadow: opacity('#000000', 0.25),
 
-    transparent: 'transparent',
-
     accent: '#888888',
-    miniMapBorder: 'red'
+
+    transparent: 'transparent',
+    red: '#b82302'
   };
 
   return light;

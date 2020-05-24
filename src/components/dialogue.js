@@ -30,9 +30,13 @@ const Dialogue = () =>
   //   });
   // }, []);
 
-  const onChange = (newValue) =>
+  const onSelect = (newValue) =>
   {
-    // TODO apply changes
+    console.log(newValue);
+  };
+
+  const onInput = (newValue) =>
+  {
     console.log(newValue);
   };
 
@@ -41,8 +45,8 @@ const Dialogue = () =>
       <div className={ styles.title }>Action:</div>
 
       <div className={ styles.options }>
-        <Select defaultIndex={ 0 } options={ [ 'Option 1', 'Option 2', 'Option 3' ] } onChange={ onChange }/>
-        <Input/>
+        <Select defaultIndex={ 0 } options={ [ 'Option 1', 'Option 2', 'Option 3' ] } onChange={ onSelect }/>
+        <Input defaultValue={ 5 } suffix={ 's' } type={ 'number' } onChange={ onInput }/>
       </div>
 
       <div className={ styles.buttons }>
