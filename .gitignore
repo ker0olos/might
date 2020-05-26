@@ -1,4 +1,7 @@
 **/node_modules
 
+__might__
+
+might.*
+
 **/bundle.js
-**/bundle.js.*
