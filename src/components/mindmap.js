@@ -19,14 +19,15 @@ import Item from './item.js';
 import Horizontal from './horizontal.js';
 import Vertical from './vertical.js';
 
+import Dialogue from './dialogue.js';
+
 const colors = getTheme();
 
 const mindMapRef = React.createRef();
 
 /**
 * @typedef { Object } FamilizedItem
-* @property { number } testIndex
-* @property { number } stepIndex
+* @property { { testIndex: number, stepIndex: number }[] } occurrences
 * @property { string } action
 * @property { string } value
 * @property { FamilizedObject } children
@@ -59,7 +60,7 @@ class Mindmap extends React.Component
 
     this.onContextMenu = this.onContextMenu.bind(this);
 
-    this.addStepAt = this.addStepAt.bind(this);
+    this.addStepAfter = this.addStepAfter.bind(this);
     this.addNewStep = this.addNewStep.bind(this);
 
     this.deleteStep = this.deleteStep.bind(this);
@@ -181,20 +182,43 @@ class Mindmap extends React.Component
       {
         const key = this.serializeStep(step);
 
-        const title = (stepIndex == test.steps.length - 1) ? test.title : undefined;
+        // if this step is the last in a full test
+        // it should be have the test's title to mark the path of the test
+
+        // title should not be an issue
+        // on duplicated steps
+
+        // TODO handle identical tests (duplicates)
+        // there never should be a step that needs two different titles
+        // that would mean that there are 2 completely identical tests
+        // and we can filter them out and only leave the first one
+
+        const title = (stepIndex === test.steps.length - 1) ? test.title : undefined;
 
         // if the step is the first in the test
         if (stepIndex === 0)
         {
           // we use the serialized step string as an identifier
-          // to catch repeated steps
+          // to catch duplicated steps
+
+          // if step is not a duplicate
+          // create a new entry for it
+
+          // however if a step is a duplicate
+          // we should push new occurrence to the array
+
           if (familizedData[key] === undefined)
+          {
             familizedData[key] = {
               title,
-              testIndex,
-              stepIndex,
+              occurrences: [ { testIndex, stepIndex } ],
               ...step
             };
+          }
+          else
+          {
+            familizedData[key].occurrences.push({ testIndex, stepIndex });
+          }
 
           // set this step as the new parent
           // going forward in a path until the last step in the test
@@ -208,12 +232,17 @@ class Mindmap extends React.Component
           const obj = parent.children;
 
           if (obj[key] === undefined)
+          {
             obj[key] = {
               title,
-              testIndex,
-              stepIndex,
+              occurrences: [ { testIndex, stepIndex } ],
               ...step
             };
+          }
+          else
+          {
+            obj[key].occurrences.push({ testIndex, stepIndex });
+          }
 
           parent = obj[key];
         }
@@ -238,40 +267,184 @@ class Mindmap extends React.Component
     ReactDOM.render(<ContextMenu
       x={ e.nativeEvent.pageX }
       y={ e.nativeEvent.pageY }
-      actions={ [ { title: 'New', callback: this.addNewStep } ] }
+      actions={ [ { title: 'Add New Step', callback: this.addNewStep } ] }
     />, document.querySelector('#contextMenu'));
   }
 
   /**
-  * @param { number } testIndex
-  * @param { number } stepIndex
+  * @param { { testIndex: number, stepIndex: number }[] } occurrences
+  * @param { 'new' | 'insert' } mode
   */
-  addStepAt(testIndex, stepIndex)
+  addStepAfter(occurrences, mode)
   {
-    // TODO
+    const data = this.state.data;
+
+    const step = { action: 'type', value: 'New Step' };
+    
+    // emits when the step edit dialogue is done
+    const done = (action, value) =>
+    {
+      if (action !== undefined)
+        step.action = action;
+
+      if (value !== undefined)
+        step.value = value;
+        
+      if (mode === 'new')
+      {
+        // TODO test if this happens and if true then handle it
+        if (occurrences.length > 1)
+          throw new Error('unhandled duplication issue');
+
+        // copy test
+        const test = { ...data[occurrences[0].testIndex] };
+
+        // set a new empty title for the test
+        test.title = 'New Untitled Test';
+
+        // slice the steps to removed unneeded steps
+        test.steps = test.steps.slice(0, occurrences[0].stepIndex + 1);
+
+        // push new step
+        test.steps.push(step);
+
+        // push new test
+        data.push(test);
+      }
+      else
+      {
+        // insert in every occurrence
+        occurrences.forEach((occurrence) =>
+        {
+          // get test
+          const test = data[occurrence.testIndex];
+
+          // split the steps from current stepIndex
+          const steps1 = test.steps.slice(0, occurrence.stepIndex + 1);
+          const steps2 = test.steps.slice(occurrence.stepIndex + 1);
+
+          // push new step in between
+
+          steps1.push(step);
+
+          test.steps = steps1.concat(steps2);
+        });
+      }
+
+      // re-create the mindmap with the new data
+      this.loadMap(data);
+    };
+
+    // open dialog to edit the new step
+    ReactDOM.render(<Dialogue type={ 'edit-step' } step={ step } done={ done }/>, document.querySelector('#dialogue'));
   }
 
   addNewStep()
   {
-    // TODO add new step with stepIndex of "0" and a new testIndex
+    const data = this.state.data;
+
+    const step = { action: 'type', value: 'New Step' };
+
+    // emits when the step edit dialogue is done
+    const done = (action, value) =>
+    {
+      if (action !== undefined)
+        step.action = action;
+
+      if (value !== undefined)
+        step.value = value;
+
+      const test = {
+        title: 'New Untitled Test',
+        steps: [
+          step
+        ]
+      };
+
+      // push new test
+      data.push(test);
+
+      // re-create the mindmap with the new data
+      this.loadMap(data);
+    };
+
+    ReactDOM.render(<Dialogue type={ 'edit-step' } step={ step } done={ done }/>, document.querySelector('#dialogue'));
   }
 
   /**
-  * @param { number } testIndex
-  * @param { number } stepIndex
+  * @param { { testIndex: number, stepIndex: number }[] } occurrences
   */
-  editStep(testIndex, stepIndex)
+  editStep(occurrences)
   {
-    // TODO
+    // TODO there should be a visual feedback that the changes were applied
+
+    const data = this.state.data;
+
+    const done = (action, value) =>
+    {
+      // edit each occurrence of the required step
+      occurrences.forEach((occurrence) =>
+      {
+        const step = data[occurrence.testIndex].steps[occurrence.stepIndex];
+
+        if (action !== undefined)
+          step.action = action;
+
+        if (value !== undefined)
+          step.value = value;
+      });
+
+      // re-create the mindmap with the new data
+      this.loadMap(data);
+    };
+
+    const occurrence = occurrences[0];
+
+    const step = data[occurrence.testIndex].steps[occurrence.stepIndex];
+
+    ReactDOM.render(<Dialogue type={ 'edit-step' } step={ step } done={ done }/>, document.querySelector('#dialogue'));
   }
 
   /**
-  * @param { number } testIndex
-  * @param { number } stepIndex
+  * @param { { testIndex: number, stepIndex: number }[] } occurrences
+  * @param { 'this' | 'branch' } mode
   */
-  deleteStep(testIndex, stepIndex)
+  deleteStep(occurrences, mode)
   {
-    // TODO
+    const data = this.state.data;
+
+    const done = () =>
+    {
+      // removes each occurrence of the required step
+      occurrences.forEach((occurrence) =>
+      {
+        /**
+        * @type { Array }
+        */
+        const steps = data[occurrence.testIndex].steps;
+
+        // there's two ways to delete items
+        
+        // delete the item and any other items branched from it
+        if (mode === 'branch')
+        {
+          // delete the step and all of its children
+          steps.splice(occurrence.stepIndex);
+        }
+        // delete just the item and leave its children in place
+        else
+        {
+          // delete just the step it self
+          // leaving its children as is
+          steps.splice(occurrence.stepIndex, 1);
+        }
+      });
+
+      // re-create the mindmap with the new data
+      this.loadMap(data);
+    };
+
+    ReactDOM.render(<Dialogue type={ 'delete-step' } done={ done }/>, document.querySelector('#dialogue'));
   }
  
   render()
@@ -353,7 +526,7 @@ class Mindmap extends React.Component
 
               { (continuation) ? handlePreLines(keys, index, item.title, mode) : undefined }
 
-              <Item mindmap={ this } mode={ mode } title={ step } testIndex={ item.testIndex } stepIndex={ item.stepIndex }/>
+              <Item mindmap={ this } mode={ mode } title={ step } occurrences={ item.occurrences }/>
 
               { handlePostLines(Object.keys(item.children || {}), mode) }
 

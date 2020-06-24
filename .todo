@@ -5,10 +5,14 @@ Performance Issues and Bugs:
   ☐ some items can exceed map size
 
 UI/UX:
+  ☐ undo button
+  ☐ redo button
+
   Management:
-    ☐ adding new test steps
-    ☐ deleting test steps
-    ☐ editing test steps
+    ✔ deleting test steps @done(20-06-24 23:09)
+      ☐ hovering over an action should highlight which items are going to be deleted
+
+    ☐ edit test titles
 
   ☐ searching for tests using their titles for actions @low
     - scrolls to the first result but highlight all results in both maps

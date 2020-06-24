@@ -93,7 +93,7 @@ const styles = createStyle({
     height: 'calc(100vh / 10)',
 
     border: '1px solid',
-    borderColor: colors.miniMapBorder
+    borderColor: colors.red
   }
 });
 

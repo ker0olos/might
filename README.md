@@ -11,7 +11,7 @@ End-to-end testing can get very complicated and can be overwhelming; especially 
 
 A no-code (almost zero-config) method to perform end-to-end tests, handling most of the mess in the background.
 
-Might GUI is an easy way to create and handle tests, it was designed to actually make the whole process easier and more enjoyable.
+Might is an easy way to create and handle tests, it was designed to actually make the whole process easier and more enjoyable.
 
 ## Installation
 
@@ -26,5 +26,5 @@ Coming Soon
 
 #### Different Usage:
 
-- [might-cli](https://github.com/ItsKerolos/might-cli) if you need to run your tests without opening the GUI or you need to run your them inside a CD pipeline.
+- [might-cli](https://github.com/ItsKerolos/might-cli) if you need to run your tests without the GUI or you need to run your them inside a CD pipeline.
 - [might-core](https://github.com/ItsKerolos/might-core) if you need to run tests programmatically or build a different tool.

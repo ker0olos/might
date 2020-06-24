@@ -45,7 +45,7 @@ const Select = ({ defaultIndex, options, onChange }) =>
 
     <ArrowDownIcon className={ styles.icon }/>
 
-    <div shown={ shown.toString() } className={ styles.wrapper }/>
+    <div shown={ shown.toString() } className={ styles.wrapper } onClick={ () => setShown(false) }/>
 
     <div shown={ shown.toString() } className={ styles.menu }>
       {
@@ -97,6 +97,7 @@ const styles = createStyle({
 
   label: {
     flexGrow: 1,
+    textTransform: 'capitalize',
 
     fontSize: '14px',
     margin: 'auto 10px'
@@ -154,6 +155,8 @@ const styles = createStyle({
   option: {
     color: colors.blackText,
     backgroundColor: colors.whiteBackground,
+
+    textTransform: 'capitalize',
 
     padding: '15px',
 

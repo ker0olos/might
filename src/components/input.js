@@ -11,13 +11,11 @@ const colors = getTheme();
 /**
 * @param { {
 *    defaultValue: string,
-*    placeholder: string,
 *    suffix: string,
-*    type: 'text' | 'number',
 *    onChange: (newValue: string) => string
 *  } } param0
 */
-const Input = ({ defaultValue, placeholder, suffix, type, onChange }) =>
+const Input = ({ defaultValue, suffix, onChange }) =>
 {
   const change = (e) =>
   {
@@ -26,16 +24,14 @@ const Input = ({ defaultValue, placeholder, suffix, type, onChange }) =>
   };
 
   return <div className={ styles.container }>
-    <input className={ styles.input } spellCheck={ false } placeholder={ placeholder } defaultValue={ defaultValue } type={ type || 'text' } onInput={ change }/>
+    <input className={ styles.input } spellCheck={ false } defaultValue={ defaultValue } type={ 'text' }  onInput={ change }/>
     <div className={ styles.suffix }>{ suffix }</div>
   </div>;
 };
 
 Input.propTypes = {
   defaultValue: PropTypes.any,
-  placeholder: PropTypes.string,
   suffix: PropTypes.string,
-  type: PropTypes.string,
   onChange: PropTypes.func
 };
 
@@ -63,10 +59,6 @@ const styles = createStyle({
 
     ':invalid': {
       borderBottom: `${colors.red} 2px solid`
-    },
-
-    '::placeholder': {
-      color: colors.accent
     },
 
     ':focus': {

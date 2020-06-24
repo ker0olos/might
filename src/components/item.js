@@ -17,10 +17,9 @@ let clickTimestamp = 0;
 * @param { React.SyntheticEvent } e
 * @param { {} } mindmap
 * @param { 'mini' | 'full' } mode
-* @param { number } testIndex
-* @param { number } stepIndex
+* @param { [] } occurrences
 */
-const rightClick = (e, mindmap, mode, testIndex, stepIndex) =>
+const rightClick = (e, mindmap, mode, occurrences) =>
 {
   if (mode !== 'full')
     return;
@@ -35,9 +34,15 @@ const rightClick = (e, mindmap, mode, testIndex, stepIndex) =>
     x={ e.nativeEvent.pageX }
     y={ e.nativeEvent.pageY }
     actions={ [
-      { title: 'New', callback: () => mindmap.addStepAt(testIndex, stepIndex + 1) },
-      { title: 'Edit', callback: () => mindmap.editStep(testIndex, stepIndex) },
-      { title: 'Delete', callback: () => mindmap.deleteStep(testIndex, stepIndex) }
+      { title: 'Edit', callback: () => mindmap.editStep(occurrences) },
+      { title: 'Add', actions: [
+        { title: 'New', callback: () => mindmap.addStepAfter(occurrences, 'new') },
+        { title: 'Insert', callback: () => mindmap.addStepAfter(occurrences, 'insert') }
+      ] },
+      { title: 'Remove', actions: [
+        { title: 'This Step', callback: () => mindmap.deleteStep(occurrences, 'this') },
+        { title: 'Entire Branch', callback: () => mindmap.deleteStep(occurrences, 'branch') }
+      ] }
     ] }
   />, document.querySelector('#contextMenu'));
 };
@@ -46,10 +51,9 @@ const rightClick = (e, mindmap, mode, testIndex, stepIndex) =>
 * @param { React.SyntheticEvent } e
 * @param { {} } mindmap
 * @param { 'mini' | 'full' } mode
-* @param { number } testIndex
-* @param { number } stepIndex
+* @param { [] } occurrences
 */
-const leftClick = (e, mindmap, mode, testIndex, stepIndex) =>
+const leftClick = (e, mindmap, mode, occurrences) =>
 {
   if (mode !== 'full')
     return;
@@ -63,7 +67,7 @@ const leftClick = (e, mindmap, mode, testIndex, stepIndex) =>
 
   // double click to open the edit dialogue (350ms window)
   if ((now - clickTimestamp) <= 350)
-    mindmap.editStep(testIndex, stepIndex);
+    mindmap.editStep(occurrences);
 
   // update timestamp
   clickTimestamp = now;
@@ -72,12 +76,13 @@ const leftClick = (e, mindmap, mode, testIndex, stepIndex) =>
 /**
 * @param { {
 *   mode: 'mini' | 'full',
-*   title: string
-*   testIndex: number
+*   title: string,
+*   occurrences: [],
+*   testIndex: number,
 *   stepIndex: number
 *  } } param0
 */
-const Item = ({ mindmap, mode, title, testIndex, stepIndex }) =>
+const Item = ({ mindmap, mode, title, occurrences }) =>
 {
   const s = {
     wrapper: (mode === 'full') ? styles.wrapper : styles.miniWrapper,
@@ -87,8 +92,8 @@ const Item = ({ mindmap, mode, title, testIndex, stepIndex }) =>
 
   return <div
     className={ s.wrapper }
-    onClick={ (e) => leftClick(e, mindmap, mode, testIndex, stepIndex) }
-    onContextMenu={ (e) => rightClick(e, mindmap, mode, testIndex, stepIndex) }
+    onClick={ (e) => leftClick(e, mindmap, mode, occurrences) }
+    onContextMenu={ (e) => rightClick(e, mindmap, mode, occurrences) }
   >
     <div className={ s.container }>
       <div className={ s.text }>{ title }</div>
@@ -100,8 +105,7 @@ Item.propTypes = {
   mindmap: PropTypes.object.isRequired,
   mode: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
-  testIndex: PropTypes.number.isRequired,
-  stepIndex: PropTypes.number.isRequired
+  occurrences: PropTypes.array.isRequired
 };
 
 const styles = createStyle({

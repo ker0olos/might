@@ -24,7 +24,7 @@ const click = (e) =>
 * @param { {
 *    x: number,
 *    y: number,
-*    actions: { title: string, callback: () => void }[]
+*    actions: { title: string, actions: { title: string, callback: () => void }[]], callback: () => void }[]
 *  } } param0
 */
 const ContextMenu = ({ x, y, actions }) =>
@@ -45,10 +45,42 @@ const ContextMenu = ({ x, y, actions }) =>
     margin: 10,
     // a fixed size
     width: 185,
-    // menu height is the sum of all actions height
-    // added to the menu's padding
-    height: 30 + (actions.length * (22 + 20))
+    // the base height padding of the menu
+    height: 30
   };
+
+  // calculate menu height
+  actions.forEach((action) =>
+  {
+    // menu height is the sum of all actions height
+
+    let height = 0;
+
+    if (action.actions)
+    {
+      // title height
+      height = 10;
+
+      // title padding
+      height = height + 10;
+
+      // actions height
+      height = height + (22 * action.actions.length);
+
+      // actions padding
+      height = height + (20 * action.actions.length);
+    }
+    else
+    {
+      // action height
+      height = 22;
+
+      // action padding
+      height = height + 20;
+    }
+
+    menu.height = menu.height + height;
+  });
 
   // if the context menu is proven to overflow
   // then it should snap to the corners of the viewport
@@ -68,9 +100,29 @@ const ContextMenu = ({ x, y, actions }) =>
       {
         actions.map((action, i) =>
         {
-          return <div key={ i } className={ styles.action } onClick={ action.callback }>
-            { action.title }
-          </div>;
+          if (action.actions)
+          {
+            return <div key={ i }>
+              <div className={ styles.title }>{ action.title }</div>
+
+              <div className={ styles.submenu }>
+                {
+                  action.actions.map((action, i) =>
+                  {
+                    return <div key={ i } className={ styles.action } onClick={ action.callback }>
+                      { action.title }
+                    </div>;
+                  })
+                }
+              </div>
+            </div>;
+          }
+          else
+          {
+            return <div key={ i } className={ styles.action } onClick={ action.callback }>
+              { action.title }
+            </div>;
+          }
         })
       }
     </div>
@@ -107,6 +159,29 @@ const styles = createStyle({
     
     boxShadow: `${colors.blackShadow} 0px 0px 9px 3px`,
     padding: '15px 0'
+  },
+
+  title: {
+    userSelect: 'none',
+
+    textTransform: 'uppercase',
+
+    color: colors.accent,
+    backgroundColor: colors.whiteBackground,
+
+    height: '10px',
+
+    fontSize: '8px',
+    padding: '5px 10px'
+  },
+
+  submenu: {
+    display: 'flex',
+    flexWrap: 'wrap',
+
+    '> div': {
+      flexBasis: '100%'
+    }
   },
 
   action: {

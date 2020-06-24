@@ -1,7 +1,7 @@
-import React from 'react';
-// import ReactDOM from 'react-dom';
+import React, { useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 
-// import PropTypes from 'prop-types';
+import PropTypes from 'prop-types';
 
 import { createStyle } from 'flcss';
 
@@ -12,52 +12,105 @@ import Input from './input.js';
 
 const colors = getTheme();
 
-// const unmount = () =>
-// {
-//   ReactDOM.unmountComponentAtNode(document.querySelector('#dialogue'));
-// };
+const unmount = () => ReactDOM.unmountComponentAtNode(document.querySelector('#dialogue'));
 
-const Dialogue = () =>
+/**
+* @param { 'edit-step' | 'delete-step' } type
+* @param { { action: string, value: string } } step
+* @param { () => void } done
+*/
+const Dialogue = ({ type, step, done }) =>
 {
-  // FIX incompatible with <Select/> focus logic
+  const actions = [ 'wait', 'select', 'click', 'type' ];
+  
+  const [ action, setAction ] = useState();
+  const [ value, setValue ] = useState();
+
   // unmount the dialogue (cancel) by pressing escape key
-  // useEffect(() =>
-  // {
-  //   window.addEventListener('keydown', (e) =>
-  //   {
-  //     if (e.key === 'Escape')
-  //       unmount();
-  //   });
-  // }, []);
-
-  const onSelect = (newValue) =>
+  useEffect(() =>
   {
-    console.log(newValue);
+    window.addEventListener('keydown', (e) =>
+    {
+      if (e.key === 'Escape')
+        unmount();
+    });
+  }, []);
+
+  // Callbacks
+
+  const _done = (...args) =>
+  {
+    if (done)
+      done.call(undefined, ...args);
+    
+    unmount();
   };
 
-  const onInput = (newValue) =>
-  {
-    console.log(newValue);
-  };
+  // Types of Dialogue
 
-  return <div className={ styles.wrapper }>
-    <div className={ styles.container }>
+  const Edit = () =>
+  {
+    let defaultAction = 0;
+    let defaultValue = '';
+
+    let suffix = (action === 'wait') ? 's' : undefined;
+  
+    if (step)
+    {
+      defaultAction = actions.indexOf(step.action);
+      defaultValue = step.value;
+
+      if (!action && defaultAction === 0)
+        suffix = 's';
+    }
+
+    const onSelect = (action) => setAction(action);
+
+    const onInput = (value) =>
+    {
+      // TODO validate the value based on the action
+      // like if wait action had characters that weren't number in its value
+      setValue(value);
+    };
+
+    return <div className={ styles.container }>
       <div className={ styles.title }>Action:</div>
-
+    
       <div className={ styles.options }>
-        <Select defaultIndex={ 0 } options={ [ 'Option 1', 'Option 2', 'Option 3' ] } onChange={ onSelect }/>
-        <Input defaultValue={ 5 } suffix={ 's' } type={ 'number' } onChange={ onInput }/>
+        <Select defaultIndex={ defaultAction } options={ actions } onChange={ onSelect }/>
+        <Input defaultValue={ defaultValue } suffix={ suffix } onChange={ onInput }/>
       </div>
 
       <div className={ styles.buttons }>
-        <div className={ styles.button }>Apply</div>
+        <div className={ styles.button } onClick={ () => _done(action, value) }>Apply</div>
+        <div className={ styles.button } onClick={ unmount }>Cancel</div>
       </div>
-    </div>
+    </div>;
+  };
+
+  const Delete = () =>
+  {
+    return <div className={ styles.container }>
+      <div className={ styles.description }>Are you sure you want to delete this step?</div>
+
+      <div className={ styles.buttons }>
+        <div className={ styles.button } onClick={ _done }>Confirm</div>
+        <div className={ styles.button } onClick={ unmount }>Cancel</div>
+      </div>
+    </div>;
+  };
+
+  const Element = (type === 'edit-step') ? Edit : Delete;
+  
+  return <div className={ styles.wrapper }>
+    { Element() }
   </div>;
 };
 
 Dialogue.propTypes = {
-  //
+  type: PropTypes.string.isRequired,
+  step: PropTypes.object,
+  done: PropTypes.func
 };
 
 const styles = createStyle({
@@ -90,7 +143,6 @@ const styles = createStyle({
     backgroundColor: colors.whiteBackground,
 
     width: '350px',
-    height: '450px',
     
     overflow: 'hidden',
     borderRadius: '5px'
@@ -101,8 +153,16 @@ const styles = createStyle({
     margin: '25px 15px 10px 15px'
   },
 
+  description: {
+    fontSize: '14px',
+
+    userSelect: 'none',
+    margin: '25px 15px 20px 15px'
+  },
+
   options: {
     flexGrow: 1,
+    minHeight: '360px',
 
     '> div': {
       margin: '15px'
