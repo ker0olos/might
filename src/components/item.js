@@ -60,7 +60,7 @@ const leftClick = (e, mindmap, mode, occurrences) =>
   
   const now = Date.now();
 
-  // NOTE: this a global check
+  // this a global check
   // meaning it can be tricked if the user clicks 2 different items
   // in that small time window.
   // this can be fixed with some react hooks magic but it's not that big of an issue.
@@ -96,7 +96,7 @@ const Item = ({ mindmap, mode, title, occurrences }) =>
     onContextMenu={ (e) => rightClick(e, mindmap, mode, occurrences) }
   >
     <div className={ s.container }>
-      <div className={ s.text }>{ title }</div>
+      <div title={ title } className={ s.text }>{ title }</div>
     </div>
   </div>;
 };

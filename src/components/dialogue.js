@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 
-import PropTypes from 'prop-types';
+import PropTypes, { string } from 'prop-types';
 
 import { createStyle } from 'flcss';
 
@@ -15,11 +15,12 @@ const colors = getTheme();
 const unmount = () => ReactDOM.unmountComponentAtNode(document.querySelector('#dialogue'));
 
 /**
-* @param { 'edit-step' | 'delete-step' } type
+* @param { 'edit-title' | 'edit-step' | 'delete-step' } type
+* @param { string } title
 * @param { { action: string, value: string } } step
 * @param { () => void } done
 */
-const Dialogue = ({ type, step, done }) =>
+const Dialogue = ({ type, title, step, done }) =>
 {
   const actions = [ 'wait', 'select', 'click', 'type' ];
   
@@ -48,7 +49,30 @@ const Dialogue = ({ type, step, done }) =>
 
   // Types of Dialogue
 
-  const Edit = () =>
+  const Title = () =>
+  {
+    let defaultTitle = '';
+
+    if (title)
+      defaultTitle = title;
+
+    const onInput = (value) => setValue(value);
+
+    return <div className={ styles.container }>
+      <div className={ styles.title }>Title:</div>
+    
+      <div className={ styles.options }>
+        <Input defaultValue={ defaultTitle } onChange={ onInput }/>
+      </div>
+
+      <div className={ styles.buttons }>
+        <div className={ styles.button } onClick={ () => _done(action, value) }>Apply</div>
+        <div className={ styles.button } onClick={ unmount }>Cancel</div>
+      </div>
+    </div>;
+  };
+
+  const Step = () =>
   {
     let defaultAction = 0;
     let defaultValue = '';
@@ -100,7 +124,14 @@ const Dialogue = ({ type, step, done }) =>
     </div>;
   };
 
-  const Element = (type === 'edit-step') ? Edit : Delete;
+  let Element;
+  
+  if (type === 'edit-title')
+    Element = Title;
+  else if (type === 'edit-step')
+    Element = Step;
+  else
+    Element = Delete;
   
   return <div className={ styles.wrapper }>
     { Element() }
@@ -109,6 +140,7 @@ const Dialogue = ({ type, step, done }) =>
 
 Dialogue.propTypes = {
   type: PropTypes.string.isRequired,
+  title: PropTypes.string,
   step: PropTypes.object,
   done: PropTypes.func
 };

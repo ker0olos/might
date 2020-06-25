@@ -28,6 +28,7 @@ const mindMapRef = React.createRef();
 /**
 * @typedef { Object } FamilizedItem
 * @property { { testIndex: number, stepIndex: number }[] } occurrences
+* @property { string } title
 * @property { string } action
 * @property { string } value
 * @property { FamilizedObject } children
@@ -45,7 +46,7 @@ class Mindmap extends React.Component
 
     this.state = {
       /**
-      * @type { Array }
+      * @type { { title: string, steps: { action: string, value: string }[] }[] }
       */
       data: undefined,
 
@@ -193,6 +194,9 @@ class Mindmap extends React.Component
         // that would mean that there are 2 completely identical tests
         // and we can filter them out and only leave the first one
 
+        // title are given to items that are the last in their branches only
+        // (for UI reasons)
+        // this is easier than doing a check on rendering
         const title = (stepIndex === test.steps.length - 1) ? test.title : undefined;
 
         // if the step is the first in the test
@@ -292,7 +296,8 @@ class Mindmap extends React.Component
         
       if (mode === 'new')
       {
-        // TODO test if this happens and if true then handle it
+        // FIX handle it
+        // to recreate error click add on any item that has more than 1 child
         if (occurrences.length > 1)
           throw new Error('unhandled duplication issue');
 
@@ -406,6 +411,26 @@ class Mindmap extends React.Component
   }
 
   /**
+  * @param { number } testIndex
+  */
+  editTitle(testIndex)
+  {
+    const data = this.state.data;
+
+    const done = (action, value) =>
+    {
+      if (typeof value === 'string' && value.length > 0)
+        data[testIndex].title = value;
+
+      // re-create the mindmap with the new data
+      this.loadMap(data);
+    };
+    
+    // open a dialogue that edits just the title
+    ReactDOM.render(<Dialogue type={ 'edit-title' } title={ data[testIndex].title } done={ done }/>, document.querySelector('#dialogue'));
+  }
+
+  /**
   * @param { { testIndex: number, stepIndex: number }[] } occurrences
   * @param { 'this' | 'branch' } mode
   */
@@ -452,10 +477,10 @@ class Mindmap extends React.Component
     /**
     * @param { string[] } children
     * @param { number } index
-    * @param { string } title
+    * @param { FamilizedItem } item
     * @param { 'mini' | 'full' } mode
     */
-    const handlePreLines = (children, index, title, mode) =>
+    const handlePreLines = (children, index, item, mode) =>
     {
       // if parent had no children
       // or if only has one child (then the parent will connect
@@ -476,7 +501,7 @@ class Mindmap extends React.Component
             <div/>
         }
 
-        <Horizontal mode={ mode } title={ title }/>
+        <Horizontal mode={ mode } title={ item.title } onClick={ () => this.editTitle(item.occurrences[0].testIndex) }/>
 
       </div>;
     };
@@ -524,7 +549,10 @@ class Mindmap extends React.Component
 
             return <div key={ index } className={ styles.row }>
 
-              { (continuation) ? handlePreLines(keys, index, item.title, mode) : undefined }
+              {/* no continuation means that the item is the first in the branch and
+                  does not need any pre-lines
+              */}
+              { (continuation) ? handlePreLines(keys, index, item, mode) : undefined }
 
               <Item mindmap={ this } mode={ mode } title={ step } occurrences={ item.occurrences }/>
 

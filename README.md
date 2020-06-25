@@ -1,5 +1,5 @@
-<!-- ![npm (tag)](https://img.shields.io/npm/v/might-gui/latest)
-![npm](https://img.shields.io/npm/dm/might-gui) -->
+<!-- ![npm (tag)](https://img.shields.io/npm/v/might-ui/latest)
+![npm](https://img.shields.io/npm/dm/might-ui) -->
 
 **This project is still in-development, it might be unstable.**
 
@@ -18,7 +18,7 @@ Might is an easy way to create and handle tests, it was designed to actually mak
 Coming Soon
 
 <!-- `
-npm install --save-dev might-gui` -->
+npm install --save-dev might-gi` -->
 
 ## Usage
 
@@ -26,5 +26,5 @@ Coming Soon
 
 #### Different Usage:
 
-- [might-cli](https://github.com/ItsKerolos/might-cli) if you need to run your tests without the GUI or you need to run your them inside a CD pipeline.
+- [might-cli](https://github.com/ItsKerolos/might-cli) if you need to run your tests without the GUI or you need to run them inside a CD pipeline.
 - [might-core](https://github.com/ItsKerolos/might-core) if you need to run tests programmatically or build a different tool.
