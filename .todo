@@ -6,24 +6,25 @@ Performance Issues and Bugs:
 
 UI/UX:
   ☐ add icons to context menu
-  
-  ☐ undo button
-  ☐ redo button
 
-  Management:
-    ✔ deleting test steps @done(20-06-24 23:09)
-      ☐ hovering over an action should highlight which items are going to be deleted
+  - record the stack of changes using mindmap.loadMap
+    ☐ undo button
+    ☐ redo button
+  
+  ✔ deleting test steps
+    ☐ hovering over an action should highlight which items are going to be deleted
 
   ☐ searching for tests using their titles for actions @low
     - scrolls to the first result but highlight all results in both maps
 
   ☐ saving additional data about the gui state in disk (can be saved inside map file for now)
     ☐ load last scroll position
-
+  
+General:
   ☐ turn the app to electron @low 
     - file system access
       ☐ loading the map file automatically at the start
       ☐ rendering screenshots of tests
     - nodejs access
       ☐ running tests inside the gui using core (leveraging on electron's main process)
-    
+      

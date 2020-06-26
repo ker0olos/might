@@ -419,6 +419,7 @@ class Mindmap extends React.Component
 
     const done = (action, value) =>
     {
+      // validate title
       if (typeof value === 'string' && value.length > 0)
         data[testIndex].title = value;
 

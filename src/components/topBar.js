@@ -2,8 +2,7 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 
-import ContentSaveIcon from 'mdi-react/ContentSaveOutlineIcon';
-import DownloadIcon from 'mdi-react/DownloadOutlineIcon';
+import { ReactSVG } from 'react-svg';
 
 import { createStyle } from 'flcss';
 
@@ -23,15 +22,14 @@ class TopBar extends React.Component
     return (
       <div className={ styles.container }>
         <div className={ styles.button } onClick={ this.props.onFileSave }>
-          <ContentSaveIcon className={ styles.icon }/>
+          <ReactSVG src='icons/save.svg' className={ styles.icon }/>
           <div>Save</div>
         </div>
 
-        <label className={ styles.button }>
-          <input className={ styles.fileInput } id='loadFile' type='file' accept='application/json' onChange={ this.props.onFileLoad }/>
-          <DownloadIcon className={ styles.icon }/>
-          Load
-        </label>
+        <div className={ styles.button } onClick={ this.props.onFileLoad }>
+          <ReactSVG src='icons/load.svg' className={ styles.icon }/>
+          <div>Load</div>
+        </div>
       </div>
     );
   }
@@ -82,13 +80,28 @@ const styles = createStyle({
 
     ':hover': {
       color: colors.whiteText,
-      backgroundColor: colors.accent
+      backgroundColor: colors.accent,
+
+      ' svg': {
+        fill: colors.whiteText
+      }
+    },
+
+    ' svg': {
+      fill: colors.blackText
     }
   },
 
   icon: {
-    width: '20px',
-    height: '20px',
+    '> div': {
+      width: '20px',
+      height: '20px'
+    },
+
+    '> div > svg': {
+      width: '20px',
+      height: '20px'
+    },
 
     margin: '0 5px'
   },

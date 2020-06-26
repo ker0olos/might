@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 import { createStyle } from 'flcss';
 
-import ArrowDownIcon from 'mdi-react/ArrowDownIcon';
+import { ReactSVG } from 'react-svg';
 
 import getTheme, { opacity } from '../colors.js';
 
@@ -43,7 +43,7 @@ const Select = ({ defaultIndex, options, onChange }) =>
 
     <div className={ styles.label }>{ value }</div>
 
-    <ArrowDownIcon className={ styles.icon }/>
+    <ReactSVG src='icons/down.svg' className={ styles.icon }/>
 
     <div shown={ shown.toString() } className={ styles.wrapper } onClick={ () => setShown(false) }/>
 
@@ -85,7 +85,15 @@ const styles = createStyle({
     ':hover': {
       color: colors.whiteText,
       backgroundColor: colors.accent,
-      border: `${colors.accent} 1px solid`
+      border: `${colors.accent} 1px solid`,
+
+      ' svg': {
+        fill: colors.whiteText
+      }
+    },
+
+    ' svg': {
+      fill: colors.blackText
     },
 
     '[shown="true"]': {
@@ -104,7 +112,16 @@ const styles = createStyle({
   },
 
   icon: {
-    width: '20px',
+    '> div': {
+      width: '20px',
+      height: '20px'
+    },
+
+    '> div > svg': {
+      width: '20px',
+      height: '20px'
+    },
+
     margin: 'auto 10px'
   },
 
