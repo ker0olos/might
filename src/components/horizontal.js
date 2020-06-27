@@ -29,7 +29,7 @@ const rightClick = (e, callback) =>
     x={ e.nativeEvent.pageX }
     y={ e.nativeEvent.pageY }
     actions={ [
-      { title: 'Edit', callback }
+      { title: 'Edit', icon: 'edit', callback }
     ] }
   />, document.querySelector('#contextMenu'));
 };

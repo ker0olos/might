@@ -34,14 +34,14 @@ const rightClick = (e, mindmap, mode, occurrences) =>
     x={ e.nativeEvent.pageX }
     y={ e.nativeEvent.pageY }
     actions={ [
-      { title: 'Edit', callback: () => mindmap.editStep(occurrences) },
+      { title: 'Edit', icon: 'edit', callback: () => mindmap.editStep(occurrences) },
       { title: 'Add', actions: [
-        { title: 'New', callback: () => mindmap.addStepAfter(occurrences, 'new') },
-        { title: 'Insert', callback: () => mindmap.addStepAfter(occurrences, 'insert') }
+        { title: 'New', icon: 'new-step', callback: () => mindmap.addStepAfter(occurrences, 'new') },
+        { title: 'Insert', icon: 'insert-step', callback: () => mindmap.addStepAfter(occurrences, 'insert') }
       ] },
       { title: 'Remove', actions: [
-        { title: 'This Step', callback: () => mindmap.deleteStep(occurrences, 'this') },
-        { title: 'Entire Branch', callback: () => mindmap.deleteStep(occurrences, 'branch') }
+        { title: 'Step', icon: 'remove-step', callback: () => mindmap.deleteStep(occurrences, 'this') },
+        { title: 'Branch', icon: 'remove-branch', callback: () => mindmap.deleteStep(occurrences, 'branch') }
       ] }
     ] }
   />, document.querySelector('#contextMenu'));

@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom';
 
 import PropTypes from 'prop-types';
 
+import { ReactSVG } from 'react-svg';
+
 import { createStyle } from 'flcss';
 
 import getTheme from '../colors.js';
@@ -24,7 +26,7 @@ const click = (e) =>
 * @param { {
 *    x: number,
 *    y: number,
-*    actions: { title: string, actions: { title: string, callback: () => void }[]], callback: () => void }[]
+*    actions: { title: string, icon: string, actions: { title: string, icon: string, callback: () => void }[]], callback: () => void }[]
 *  } } param0
 */
 const ContextMenu = ({ x, y, actions }) =>
@@ -103,14 +105,17 @@ const ContextMenu = ({ x, y, actions }) =>
           if (action.actions)
           {
             return <div key={ i }>
-              <div className={ styles.title }>{ action.title }</div>
+              <div className={ styles.subTitle }>{ action.title }</div>
 
               <div className={ styles.submenu }>
                 {
                   action.actions.map((action, i) =>
                   {
+                    const icon = (action.icon) ? <ReactSVG src={ `icons/${action.icon}.svg` } className={ styles.icon }/> : <div/>;
+
                     return <div key={ i } className={ styles.action } onClick={ action.callback }>
-                      { action.title }
+                      <div className={ styles.title }>{ action.title }</div>
+                      { icon }
                     </div>;
                   })
                 }
@@ -119,8 +124,11 @@ const ContextMenu = ({ x, y, actions }) =>
           }
           else
           {
+            const icon = (action.icon) ? <ReactSVG src={ `icons/${action.icon}.svg` } className={ styles.icon }/> : <div/>;
+
             return <div key={ i } className={ styles.action } onClick={ action.callback }>
-              { action.title }
+              <div className={ styles.title }>{ action.title }</div>
+              { icon }
             </div>;
           }
         })
@@ -161,7 +169,7 @@ const styles = createStyle({
     padding: '15px 0'
   },
 
-  title: {
+  subTitle: {
     userSelect: 'none',
 
     textTransform: 'uppercase',
@@ -200,8 +208,34 @@ const styles = createStyle({
 
     ':hover': {
       color: colors.whiteText,
-      backgroundColor: colors.accent
+      backgroundColor: colors.accent,
+
+      ' svg': {
+        fill: colors.whiteText
+      }
+    },
+
+    ' svg': {
+      fill: colors.blackText
     }
+  },
+
+  title: {
+    flexGrow: 1
+  },
+
+  icon: {
+    '> div': {
+      width: '20px',
+      height: '20px'
+    },
+
+    '> div > svg': {
+      width: '20px',
+      height: '20px'
+    },
+
+    margin: '0 5px'
   }
 });
 

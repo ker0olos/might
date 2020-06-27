@@ -271,7 +271,7 @@ class Mindmap extends React.Component
     ReactDOM.render(<ContextMenu
       x={ e.nativeEvent.pageX }
       y={ e.nativeEvent.pageY }
-      actions={ [ { title: 'Add New Step', callback: this.addNewStep } ] }
+      actions={ [ { title: 'Add', actions: [ { title: 'Step', callback: this.addNewStep } ] } ] }
     />, document.querySelector('#contextMenu'));
   }
 
