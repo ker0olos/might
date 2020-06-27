@@ -70,6 +70,8 @@ Select.propTypes = {
 const styles = createStyle({
   container: {
     display: 'flex',
+    cursor: 'pointer',
+
     position: 'relative',
 
     color: colors.blackText,
@@ -79,13 +81,14 @@ const styles = createStyle({
 
     height: '40px',
 
-    borderRadius: '5px',
-    border: `${colors.blackText} 1px solid`,
+    border: 0,
+    borderBottom: `${colors.blackText} 1px solid`,
 
     ':hover': {
       color: colors.whiteText,
       backgroundColor: colors.accent,
-      border: `${colors.accent} 1px solid`,
+
+      borderBottom: `${colors.accent} 1px solid`,
 
       ' svg': {
         fill: colors.whiteText
@@ -99,7 +102,8 @@ const styles = createStyle({
     '[shown="true"]': {
       color: colors.whiteText,
       backgroundColor: colors.accent,
-      border: `${colors.accent} 1px solid`
+
+      borderBottom: `${colors.accent} 1px solid`
     }
   },
 
@@ -158,9 +162,6 @@ const styles = createStyle({
     minHeight: '40px',
     width: 'calc(100% + 10px)',
     height: 'fit-content',
-
-    overflow: 'hidden',
-    borderRadius: '5px',
 
     border: `${colors.accent} 1px solid`,
     

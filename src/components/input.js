@@ -4,18 +4,19 @@ import PropTypes from 'prop-types';
 
 import { createStyle } from 'flcss';
 
-import getTheme from '../colors.js';
+import getTheme, { opacity } from '../colors.js';
 
 const colors = getTheme();
 
 /**
 * @param { {
 *    defaultValue: string,
-*    suffix: string,
+*    suffix: { content: string, title: string },
+*    autoFocus: boolean,
 *    onChange: (newValue: string) => string
 *  } } param0
 */
-const Input = ({ defaultValue, suffix, onChange }) =>
+const Input = ({ defaultValue, suffix, autoFocus, onChange }) =>
 {
   const change = (e) =>
   {
@@ -24,14 +25,15 @@ const Input = ({ defaultValue, suffix, onChange }) =>
   };
 
   return <div className={ styles.container }>
-    <input className={ styles.input } spellCheck={ false } defaultValue={ defaultValue } type={ 'text' }  onInput={ change }/>
-    <div className={ styles.suffix }>{ suffix }</div>
+    <input autoFocus={ autoFocus } className={ styles.input } spellCheck={ false } defaultValue={ defaultValue } type={ 'text' }  onInput={ change }/>
+    <div className={ styles.suffix } title={ suffix?.title }>{ suffix?.content }</div>
   </div>;
 };
 
 Input.propTypes = {
   defaultValue: PropTypes.any,
-  suffix: PropTypes.string,
+  suffix: PropTypes.object,
+  autoFocus: PropTypes.bool,
   onChange: PropTypes.func
 };
 
@@ -40,10 +42,7 @@ const styles = createStyle({
     display: 'flex',
     backgroundColor: colors.whiteBackground,
 
-    height: '40px',
-
-    borderRadius: '5px',
-    border: `${colors.blackText} 1px solid`
+    height: '40px'
   },
 
   input: {
@@ -53,16 +52,21 @@ const styles = createStyle({
     fontFamily: 'Noto Sans',
     fontWeight: 700,
 
+    padding: '10px',
+
     border: 0,
-    padding: 0,
-    margin: '10px',
+    borderBottom: `${colors.blackText} 1px solid`,
+
+    transition: 'border-bottom 0.1s',
 
     ':invalid': {
-      borderBottom: `${colors.red} 2px solid`
+      borderBottom: `${colors.red} 3px solid`
     },
 
     ':focus': {
-      outline: 'none'
+      borderBottom: `${colors.blue} 3px solid`,
+
+      outline: 0
     }
   },
 
@@ -70,7 +74,22 @@ const styles = createStyle({
     userSelect: 'none',
 
     fontSize: '14px',
-    margin: '10px',
+    padding: '10px',
+
+    border: 0,
+    borderBottom: `${colors.blackText} 1px solid`,
+
+    transition: 'border-bottom 0.1s',
+
+    'input:invalid ~ %this':
+    {
+      borderBottom: `${colors.red} 3px solid`
+    },
+
+    'input:focus ~ %this':
+    {
+      borderBottom: `${colors.blue} 3px solid`
+    },
 
     ':empty': {
       margin: 0

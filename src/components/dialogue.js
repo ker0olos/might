@@ -62,7 +62,7 @@ const Dialogue = ({ type, title, step, done }) =>
       <div className={ styles.title }>Title:</div>
     
       <div className={ styles.options }>
-        <Input defaultValue={ defaultTitle } onChange={ onInput }/>
+        <Input defaultValue={ defaultTitle } autoFocus={ true } onChange={ onInput }/>
       </div>
 
       <div className={ styles.buttons }>
@@ -77,7 +77,14 @@ const Dialogue = ({ type, title, step, done }) =>
     let defaultAction = 0;
     let defaultValue = '';
 
-    let suffix = (action === 'wait') ? 's' : undefined;
+    let suffix;
+    let suffixTitle;
+
+    if (action === 'wait')
+    {
+      suffix = 'S';
+      suffixTitle = 'Seconds';
+    }
   
     if (step)
     {
@@ -85,7 +92,10 @@ const Dialogue = ({ type, title, step, done }) =>
       defaultValue = step.value;
 
       if (!action && defaultAction === 0)
-        suffix = 's';
+      {
+        suffix = 'S';
+        suffixTitle = 'Seconds';
+      }
     }
 
     const onSelect = (action) => setAction(action);
@@ -102,7 +112,7 @@ const Dialogue = ({ type, title, step, done }) =>
     
       <div className={ styles.options }>
         <Select defaultIndex={ defaultAction } options={ actions } onChange={ onSelect }/>
-        <Input defaultValue={ defaultValue } suffix={ suffix } onChange={ onInput }/>
+        <Input defaultValue={ defaultValue } suffix={ { content: suffix, title: suffixTitle } } autoFocus={ true } onChange={ onInput }/>
       </div>
 
       <div className={ styles.buttons }>

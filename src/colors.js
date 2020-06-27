@@ -24,6 +24,8 @@ export default function getTheme()
     accent: '#888888',
 
     transparent: 'transparent',
+
+    blue: '#1abfe8',
     red: '#b82302'
   };
 
