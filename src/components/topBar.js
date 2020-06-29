@@ -2,11 +2,14 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 
-import { ReactSVG } from 'react-svg';
-
 import { createStyle } from 'flcss';
 
 import getTheme, { opacity } from '../colors.js';
+
+import SaveIcon from '../../icons/save.svg';
+import LoadIcon from '../../icons/load.svg';
+import UndoIcon from '../../icons/undo.svg';
+import RedoIcon from '../../icons/redo.svg';
 
 const colors = getTheme();
 
@@ -19,25 +22,27 @@ class TopBar extends React.Component
 
   render()
   {
+    const { stack } = this.props;
+
     return (
       <div className={ styles.container }>
         <div dirty={ this.props.dirty.toString() } className={ styles.button } title={ 'Ctrl+S' } onClick={ this.props.onFileSave }>
-          <ReactSVG src='icons/save.svg' className={ styles.icon }/>
+          <SaveIcon className={ styles.icon }/>
           <div className={ styles.title }>Save</div>
         </div>
 
         <div className={ styles.button } title={ 'Ctrl+O' } onClick={ this.props.onFileLoad }>
-          <ReactSVG src='icons/load.svg' className={ styles.icon }/>
+          <LoadIcon className={ styles.icon }/>
           <div className={ styles.title }>Load</div>
         </div>
 
-        <div className={ styles.button } title={ 'Ctrl+Z' } onClick={ this.props.onUndo }>
-          <ReactSVG src='icons/undo.svg' className={ styles.icon }/>
+        <div className={ styles.button } title={ 'Ctrl+Z' } disabled={ !stack.undo } onClick={ this.props.onUndo }>
+          <UndoIcon className={ styles.icon }/>
           <div className={ styles.title }>Undo</div>
         </div>
 
-        <div className={ styles.button } title={ 'Ctrl+Y' } onClick={ this.props.onRedo }>
-          <ReactSVG src='icons/redo.svg' className={ styles.icon }/>
+        <div className={ styles.button } title={ 'Ctrl+Y' } disabled={ !stack.redo } onClick={ this.props.onRedo }>
+          <RedoIcon className={ styles.icon }/>
           <div className={ styles.title }>Redo</div>
         </div>
       </div>
@@ -47,6 +52,7 @@ class TopBar extends React.Component
 
 TopBar.propTypes = {
   dirty: PropTypes.bool.isRequired,
+  stack: PropTypes.object.isRequired,
   onFileSave: PropTypes.func.isRequired,
   onFileLoad: PropTypes.func.isRequired,
   onUndo: PropTypes.func.isRequired,
@@ -91,6 +97,15 @@ const styles = createStyle({
     padding: '0 10px',
     margin: '0 5px',
 
+    '[disabled]': {
+      pointerEvents: 'none',
+      color: colors.accent,
+
+      ' svg': {
+        fill: colors.accent
+      }
+    },
+
     '[dirty="true"]': {
       fontStyle: 'italic',
 
@@ -119,15 +134,8 @@ const styles = createStyle({
   },
 
   icon: {
-    '> div': {
-      width: '20px',
-      height: '20px'
-    },
-
-    '> div > svg': {
-      width: '20px',
-      height: '20px'
-    },
+    width: '20px',
+    height: '20px',
 
     margin: '0 5px 0 0'
   }

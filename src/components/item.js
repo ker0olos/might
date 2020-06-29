@@ -9,6 +9,14 @@ import getTheme from '../colors.js';
 
 import ContextMenu from './contextMenu.js';
 
+import EditIcon from '../../icons/edit.svg';
+
+import NewStepIcon from '../../icons/new-step.svg';
+import InsertStepIcon from '../../icons/insert-step.svg';
+
+import RemoveStepIcon from '../../icons/remove-step.svg';
+import RemoveBranchIcon from '../../icons/remove-branch.svg';
+
 const colors = getTheme();
 
 let clickTimestamp = 0;
@@ -34,14 +42,14 @@ const rightClick = (e, mindmap, mode, occurrences) =>
     x={ e.nativeEvent.pageX }
     y={ e.nativeEvent.pageY }
     actions={ [
-      { title: 'Edit', icon: 'edit', callback: () => mindmap.editStep(occurrences) },
+      { title: 'Edit', icon: EditIcon, callback: () => mindmap.editStep(occurrences) },
       { title: 'Add', actions: [
-        { title: 'New', icon: 'new-step', callback: () => mindmap.addStepAfter(occurrences, 'new') },
-        { title: 'Insert', icon: 'insert-step', callback: () => mindmap.addStepAfter(occurrences, 'insert') }
+        { title: 'New', icon: NewStepIcon, callback: () => mindmap.addStepAfter(occurrences, 'new') },
+        { title: 'Insert', icon: InsertStepIcon, callback: () => mindmap.addStepAfter(occurrences, 'insert') }
       ] },
       { title: 'Remove', actions: [
-        { title: 'Step', icon: 'remove-step', callback: () => mindmap.deleteStep(occurrences, 'this') },
-        { title: 'Branch', icon: 'remove-branch', callback: () => mindmap.deleteStep(occurrences, 'branch') }
+        { title: 'Step', icon: RemoveStepIcon, callback: () => mindmap.deleteStep(occurrences, 'this') },
+        { title: 'Branch', icon: RemoveBranchIcon, callback: () => mindmap.deleteStep(occurrences, 'branch') }
       ] }
     ] }
   />, document.querySelector('#contextMenu'));

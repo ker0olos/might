@@ -713,10 +713,16 @@ class Mindmap extends React.Component
       </div>;
     };
 
+    const stackIndex = (this.state.stackIndex !== undefined) ? this.state.stackIndex : this.changeStack.length - 1;
+
+    const undo = (stackIndex - 1 > -1);
+    const redo = (stackIndex + 1 < this.changeStack.length);
+
     return <div ref={ mindMapRef } className={ styles.wrapper }>
 
       <TopBar
         dirty={ this.state.dirty }
+        stack={ { undo, redo } }
         onFileSave={ this.onFileSave }
         onFileLoad={ this.onFileLoad }
         onUndo={ this.onUndo }

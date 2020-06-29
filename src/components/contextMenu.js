@@ -3,8 +3,6 @@ import ReactDOM from 'react-dom';
 
 import PropTypes from 'prop-types';
 
-import { ReactSVG } from 'react-svg';
-
 import { createStyle } from 'flcss';
 
 import getTheme from '../colors.js';
@@ -26,7 +24,7 @@ const click = (e) =>
 * @param { {
 *    x: number,
 *    y: number,
-*    actions: { title: string, icon: string, actions: { title: string, icon: string, callback: () => void }[]], callback: () => void }[]
+*    actions: { title: string, icon: JSX.Element, actions: { title: string, icon: string, callback: () => void }[]], callback: () => void }[]
 *  } } param0
 */
 const ContextMenu = ({ x, y, actions }) =>
@@ -111,7 +109,7 @@ const ContextMenu = ({ x, y, actions }) =>
                 {
                   action.actions.map((action, i) =>
                   {
-                    const icon = (action.icon) ? <ReactSVG src={ `icons/${action.icon}.svg` } className={ styles.icon }/> : <div/>;
+                    const icon = (action.icon) ? <action.icon className={ styles.icon }/> : <div/>;
 
                     return <div key={ i } className={ styles.action } onClick={ action.callback }>
                       <div className={ styles.title }>{ action.title }</div>
@@ -124,7 +122,7 @@ const ContextMenu = ({ x, y, actions }) =>
           }
           else
           {
-            const icon = (action.icon) ? <ReactSVG src={ `icons/${action.icon}.svg` } className={ styles.icon }/> : <div/>;
+            const icon = (action.icon) ? <action.icon className={ styles.icon }/> : <div/>;
 
             return <div key={ i } className={ styles.action } onClick={ action.callback }>
               <div className={ styles.title }>{ action.title }</div>
@@ -225,15 +223,8 @@ const styles = createStyle({
   },
 
   icon: {
-    '> div': {
-      width: '20px',
-      height: '20px'
-    },
-
-    '> div > svg': {
-      width: '20px',
-      height: '20px'
-    },
+    width: '20px',
+    height: '20px',
 
     margin: '0 5px'
   }

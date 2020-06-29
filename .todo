@@ -6,8 +6,6 @@ Performance Issues and Bugs:
 
   ☐ some items can exceed map size
 
-  ☐ improve svg loading times by detaching react-svg
-
 UI/UX:
   ☐ allow click and drag function in minimap
 

@@ -4,9 +4,9 @@ import PropTypes from 'prop-types';
 
 import { createStyle } from 'flcss';
 
-import { ReactSVG } from 'react-svg';
-
 import getTheme, { opacity } from '../colors.js';
+
+import DownIcon from '../../icons/down.svg';
 
 const colors = getTheme();
 
@@ -43,7 +43,7 @@ const Select = ({ defaultIndex, options, onChange }) =>
 
     <div className={ styles.label }>{ value }</div>
 
-    <ReactSVG src='icons/down.svg' className={ styles.icon }/>
+    <DownIcon className={ styles.icon }/>
 
     <div shown={ shown.toString() } className={ styles.wrapper } onClick={ () => setShown(false) }/>
 
@@ -116,15 +116,8 @@ const styles = createStyle({
   },
 
   icon: {
-    '> div': {
-      width: '20px',
-      height: '20px'
-    },
-
-    '> div > svg': {
-      width: '20px',
-      height: '20px'
-    },
+    width: '20px',
+    height: '20px',
 
     margin: 'auto 10px'
   },
