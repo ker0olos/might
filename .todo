@@ -6,18 +6,27 @@ Performance Issues and Bugs:
 
   ☐ some items can exceed map size
 
+  ☐ improve svg loading times by detaching react-svg
+
 UI/UX:
+  ☐ allow click and drag function in minimap
+
+  ☐ improve the dialogue UX
+    - enter to apply
+    - better UI to the focused input box
+    - redesign the delete dialogue
+
   ✔ deleting test steps
     ☐ hovering over an action should highlight which items are going to be deleted
+
+    ☐ saving additional data about the gui state in disk (can be saved inside map file for now)
+      ☐ load last scroll position
 
   ☐ searching for tests using their titles for actions @low
     - scrolls to the first result but highlight all results in both maps
 
-  ☐ saving additional data about the gui state in disk (can be saved inside map file for now)
-    ☐ load last scroll position
-  
 General:
-  ☐ turn the app to electron @low 
+  ☐ turn the app to electron @low
     - file system access
       ☐ loading the map file automatically at the start
       ☐ rendering screenshots of tests

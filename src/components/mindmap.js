@@ -68,6 +68,10 @@ class Mindmap extends React.Component
       familizedData: {}
     } ];
 
+    /** the current path to the opened file
+    */
+    this.file = '';
+
     this.onKeyDown = this.onKeyDown.bind(this);
 
     this.onFileSave = this.onFileSave.bind(this);
@@ -138,7 +142,11 @@ class Mindmap extends React.Component
   onKeyDown(e)
   {
     if (e.ctrlKey && e.key.toLowerCase() === 's')
+    {
+      e.preventDefault();
+
       this.onFileSave();
+    }
 
     if (e.ctrlKey && e.key.toLowerCase() === 'o')
     {
@@ -160,10 +168,17 @@ class Mindmap extends React.Component
   */
   onFileSave()
   {
-    // TODO
-    // const blob = new Blob([ '{ "a": "b" }' ], { type: 'application/json;charset=utf-8' });
-
+    // const blob = new Blob([
+    //   JSON.stringify({ data: this.state.data })
+    // ], { type: 'application/json;charset=utf-8' });
+    
+    // TODO update this.file (can't do that using this API)
     // saveAs(blob, 'might.map.test.json');
+
+    // remove the dirty state
+    this.setState({
+      dirty: false
+    });
   }
 
   /**
@@ -192,10 +207,17 @@ class Mindmap extends React.Component
     */
     const files = e?.target?.files;
 
-    if (!files)
+    if (!files || !files[0])
       return;
+    
+    readJSON(files[0]).then((file) =>
+    {
+      // load the map from the file
+      this.loadMap(file.data, true);
 
-    readJSON(files[0]).then((file) => this.loadMap(file.data, true));
+      // store the path of the file
+      this.file = files[0];
+    });
   }
 
   serializeStep(step)
@@ -226,6 +248,7 @@ class Mindmap extends React.Component
 
     this.setState({
       stackIndex,
+      dirty: true,
       data: this.changeStack[stackIndex].data,
       familizedData: this.changeStack[stackIndex].familizedData
     });
@@ -247,6 +270,7 @@ class Mindmap extends React.Component
 
     this.setState({
       stackIndex,
+      dirty: true,
       data: this.changeStack[stackIndex].data,
       familizedData: this.changeStack[stackIndex].familizedData
     });
@@ -351,11 +375,13 @@ class Mindmap extends React.Component
     });
 
     // if loaded form a file
-    // the change stack array should to emptied
-    // the first stack should be set to the initial state of the loaded file
-    // meaning it will replace the default empty stack
     if (file)
+    {
+      // the change stack array should to emptied
+      // the first stack should be set to the initial state of the loaded file
+      // meaning it will replace the default empty stack
       this.changeStack.splice(0);
+    }
 
     // record the change
     this.recordChange(data, familizedData);
@@ -363,7 +389,8 @@ class Mindmap extends React.Component
     this.setState({
       data,
       familizedData,
-      stackIndex: undefined
+      stackIndex: undefined,
+      dirty: (file) ? false : true
     });
   }
 

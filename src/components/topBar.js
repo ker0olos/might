@@ -96,7 +96,7 @@ const styles = createStyle({
       fontStyle: 'italic',
 
       ':after': {
-        content: '"**"'
+        content: '"!?"'
       }
     },
 
