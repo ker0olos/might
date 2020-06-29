@@ -45,19 +45,36 @@ class Mindmap extends React.Component
     super();
 
     this.state = {
+      dirty: false,
+
+      stackIndex: undefined,
+
       /**
       * @type { { title: string, steps: { action: string, value: string }[] }[] }
       */
-      data: undefined,
+      data: [],
 
       /**
       * @type { FamilizedObject }
       */
-      familizedData: undefined
+      familizedData: {}
     };
+
+    /**
+    * @type { { data: Array, familizedData: {} }[] }
+    */
+    this.changeStack = [ {
+      data: [],
+      familizedData: {}
+    } ];
+
+    this.onKeyDown = this.onKeyDown.bind(this);
 
     this.onFileSave = this.onFileSave.bind(this);
     this.onFileLoad = this.onFileLoad.bind(this);
+
+    this.onUndo = this.onUndo.bind(this);
+    this.onRedo = this.onRedo.bind(this);
 
     this.onContextMenu = this.onContextMenu.bind(this);
 
@@ -89,23 +106,53 @@ class Mindmap extends React.Component
       behavior: 'auto'
     });
 
+    document.body.addEventListener('keydown', this.onKeyDown);
+
     // REMOVE (test group)
-    this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]}]}').data);
+    this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]}]}').data, true);
 
     // REMOVE (test group 2)
-    // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]}, {"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello Mars"}]}]}').data);
+    // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]}, {"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello Mars"}]}]}').data, true);
 
     // REMOVE (test group 3)
-    // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"},{"action":"click"}]}]}').data);
+    // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"},{"action":"click"}]}]}').data, true);
 
     // REMOVE (one group)
-    // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 4","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"}]},{"title":"test search-bar input 5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"click"}]}]}').data);
+    // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 4","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"}]},{"title":"test search-bar input 5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"click"}]}]}').data, true);
 
     // REMOVE (one group 2)
-    // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 4","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"}]},{"title":"test search-bar input 4.5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"},{"action":"click"}]},{"title":"test search-bar input 5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"click"}]}]}').data);
+    // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 4","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"}]},{"title":"test search-bar input 4.5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"},{"action":"click"}]},{"title":"test search-bar input 5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"click"}]}]}').data, true);
 
     // REMOVE (three group)
-    // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"},{"action":"click"}]},{"title":"test search-bar input 2","steps":[{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 3","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-button"},{"action":"click"}]},{"title":"test search-bar input 4","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"}]},{"title":"test search-bar input 5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"click"}]}]}').data);
+    // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"},{"action":"click"}]},{"title":"test search-bar input 2","steps":[{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 3","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-button"},{"action":"click"}]},{"title":"test search-bar input 4","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"}]},{"title":"test search-bar input 5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"click"}]}]}').data, true);
+  }
+
+  componentWillUnmount()
+  {
+    document.body.removeEventListener('keydown', this.onKeyDown);
+  }
+
+  /**
+  * @param { KeyboardEvent } e
+  */
+  onKeyDown(e)
+  {
+    if (e.ctrlKey && e.key.toLowerCase() === 's')
+      this.onFileSave();
+
+    if (e.ctrlKey && e.key.toLowerCase() === 'o')
+    {
+      e.preventDefault();
+
+      // simulate clicking the load button
+      document.body.querySelector('#loadFile').click();
+    }
+
+    if (e.ctrlKey && e.key.toLowerCase() === 'z')
+      this.onUndo();
+
+    if (e.ctrlKey && e.key.toLowerCase() === 'y')
+      this.onRedo();
   }
 
   /**
@@ -116,7 +163,7 @@ class Mindmap extends React.Component
     // TODO
     // const blob = new Blob([ '{ "a": "b" }' ], { type: 'application/json;charset=utf-8' });
 
-    // saveAs(blob, 'might.gui.json');
+    // saveAs(blob, 'might.map.test.json');
   }
 
   /**
@@ -143,9 +190,12 @@ class Mindmap extends React.Component
     /**
     * @type { FileList }
     */
-    const files = e.target.files;
+    const files = e?.target?.files;
 
-    readJSON(files[0]).then((file) => this.loadMap(file.data));
+    if (!files)
+      return;
+
+    readJSON(files[0]).then((file) => this.loadMap(file.data, true));
   }
 
   serializeStep(step)
@@ -160,11 +210,58 @@ class Mindmap extends React.Component
       return `Type ${step.value}`;
   }
 
+  onUndo()
+  {
+    let { stackIndex } = this.state;
+
+    if (stackIndex === undefined)
+      stackIndex = this.changeStack.length - 1;
+    
+    // already at the oldest change in the stack
+    if (stackIndex - 1 <= -1)
+      return;
+
+    // move through the stack by 1 change
+    stackIndex = stackIndex - 1;
+
+    this.setState({
+      stackIndex,
+      data: this.changeStack[stackIndex].data,
+      familizedData: this.changeStack[stackIndex].familizedData
+    });
+  }
+
+  onRedo()
+  {
+    let { stackIndex } = this.state;
+
+    if (stackIndex === undefined)
+      stackIndex = this.changeStack.length - 1;
+    
+    // already at the newest change in the stack
+    if (stackIndex + 1 >= this.changeStack.length)
+      return;
+    
+    // move through the stack by 1 change
+    stackIndex = stackIndex + 1;
+
+    this.setState({
+      stackIndex,
+      data: this.changeStack[stackIndex].data,
+      familizedData: this.changeStack[stackIndex].familizedData
+    });
+  }
+
   /**
   * @param { { title: string, steps: { action: string, value: string }[] }[] } data
+  * @param { boolean } file
   */
-  loadMap(data)
+  loadMap(data, file)
   {
+    // when loaded
+    // reset the first stack to the initial load data
+    // else the fist stack always is empty
+    
     /**
     * @type { FamilizedObject }
     */
@@ -253,10 +350,41 @@ class Mindmap extends React.Component
       });
     });
 
+    // if loaded form a file
+    // the change stack array should to emptied
+    // the first stack should be set to the initial state of the loaded file
+    // meaning it will replace the default empty stack
+    if (file)
+      this.changeStack.splice(0);
+
+    // record the change
+    this.recordChange(data, familizedData);
+
     this.setState({
       data,
-      familizedData
+      familizedData,
+      stackIndex: undefined
     });
+  }
+
+  /**
+  * @param { Array } data
+  * @param { {} } data
+  */
+  recordChange(data, familizedData)
+  {
+    const { stackIndex } = this.state;
+
+    // if the current stack was changed by undo/redo
+    // then remove any unused stacks
+    // is the common practice in most applications that offer
+    // this function
+    if (stackIndex !== undefined)
+      this.changeStack.splice(stackIndex + 1);
+
+    // push the new data to the stack
+
+    this.changeStack.push({ data: [ ...data ], familizedData: { ...familizedData } });
   }
 
   /**
@@ -568,7 +696,13 @@ class Mindmap extends React.Component
 
     return <div ref={ mindMapRef } className={ styles.wrapper }>
 
-      <TopBar onFileSave={ this.onFileSave } onFileLoad={ this.onFileLoad }/>
+      <TopBar
+        dirty={ this.state.dirty }
+        onFileSave={ this.onFileSave }
+        onFileLoad={ this.onFileLoad }
+        onUndo={ this.onUndo }
+        onRedo={ this.onRedo }
+      />
 
       {/* Mini-map */}
       <Minimap mindMapRef={ mindMapRef } onContextMenu={ this.onContextMenu }>

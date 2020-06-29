@@ -81,8 +81,8 @@ class Minimap extends React.Component
   {
     return <div
       className={ styles.wrapper }
+      onContextMenu={ this.props?.onContextMenu }
       onClick={ this.onClick }
-      { ...this.props }
     >
       <div className={ styles.container }>
         <MinimapIndicator x={ this.state.x } y={ this.state.y }/>
@@ -95,6 +95,7 @@ class Minimap extends React.Component
 
 Minimap.propTypes = {
   mindMapRef: PropTypes.object.isRequired,
+  onContextMenu: PropTypes.func,
   children: PropTypes.oneOfType([
     PropTypes.node,
     PropTypes.arrayOf(PropTypes.node)

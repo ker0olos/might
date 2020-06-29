@@ -125,7 +125,7 @@ const Dialogue = ({ type, title, step, done }) =>
   const Delete = () =>
   {
     return <div className={ styles.container }>
-      <div className={ styles.description }>Are you sure you want to delete this step?</div>
+      <div className={ styles.description }>Are you sure you want to delete that?</div>
 
       <div className={ styles.buttons }>
         <div className={ styles.button } onClick={ _done }>Confirm</div>

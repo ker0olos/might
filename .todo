@@ -1,16 +1,12 @@
 Performance Issues and Bugs:
+  ☐ research changing might-core map to be familized and get rid of the duplicate issues
+
   ☐ test duplicated test steps (same test, same title twice in map.json)
     ☐ test with different titles (same test, different titles)
 
   ☐ some items can exceed map size
 
 UI/UX:
-  ☐ add icons to context menu
-
-  - record the stack of changes using mindmap.loadMap
-    ☐ undo button
-    ☐ redo button
-  
   ✔ deleting test steps
     ☐ hovering over an action should highlight which items are going to be deleted
 

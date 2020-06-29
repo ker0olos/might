@@ -21,14 +21,25 @@ class TopBar extends React.Component
   {
     return (
       <div className={ styles.container }>
-        <div className={ styles.button } onClick={ this.props.onFileSave }>
+        <div dirty={ this.props.dirty.toString() } className={ styles.button } title={ 'Ctrl+S' } onClick={ this.props.onFileSave }>
           <ReactSVG src='icons/save.svg' className={ styles.icon }/>
-          <div>Save</div>
+          <div className={ styles.title }>Save</div>
         </div>
 
-        <div className={ styles.button } onClick={ this.props.onFileLoad }>
+        <label className={ styles.button } title={ 'Ctrl+O' }>
+          <input id={ 'loadFile' } className={ styles.fileInput } type='file' accept='application/json' onChange={ this.props.onFileLoad }/>
           <ReactSVG src='icons/load.svg' className={ styles.icon }/>
-          <div>Load</div>
+          <div className={ styles.title }>Load</div>
+        </label>
+
+        <div className={ styles.button } title={ 'Ctrl+Z' } onClick={ this.props.onUndo }>
+          <ReactSVG src='icons/undo.svg' className={ styles.icon }/>
+          <div className={ styles.title }>Undo</div>
+        </div>
+
+        <div className={ styles.button } title={ 'Ctrl+Y' } onClick={ this.props.onRedo }>
+          <ReactSVG src='icons/redo.svg' className={ styles.icon }/>
+          <div className={ styles.title }>Redo</div>
         </div>
       </div>
     );
@@ -36,8 +47,11 @@ class TopBar extends React.Component
 }
 
 TopBar.propTypes = {
+  dirty: PropTypes.bool.isRequired,
   onFileSave: PropTypes.func.isRequired,
-  onFileLoad: PropTypes.func.isRequired
+  onFileLoad: PropTypes.func.isRequired,
+  onUndo: PropTypes.func.isRequired,
+  onRedo: PropTypes.func.isRequired
 };
 
 const styles = createStyle({
@@ -78,6 +92,14 @@ const styles = createStyle({
     padding: '0 10px',
     margin: '0 5px',
 
+    '[dirty="true"]': {
+      fontStyle: 'italic',
+
+      ':after': {
+        content: '"**"'
+      }
+    },
+
     ':hover': {
       color: colors.whiteText,
       backgroundColor: colors.accent,
@@ -92,6 +114,10 @@ const styles = createStyle({
     }
   },
 
+  title: {
+    margin: '0 5px 0 0'
+  },
+
   icon: {
     '> div': {
       width: '20px',
@@ -103,7 +129,7 @@ const styles = createStyle({
       height: '20px'
     },
 
-    margin: '0 5px'
+    margin: '0 5px 0 0'
   },
 
   fileInput: {
