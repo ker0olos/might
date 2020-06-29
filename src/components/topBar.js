@@ -26,11 +26,10 @@ class TopBar extends React.Component
           <div className={ styles.title }>Save</div>
         </div>
 
-        <label className={ styles.button } title={ 'Ctrl+O' }>
-          <input id={ 'loadFile' } className={ styles.fileInput } type='file' accept='application/json' onChange={ this.props.onFileLoad }/>
+        <div className={ styles.button } title={ 'Ctrl+O' } onClick={ this.props.onFileLoad }>
           <ReactSVG src='icons/load.svg' className={ styles.icon }/>
           <div className={ styles.title }>Load</div>
-        </label>
+        </div>
 
         <div className={ styles.button } title={ 'Ctrl+Z' } onClick={ this.props.onUndo }>
           <ReactSVG src='icons/undo.svg' className={ styles.icon }/>
@@ -96,7 +95,8 @@ const styles = createStyle({
       fontStyle: 'italic',
 
       ':after': {
-        content: '"!?"'
+        content: '"!??"',
+        margin: '0 0 0 -5px'
       }
     },
 
@@ -130,15 +130,6 @@ const styles = createStyle({
     },
 
     margin: '0 5px 0 0'
-  },
-
-  fileInput: {
-    width: '0.1px',
-    height: '0.1px',
-    opacity: 0,
-    overflow: 'hidden',
-    position: 'absolute',
-    zIndex: '-1'
   }
 });
 

@@ -15,6 +15,8 @@ Might is an easy way to create and handle tests, it was designed to actually mak
 
 ## Installation
 
+#### IMPORTANT: This project depends on the experimental [Native File System API](https://web.dev/native-file-system/) which is currently only supported by Chrome 83+ with ```chrome://flags/#native-file-system-api``` enabled.
+
 Coming Soon
 
 <!-- `

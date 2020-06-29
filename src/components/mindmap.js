@@ -5,8 +5,6 @@ import ReactDOM from 'react-dom';
 
 import { createStyle } from 'flcss';
 
-// import { saveAs } from 'file-saver';
-
 import getTheme from '../colors.js';
 
 import TopBar from './topBar.js';
@@ -68,10 +66,6 @@ class Mindmap extends React.Component
       familizedData: {}
     } ];
 
-    /** the current path to the opened file
-    */
-    this.file = '';
-
     this.onKeyDown = this.onKeyDown.bind(this);
 
     this.onFileSave = this.onFileSave.bind(this);
@@ -113,7 +107,7 @@ class Mindmap extends React.Component
     document.body.addEventListener('keydown', this.onKeyDown);
 
     // REMOVE (test group)
-    this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]}]}').data, true);
+    // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]}]}').data, true);
 
     // REMOVE (test group 2)
     // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]}, {"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello Mars"}]}]}').data, true);
@@ -152,8 +146,7 @@ class Mindmap extends React.Component
     {
       e.preventDefault();
 
-      // simulate clicking the load button
-      document.body.querySelector('#loadFile').click();
+      this.onFileLoad();
     }
 
     if (e.ctrlKey && e.key.toLowerCase() === 'z')
@@ -163,61 +156,60 @@ class Mindmap extends React.Component
       this.onRedo();
   }
 
-  /**
-  * @param { React.SyntheticEvent } e
-  */
   onFileSave()
   {
-    // const blob = new Blob([
-    //   JSON.stringify({ data: this.state.data })
-    // ], { type: 'application/json;charset=utf-8' });
+    const content = JSON.stringify({ data: this.state.data });
     
-    // TODO update this.file (can't do that using this API)
-    // saveAs(blob, 'might.map.test.json');
-
-    // remove the dirty state
-    this.setState({
-      dirty: false
-    });
+    // shows the user the pick file dialogue
+    window.chooseFileSystemEntries({
+      type: 'save-file',
+      accepts: [ {
+        description: 'Might Map File (.json)',
+        extensions: [ 'json' ],
+        mimeTypes: [ 'application/json' ]
+      } ]
+    })
+      // get a writeable stream
+      .then((fileHandle) => fileHandle.createWritable())
+      // add data to the stream
+      .then((writable) =>
+      {
+        writable.write(content);
+      
+        return writable;
+      })
+      // close the stream (writes the data to disk)
+      .then((writable) => writable.close())
+      // set dirty state
+      .then(() => this.setState({ dirty: false }))
+      .catch((err) => console.error(err));
   }
 
-  /**
-  * @param { React.SyntheticEvent } e
-  */
-  onFileLoad(e)
+  onFileLoad()
   {
-    /**
-    * @type { File }
-    */
-    function readJSON(file)
-    {
-      return new Promise((resolve, reject) =>
+    // shows the user the pick file dialogue
+    window.chooseFileSystemEntries({
+      type: 'open-file',
+      multiple: false,
+      accepts: [ {
+        description: 'Might Map File (.json)',
+        extensions: [ 'json' ],
+        mimeTypes: [ 'application/json' ]
+      } ]
+    })
+      // get a readable stream
+      .then((fileHandle) => fileHandle.getFile())
+      // get some readable text from the stream
+      .then((file) => file.text())
+      .then((content) =>
       {
-        const fr = new FileReader();
+        // parse the text
+        const json = JSON.parse(content);
 
-        fr.onerror = () => reject(fr.error);
-        fr.onload = () => resolve(JSON.parse(fr.result));
-
-        fr.readAsText(file, 'utf8');
-      });
-    }
-
-    /**
-    * @type { FileList }
-    */
-    const files = e?.target?.files;
-
-    if (!files || !files[0])
-      return;
-    
-    readJSON(files[0]).then((file) =>
-    {
-      // load the map from the file
-      this.loadMap(file.data, true);
-
-      // store the path of the file
-      this.file = files[0];
-    });
+        // load the data
+        this.loadMap(json.data, true);
+      })
+      .catch((err) => console.error(err));
   }
 
   serializeStep(step)

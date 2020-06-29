@@ -26,10 +26,10 @@ UI/UX:
     - scrolls to the first result but highlight all results in both maps
 
 General:
-  ☐ turn the app to electron @low
-    - file system access
-      ☐ loading the map file automatically at the start
-      ☐ rendering screenshots of tests
-    - nodejs access
-      ☐ running tests inside the gui using core (leveraging on electron's main process)
+  - file system access
+  ☐ rendering screenshots of tests (needs a directory handle of the project)
+  - loading the map file automatically at the start
+    (not available using the native filesystem api yet,
+    but might happen in the feature since a lot of apps how need access to files
+    also need a similar feature like IDEs)
       

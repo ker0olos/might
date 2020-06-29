@@ -20,7 +20,6 @@
   },
   "homepage": "https://github.com/ItsKerolos/might#readme",
   "dependencies": {
-    "file-saver": "^2.0.2",
     "flcss": "^0.1.2",
     "prop-types": "^15.7.2",
     "react": "^16.13.1",
