@@ -6,9 +6,9 @@ Performance Issues and Bugs:
 
   ☐ some items can exceed map size
 
-UI/UX:
-  ☐ allow click and drag function in minimap
+  ☐ marking what steps are tests are what are not is a huge mess to handle
 
+UI/UX:
   ☐ improve the dialogue UX
     - enter to apply
     - better UI to the focused input box
@@ -17,8 +17,8 @@ UI/UX:
   ✔ deleting test steps
     ☐ hovering over an action should highlight which items are going to be deleted
 
-    ☐ saving additional data about the gui state in disk (can be saved inside map file for now)
-      ☐ load last scroll position
+  ☐ saving additional data about the gui state in disk (can be saved inside map file for now) @low
+    ☐ load last scroll position
 
   ☐ searching for tests using their titles for actions @low
     - scrolls to the first result but highlight all results in both maps

@@ -21,13 +21,19 @@ class Minimap extends React.Component
       y: 0
     };
 
-    this.onClick = this.onClick.bind(this);
+    this.down = false;
+    this.timestamp = 0;
+
+    this.onMouseUp = this.onMouseUp.bind(this);
+    this.onMouseDown = this.onMouseDown.bind(this);
+    this.onMouseMove = this.onMouseMove.bind(this);
   }
 
   /**
   * @param { React.MouseEvent } e
+  * @param { boolean } smooth
   */
-  onClick(e)
+  handleMovement(e, smooth)
   {
     /**
     * @type { HTMLElement }
@@ -73,16 +79,52 @@ class Minimap extends React.Component
     mindMapRef.parentElement.scrollTo({
       left: x,
       top: y,
-      behavior: 'smooth'
+      behavior: (smooth) ? 'smooth' : 'auto'
     });
+  }
+
+  /**
+  * @param { React.MouseEvent } e
+  */
+  onMouseUp(e)
+  {
+    this.down = false;
+    
+    this.handleMovement(e, true);
+  }
+
+  onMouseDown()
+  {
+    this.down = true;
+  }
+
+  /**
+  * @param { React.MouseEvent } e
+  */
+  onMouseMove(e)
+  {
+    if (!this.down)
+      return;
+
+    const delta = Date.now() - this.timestamp;
+
+    // small cooldown between each call
+    if (delta > 25)
+    {
+      this.handleMovement(e, false);
+
+      this.timestamp = Date.now();
+    }
   }
 
   render()
   {
     return <div
       className={ styles.wrapper }
+      onMouseUp={ this.onMouseUp }
+      onMouseDown={ this.onMouseDown }
+      onMouseMove={ this.onMouseMove }
       onContextMenu={ this.props?.onContextMenu }
-      onClick={ this.onClick }
     >
       <div className={ styles.container }>
         <MinimapIndicator x={ this.state.x } y={ this.state.y }/>
