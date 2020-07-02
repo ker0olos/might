@@ -100,6 +100,11 @@ const styles = createStyle({
     '[highlight="remove"]': {
       color: colors.red,
       backgroundColor: colors.red
+    },
+
+    '[highlight="add"]': {
+      color: colors.blue,
+      backgroundColor: colors.blue
     }
   },
 

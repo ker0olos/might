@@ -25,7 +25,7 @@ export default function getTheme()
 
     transparent: 'transparent',
 
-    blue: '#1abfe8',
+    blue: '#1a7ee8',
     red: '#de3e3e'
   };
 

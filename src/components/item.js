@@ -46,12 +46,60 @@ const rightClick = (e, mindmap, item) =>
         {
           title: 'New',
           icon: NewStepIcon,
+          // highlights where the step will be added
+          enter: () =>
+          {
+            // create a fake item and add it
+            // where the acutal new item would go
+
+            const newItem = {
+              hover: 'new-step'
+            };
+
+            item.hover = 'parent-new-step';
+
+            item.children = {
+              ...item.children,
+              '!': newItem
+            };
+
+            mindmap.forceUpdate();
+          },
+          leave: () =>
+          {
+            delete item.children['!'];
+            
+            mindmap.forceUpdate();
+          },
           callback: () => mindmap.addStepAfter(occurrences, 'new')
         },
         {
           title: 'Insert',
           icon: InsertStepIcon,
           hidden: (!item.children) ? true : false,
+          // highlights where the step will be added
+          enter: () =>
+          {
+            // create a fake item and insert it
+            // where the acutal new item would go
+
+            const insertedItem = {
+              hover: 'insert-step',
+              children: item.children
+            };
+
+            item.children = {
+              '!': insertedItem
+            };
+            
+            mindmap.forceUpdate();
+          },
+          leave: () =>
+          {
+            item.children = item.children['!'].children;
+            
+            mindmap.forceUpdate();
+          },
           callback: () => mindmap.addStepAfter(occurrences, 'insert')
         }
       ] },
@@ -190,6 +238,10 @@ const styles = createStyle({
 
     '[highlight="remove"]': {
       backgroundColor: colors.red
+    },
+
+    '[highlight="add"]': {
+      backgroundColor: colors.blue
     }
   },
 
@@ -206,6 +258,12 @@ const styles = createStyle({
       color: colors.whiteText,
       backgroundColor: colors.red,
       border: `${colors.red} 1px solid`
+    },
+
+    '[highlight="add"]': {
+      color: colors.blue,
+      backgroundColor: colors.blue,
+      border: `${colors.blue} 1px solid`
     }
   },
 

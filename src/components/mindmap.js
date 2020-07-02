@@ -448,7 +448,7 @@ class Mindmap extends React.Component
         const test = { ...data[occurrences[0].testIndex] };
 
         // set a new empty title for the test
-        test.title = 'New Untitled Test';
+        test.title = 'Untitled Test';
 
         // slice the steps to removed unneeded steps
         test.steps = test.steps.slice(0, occurrences[0].stepIndex + 1);
@@ -503,7 +503,7 @@ class Mindmap extends React.Component
         step.value = value;
 
       const test = {
-        title: 'New Untitled Test',
+        title: 'Untitled Test',
         steps: [
           step
         ]
@@ -695,14 +695,23 @@ class Mindmap extends React.Component
               highlight = 'remove';
               preLinesHighlight = 'remove';
             }
-            else if (item.hover === 'remove-step')
+            else if (item.hover === 'new-step' || item.hover === 'insert-step')
             {
-              highlight = 'remove';
+              highlight = 'add';
+              preLinesHighlight = 'add';
+            }
+            else if (item.hover === 'parent-new-step')
+            {
+              postLinesHighlight = 'add';
             }
             else if (item.hover === 'remove-branch')
             {
               highlight = 'remove';
               postLinesHighlight = 'remove';
+            }
+            else if (item.hover === 'remove-step')
+            {
+              highlight = 'remove';
             }
 
             return <div key={ index } className={ styles.row }>
