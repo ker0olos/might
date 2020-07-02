@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
 
-import PropTypes, { string } from 'prop-types';
+import PropTypes from 'prop-types';
 
 import { createStyle } from 'flcss';
 
@@ -12,141 +12,168 @@ import Input from './input.js';
 
 const colors = getTheme();
 
+const actions = [ 'wait', 'select', 'click', 'type' ];
+
 const unmount = () => ReactDOM.unmountComponentAtNode(document.querySelector('#dialogue'));
 
-/**
-* @param { 'edit-title' | 'edit-step' | 'delete-step' } type
-* @param { string } title
-* @param { { action: string, value: string } } step
-* @param { () => void } done
-*/
-const Dialogue = ({ type, title, step, done }) =>
+class Dialogue extends React.Component
 {
-  const actions = [ 'wait', 'select', 'click', 'type' ];
-  
-  const [ action, setAction ] = useState();
-  const [ value, setValue ] = useState();
-
-  // unmount the dialogue (cancel) by pressing escape key
-  useEffect(() =>
+  constructor()
   {
-    window.addEventListener('keydown', (e) =>
-    {
-      if (e.key === 'Escape')
-        unmount();
-    });
-  }, []);
+    super();
 
-  // Callbacks
+    this.state = {};
 
-  const _done = (...args) =>
+    this.onKeyDown = this.onKeyDown.bind(this);
+    
+    this.done = this.done.bind(this);
+  }
+
+  componentDidMount()
   {
-    if (done)
-      done.call(undefined, ...args);
+    window.addEventListener('keydown', this.onKeyDown);
+  }
+
+  componentWillUnmount()
+  {
+    window.removeEventListener('keydown', this.onKeyDown);
+  }
+
+  onKeyDown(e)
+  {
+    if (e.key === 'Escape')
+      unmount();
+
+    if (e.key === 'Enter')
+      this.done();
+  }
+
+  done()
+  {
+    const _done = this.props.done;
+
+    const { action, value } = this.state;
+
+    _done?.call(undefined, action, value);
     
     unmount();
-  };
+  }
 
-  // Types of Dialogue
-
-  const Title = () =>
+  render()
   {
-    let defaultTitle = '';
+    const { action } = this.state;
 
-    if (title)
-      defaultTitle = title;
+    /**
+    * @type { {
+    * type: 'edit-title' | 'edit-step' | 'delete-step'
+    * title: string
+    * step: { action: string, value: string }
+    * done: () => void
+    * } }
+    */
+    const { type, title, step } = this.props;
 
-    const onInput = (value) => setValue(value);
+    // Types of Dialogue
 
-    return <div className={ styles.container }>
-      <div className={ styles.title }>Title:</div>
+    const Title = () =>
+    {
+      let defaultTitle = '';
+
+      if (title)
+        defaultTitle = title;
+
+      const onInput = (value) => this.setState({ value });
+
+      return <div className={ styles.container }>
+        <div className={ styles.title }>Title:</div>
     
-      <div className={ styles.options }>
-        <Input defaultValue={ defaultTitle } autoFocus={ true } onChange={ onInput }/>
-      </div>
+        <div className={ styles.options }>
+          <Input defaultValue={ defaultTitle } autoFocus={ true } onChange={ onInput }/>
+        </div>
 
-      <div className={ styles.buttons }>
-        <div className={ styles.button } onClick={ () => _done(action, value) }>Apply</div>
-        <div className={ styles.button } onClick={ unmount }>Cancel</div>
-      </div>
-    </div>;
-  };
+        <div className={ styles.buttons }>
+          <div className={ styles.button } onClick={ this.done }>Apply</div>
+          <div className={ styles.button } onClick={ unmount }>Cancel</div>
+        </div>
+      </div>;
+    };
 
-  const Step = () =>
-  {
-    let defaultAction = 0;
-    let defaultValue = '';
-
-    let suffix;
-    let suffixTitle;
-
-    if (action === 'wait')
+    const Step = () =>
     {
-      suffix = 'S';
-      suffixTitle = 'Seconds';
-    }
-  
-    if (step)
-    {
-      defaultAction = actions.indexOf(step.action);
-      defaultValue = step.value;
+      let defaultAction = 0;
+      let defaultValue = '';
 
-      if (!action && defaultAction === 0)
+      let suffix;
+      let suffixTitle;
+
+      if (action === 'wait')
       {
         suffix = 'S';
         suffixTitle = 'Seconds';
       }
-    }
+  
+      if (step)
+      {
+        defaultAction = actions.indexOf(step.action);
+        defaultValue = step.value;
 
-    const onSelect = (action) => setAction(action);
+        if (!action && defaultAction === 0)
+        {
+          suffix = 'S';
+          suffixTitle = 'Seconds';
+        }
+      }
 
-    const onInput = (value) =>
-    {
-      // TODO validate the value based on the action
-      // like if wait action had characters that weren't number in its value
-      setValue(value);
+      const onSelect = (action) => this.setState({ action });
+
+      const onInput = (value) =>
+      {
+        // TODO validate the value based on the action
+        // like if wait action had characters that weren't number in its value
+        this.setState({ value });
+      };
+
+      return <div className={ styles.container }>
+        <div className={ styles.title }>Action:</div>
+    
+        <div className={ styles.options }>
+          <Select defaultIndex={ defaultAction } options={ actions } onChange={ onSelect }/>
+          <Input defaultValue={ defaultValue } suffix={ { content: suffix, title: suffixTitle } } autoFocus={ true } onChange={ onInput }/>
+        </div>
+
+        <div className={ styles.buttons }>
+          <div className={ styles.button } onClick={ this.done }>Apply</div>
+          <div className={ styles.button } onClick={ unmount }>Cancel</div>
+        </div>
+      </div>;
     };
 
-    return <div className={ styles.container }>
-      <div className={ styles.title }>Action:</div>
-    
-      <div className={ styles.options }>
-        <Select defaultIndex={ defaultAction } options={ actions } onChange={ onSelect }/>
-        <Input defaultValue={ defaultValue } suffix={ { content: suffix, title: suffixTitle } } autoFocus={ true } onChange={ onInput }/>
-      </div>
+    const Delete = () =>
+    {
+      return <div className={ styles.container }>
+        <div className={ styles.description }>Are you sure you want to delete that?</div>
 
-      <div className={ styles.buttons }>
-        <div className={ styles.button } onClick={ () => _done(action, value) }>Apply</div>
-        <div className={ styles.button } onClick={ unmount }>Cancel</div>
-      </div>
-    </div>;
-  };
+        <div className={ styles.buttons }>
+          <div className={ styles.button } onClick={ this.done }>Confirm</div>
+          <div className={ styles.button } onClick={ unmount }>Cancel</div>
+        </div>
+      </div>;
+    };
 
-  const Delete = () =>
-  {
-    return <div className={ styles.container }>
-      <div className={ styles.description }>Are you sure you want to delete that?</div>
+    let Element;
 
-      <div className={ styles.buttons }>
-        <div className={ styles.button } onClick={ _done }>Confirm</div>
-        <div className={ styles.button } onClick={ unmount }>Cancel</div>
-      </div>
-    </div>;
-  };
-
-  let Element;
+    if (type === 'edit-title')
+      Element = Title;
+    else if (type === 'edit-step')
+      Element = Step;
+    else
+      Element = Delete;
   
-  if (type === 'edit-title')
-    Element = Title;
-  else if (type === 'edit-step')
-    Element = Step;
-  else
-    Element = Delete;
-  
-  return <div className={ styles.wrapper }>
-    { Element() }
-  </div>;
-};
+    return <div className={ styles.wrapper }>
+      { Element() }
+    </div>;
+  }
+}
 
 Dialogue.propTypes = {
   type: PropTypes.string.isRequired,

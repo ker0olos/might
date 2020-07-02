@@ -10,9 +10,9 @@ Performance Issues and Bugs:
 
 UI/UX:
   ☐ improve the dialogue UX
-    - enter to apply
-    - better UI to the focused input box
-    - redesign the delete dialogue
+    ✔ enter to apply
+    ☐ better UI to the focused input box
+    ☐ redesign the delete dialogue
 
   ✔ deleting test steps
     ☐ hovering over an action should highlight which items are going to be deleted
