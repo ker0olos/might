@@ -50,11 +50,12 @@ class Dialogue extends React.Component
 
   done()
   {
+    const { action, value } = this.state;
+    
     const _done = this.props.done;
 
-    const { action, value } = this.state;
-
-    _done?.call(undefined, action, value);
+    if (_done)
+      _done(undefined, action, value);
     
     unmount();
   }
@@ -65,7 +66,7 @@ class Dialogue extends React.Component
 
     /**
     * @type { {
-    * type: 'edit-title' | 'edit-step' | 'delete-step'
+    * type: 'edit-title' | 'edit-step'
     * title: string
     * step: { action: string, value: string }
     * done: () => void
@@ -148,29 +149,8 @@ class Dialogue extends React.Component
       </div>;
     };
 
-    const Delete = () =>
-    {
-      return <div className={ styles.container }>
-        <div className={ styles.description }>Are you sure you want to delete that?</div>
-
-        <div className={ styles.buttons }>
-          <div className={ styles.button } onClick={ this.done }>Confirm</div>
-          <div className={ styles.button } onClick={ unmount }>Cancel</div>
-        </div>
-      </div>;
-    };
-
-    let Element;
-
-    if (type === 'edit-title')
-      Element = Title;
-    else if (type === 'edit-step')
-      Element = Step;
-    else
-      Element = Delete;
-  
     return <div className={ styles.wrapper }>
-      { Element() }
+      { (type === 'edit-step') ? Step() : Title() }
     </div>;
   }
 }
@@ -220,13 +200,6 @@ const styles = createStyle({
   title: {
     userSelect: 'none',
     margin: '25px 15px 10px 15px'
-  },
-
-  description: {
-    fontSize: '14px',
-
-    userSelect: 'none',
-    margin: '25px 15px 20px 15px'
   },
 
   options: {

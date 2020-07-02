@@ -8,7 +8,7 @@ import getTheme from '../colors.js';
 
 const colors = getTheme();
 
-const Vertical = ({ reverse, half, mode }) =>
+const Vertical = ({ reverse, half, mode, highlight }) =>
 {
   const normal = {
     container: (mode === 'full') ? styles.container : styles.miniContainer
@@ -29,13 +29,14 @@ const Vertical = ({ reverse, half, mode }) =>
   else if (half)
     s = sHalf;
 
-  return <div className={ s.container }/>;
+  return <div className={ s.container } highlight={ highlight }/>;
 };
 
 Vertical.propTypes = {
   reverse: PropTypes.bool.isRequired,
   half: PropTypes.bool.isRequired,
-  mode: PropTypes.string.isRequired
+  mode: PropTypes.string.isRequired,
+  highlight: PropTypes.string
 };
 
 const styles = createStyle({
@@ -45,7 +46,11 @@ const styles = createStyle({
 
     top: 0,
     width: '1px',
-    height: '100%'
+    height: '100%',
+
+    '[highlight="remove"]': {
+      backgroundColor: colors.red
+    }
   },
 
   miniContainer: {

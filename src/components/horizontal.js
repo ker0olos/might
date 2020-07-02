@@ -55,7 +55,7 @@ const leftClick = (e, callback) =>
   clickTimestamp = now;
 };
 
-const Horizontal = ({ mode, title, onClick }) =>
+const Horizontal = ({ mode, title, highlight, onClick }) =>
 {
   const s = {
     container: (mode === 'full') ? styles.container : styles.miniContainer,
@@ -64,7 +64,7 @@ const Horizontal = ({ mode, title, onClick }) =>
 
   if (title)
   {
-    return <div className={ s.container }>
+    return <div className={ s.container } highlight={ highlight }>
       <div
         title={ title }
         className={ s.title }
@@ -73,15 +73,15 @@ const Horizontal = ({ mode, title, onClick }) =>
       >{ title }</div>
     </div>;
   }
-  else
-  {
-    return <div className={ s.container }/>;
-  }
+
+  return <div className={ s.container } highlight={ highlight }/>;
 };
 
 Horizontal.propTypes = {
   mode: PropTypes.string.isRequired,
-  title: PropTypes.string
+  title: PropTypes.string,
+  highlight: PropTypes.string,
+  onClick: PropTypes.func
 };
 
 const styles = createStyle({
@@ -89,12 +89,18 @@ const styles = createStyle({
     display: 'flex',
     alignItems: 'flex-end',
 
+    color: colors.accent,
     backgroundColor: colors.accent,
 
     height: '1px',
 
     padding: '0 30px',
-    margin: 'auto'
+    margin: 'auto',
+
+    '[highlight="remove"]': {
+      color: colors.red,
+      backgroundColor: colors.red
+    }
   },
 
   miniContainer: {
@@ -105,7 +111,6 @@ const styles = createStyle({
   },
 
   title: {
-    color: colors.accent,
     fontSize: '11px',
 
     userSelect: 'none',

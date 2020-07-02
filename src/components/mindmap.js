@@ -27,6 +27,7 @@ const mindMapRef = React.createRef();
 * @typedef { Object } FamilizedItem
 * @property { { testIndex: number, stepIndex: number }[] } occurrences
 * @property { string } title
+* @property { 'remove-step' | 'remove-branch' } hover
 * @property { string } action
 * @property { string } value
 * @property { FamilizedObject } children
@@ -107,7 +108,7 @@ class Mindmap extends React.Component
     document.body.addEventListener('keydown', this.onKeyDown);
 
     // REMOVE (test group)
-    // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]}]}').data, true);
+    this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]}]}').data, true);
 
     // REMOVE (test group 2)
     // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]}, {"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello Mars"}]}]}').data, true);
@@ -443,11 +444,6 @@ class Mindmap extends React.Component
         
       if (mode === 'new')
       {
-        // FIX handle it
-        // to recreate error click add on any item that has more than 1 child
-        if (occurrences.length > 1)
-          throw new Error('unhandled duplication issue');
-
         // copy test
         const test = { ...data[occurrences[0].testIndex] };
 
@@ -586,38 +582,33 @@ class Mindmap extends React.Component
   {
     const data = this.state.data;
 
-    const done = () =>
+    // removes each occurrence of the required step
+    occurrences.forEach((occurrence) =>
     {
-      // removes each occurrence of the required step
-      occurrences.forEach((occurrence) =>
+      /**
+      * @type { Array }
+      */
+      const steps = data[occurrence.testIndex].steps;
+
+      // there's two ways to delete items
+  
+      // delete the item and any other items branched from it
+      if (mode === 'branch')
       {
-        /**
-        * @type { Array }
-        */
-        const steps = data[occurrence.testIndex].steps;
+        // delete the step and all of its children
+        steps.splice(occurrence.stepIndex);
+      }
+      // delete just the item and leave its children in place
+      else
+      {
+        // delete just the step it self
+        // leaving its children as is
+        steps.splice(occurrence.stepIndex, 1);
+      }
+    });
 
-        // there's two ways to delete items
-        
-        // delete the item and any other items branched from it
-        if (mode === 'branch')
-        {
-          // delete the step and all of its children
-          steps.splice(occurrence.stepIndex);
-        }
-        // delete just the item and leave its children in place
-        else
-        {
-          // delete just the step it self
-          // leaving its children as is
-          steps.splice(occurrence.stepIndex, 1);
-        }
-      });
-
-      // re-create the mindmap with the new data
-      this.loadMap(data);
-    };
-
-    ReactDOM.render(<Dialogue type={ 'delete-step' } done={ done }/>, document.querySelector('#dialogue'));
+    // re-create the mindmap with the new data
+    this.loadMap(data);
   }
  
   render()
@@ -627,8 +618,9 @@ class Mindmap extends React.Component
     * @param { number } index
     * @param { FamilizedItem } item
     * @param { 'mini' | 'full' } mode
+    * @param { string } highlight
     */
-    const handlePreLines = (children, index, item, mode) =>
+    const handlePreLines = (children, index, item, mode, highlight) =>
     {
       // if parent had no children
       // or if only has one child (then the parent will connect
@@ -645,27 +637,27 @@ class Mindmap extends React.Component
             // first line should be rotated upside down (reversed)
             // first and last child get half vertical lines
             // all other children get full vertical lines
-            <Vertical reverse={ index === 0 } half={ index === 0 || index === children.length - 1 } mode={ mode }/> :
+            <Vertical reverse={ index === 0 } half={ index === 0 || index === children.length - 1 } mode={ mode } highlight={ highlight }/> :
             <div/>
         }
 
-        <Horizontal mode={ mode } title={ item.title } onClick={ () => this.editTitle(item.occurrences[0].testIndex) }/>
-
+        <Horizontal mode={ mode } title={ item.title } highlight={ highlight } onClick={ () => this.editTitle(item.occurrences[0].testIndex) }/>
       </div>;
     };
 
     /**
     * @param { string[] } children
     * @param { 'mini' | 'full' } mode
+    * @param { string } highlight
     */
-    const handlePostLines = (children, mode) =>
+    const handlePostLines = (children, mode, highlight) =>
     {
       // post lines are only drawn to connect to the pre-lines of the next step in the map
       // that means that there need to be pre-lines
       if (!children || children.length <= 1)
         return <div/>;
 
-      return <Horizontal mode={ mode }/>;
+      return <Horizontal mode={ mode } highlight={ highlight }/>;
     };
 
     // using the familized data
@@ -680,8 +672,9 @@ class Mindmap extends React.Component
     * @param { FamilizedObject } children
     * @param { 'mini' | 'full' } mode
     * @param { boolean } continuation
+    * @param { string } hover
     */
-    const handleItems = (children, mode, continuation) =>
+    const handleItems = (children, mode, continuation, hover) =>
     {
       // nothing to be rendered
       if (!children)
@@ -695,18 +688,38 @@ class Mindmap extends React.Component
           {
             const item = children[step];
 
+            let highlight, postLinesHighlight, preLinesHighlight;
+
+            if (hover === 'remove-branch')
+            {
+              highlight = 'remove';
+              preLinesHighlight = 'remove';
+            }
+            else if (item.hover === 'remove-step')
+            {
+              highlight = 'remove';
+            }
+            else if (item.hover === 'remove-branch')
+            {
+              highlight = 'remove';
+              postLinesHighlight = 'remove';
+            }
+
             return <div key={ index } className={ styles.row }>
 
-              {/* no continuation means that the item is the first in the branch and
-                  does not need any pre-lines
+              {/*
+                no continuation means that the item is the first in the branch and
+                does not need any pre-lines
               */}
-              { (continuation) ? handlePreLines(keys, index, item, mode) : undefined }
+              {
+                (continuation) ? handlePreLines(keys, index, item, mode, preLinesHighlight) : undefined
+              }
 
-              <Item mindmap={ this } mode={ mode } title={ step } occurrences={ item.occurrences }/>
+              <Item mindmap={ this } mode={ mode } title={ step } highlight={ highlight } item={ item }/>
 
-              { handlePostLines(Object.keys(item.children || {}), mode) }
+              { handlePostLines(Object.keys(item.children || {}), mode, postLinesHighlight) }
 
-              { handleItems(item.children, mode, true) }
+              { handleItems(item.children, mode, true, hover || item.hover) }
             </div>;
           })
         }

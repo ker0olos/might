@@ -12,10 +12,6 @@ UI/UX:
   ☐ improve the dialogue UX
     ✔ enter to apply
     ☐ better UI to the focused input box
-    ☐ redesign the delete dialogue
-
-  ✔ deleting test steps
-    ☐ hovering over an action should highlight which items are going to be deleted
 
   ☐ saving additional data about the gui state in disk (can be saved inside map file for now) @low
     ☐ load last scroll position

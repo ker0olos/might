@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
 
 import PropTypes from 'prop-types';
@@ -11,10 +11,17 @@ const colors = getTheme();
 
 const click = (e) =>
 {
-  // by not preventing default, the user can reach
+  // by not preventing default here, the user can reach
   // the native browser context menu by double clicking
   // the right mouse button
-  e.preventDefault();
+  if (e.preventDefault)
+    e.preventDefault();
+
+  if (e.leave)
+    e.leave();
+
+  if (e.callback)
+    e.callback();
 
   // unmount the context menu
   ReactDOM.unmountComponentAtNode(document.querySelector('#contextMenu'));
@@ -24,11 +31,17 @@ const click = (e) =>
 * @param { {
 *    x: number,
 *    y: number,
-*    actions: { title: string, icon: JSX.Element, actions: { title: string, icon: string, callback: () => void }[]], callback: () => void }[]
+*    actions: { title: string, icon: JSX.Element, actions: { title: string, icon: string, enter: () => void, leave: () => void, callback: () => void }[]], enter: () => void, leave: () => void, callback: () => void }[]
 *  } } param0
 */
 const ContextMenu = ({ x, y, actions }) =>
 {
+  // remove the context menu if the cursor leaves the viewport
+  useEffect(() =>
+  {
+    document.body.addEventListener('mouseleave', click);
+  }, []);
+
   // before passing the x and y
   // they are checked against
   // the width and height of context menu and
@@ -111,7 +124,7 @@ const ContextMenu = ({ x, y, actions }) =>
                   {
                     const icon = (action.icon) ? <action.icon className={ styles.icon }/> : <div/>;
 
-                    return <div key={ i } className={ styles.action } onClick={ action.callback }>
+                    return <div key={ i } className={ styles.action } onMouseEnter={ action.enter } onMouseLeave={ action.leave } onClick={ () => click(action) }>
                       <div className={ styles.title }>{ action.title }</div>
                       { icon }
                     </div>;
@@ -124,7 +137,7 @@ const ContextMenu = ({ x, y, actions }) =>
           {
             const icon = (action.icon) ? <action.icon className={ styles.icon }/> : <div/>;
 
-            return <div key={ i } className={ styles.action } onClick={ action.callback }>
+            return <div key={ i } className={ styles.action } onMouseEnter={ action.enter } onMouseLeave={ action.leave } onClick={ () => click(action) }>
               <div className={ styles.title }>{ action.title }</div>
               { icon }
             </div>;

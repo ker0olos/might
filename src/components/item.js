@@ -25,17 +25,16 @@ let clickTimestamp = 0;
 * @param { React.SyntheticEvent } e
 * @param { {} } mindmap
 * @param { 'mini' | 'full' } mode
-* @param { [] } occurrences
+* @param { import('./mindmap.js').FamilizedItem } item
 */
-const rightClick = (e, mindmap, mode, occurrences) =>
+const rightClick = (e, mindmap, item) =>
 {
-  if (mode !== 'full')
-    return;
-
   // prevent the native browser context menu and
   // and the normal mindmap menu from showing
   e.stopPropagation();
   e.preventDefault();
+
+  const { occurrences } = item;
 
   // mount the context menu
   ReactDOM.render(<ContextMenu
@@ -44,28 +43,63 @@ const rightClick = (e, mindmap, mode, occurrences) =>
     actions={ [
       { title: 'Edit', icon: EditIcon, callback: () => mindmap.editStep(occurrences) },
       { title: 'Add', actions: [
-        { title: 'New', icon: NewStepIcon, callback: () => mindmap.addStepAfter(occurrences, 'new') },
-        { title: 'Insert', icon: InsertStepIcon, callback: () => mindmap.addStepAfter(occurrences, 'insert') }
+        {
+          title: 'New',
+          icon: NewStepIcon,
+          callback: () => mindmap.addStepAfter(occurrences, 'new')
+        },
+        {
+          title: 'Insert',
+          icon: InsertStepIcon,
+          callback: () => mindmap.addStepAfter(occurrences, 'insert')
+        }
       ] },
       { title: 'Remove', actions: [
-        { title: 'Step', icon: RemoveStepIcon, callback: () => mindmap.deleteStep(occurrences, 'this') },
-        { title: 'Branch', icon: RemoveBranchIcon, callback: () => mindmap.deleteStep(occurrences, 'branch') }
+        {
+          title: 'Step',
+          icon: RemoveStepIcon,
+          // highlights the step that
+          // will be deleted
+          enter: () =>
+          {
+            item.hover = 'remove-step';
+            mindmap.forceUpdate();
+          },
+          leave: () =>
+          {
+            item.hover = undefined;
+            mindmap.forceUpdate();
+          },
+          callback: () => mindmap.deleteStep(occurrences, 'this')
+        },
+        {
+          title: 'Branch',
+          icon: RemoveBranchIcon,
+          // highlights the entire branch
+          // that will be deleted
+          enter: () =>
+          {
+            item.hover = 'remove-branch';
+            mindmap.forceUpdate();
+          },
+          leave: () =>
+          {
+            item.hover = undefined;
+            mindmap.forceUpdate();
+          },
+          callback: () => mindmap.deleteStep(occurrences, 'branch')
+        }
       ] }
     ] }
   />, document.querySelector('#contextMenu'));
 };
 
 /**
-* @param { React.SyntheticEvent } e
 * @param { {} } mindmap
-* @param { 'mini' | 'full' } mode
-* @param { [] } occurrences
+* @param { import('./mindmap.js').FamilizedItem } item
 */
-const leftClick = (e, mindmap, mode, occurrences) =>
+const leftClick = (mindmap, item) =>
 {
-  if (mode !== 'full')
-    return;
-  
   const now = Date.now();
 
   // this a global check
@@ -75,7 +109,7 @@ const leftClick = (e, mindmap, mode, occurrences) =>
 
   // double click to open the edit dialogue (350ms window)
   if ((now - clickTimestamp) <= 350)
-    mindmap.editStep(occurrences);
+    mindmap.editStep(item.occurrences);
 
   // update timestamp
   clickTimestamp = now;
@@ -83,28 +117,30 @@ const leftClick = (e, mindmap, mode, occurrences) =>
 
 /**
 * @param { {
+*   mindmap: {},
 *   mode: 'mini' | 'full',
 *   title: string,
-*   occurrences: [],
-*   testIndex: number,
-*   stepIndex: number
+*   highlight: string,
+*   item: import('./mindmap.js').FamilizedItem
 *  } } param0
 */
-const Item = ({ mindmap, mode, title, occurrences }) =>
+const Item = ({ mindmap, mode, title, highlight, item }) =>
 {
-  const s = {
-    wrapper: (mode === 'full') ? styles.wrapper : styles.miniWrapper,
-    container: (mode === 'full') ? styles.container : styles.miniContainer,
-    text: (mode === 'full') ? styles.text : styles.miniText
-  };
+  if (mode === 'mini')
+  
+    return <div className={ styles.miniWrapper } highlight={ highlight }>
+      <div className={ styles.miniContainer }>
+        <div className={ styles.miniText }>{ title }</div>
+      </div>
+    </div>;
 
   return <div
-    className={ s.wrapper }
-    onClick={ (e) => leftClick(e, mindmap, mode, occurrences) }
-    onContextMenu={ (e) => rightClick(e, mindmap, mode, occurrences) }
+    className={ styles.wrapper }
+    onClick={ () => leftClick(mindmap, item) }
+    onContextMenu={ (e) => rightClick(e, mindmap, item) }
   >
-    <div className={ s.container }>
-      <div title={ title } className={ s.text }>{ title }</div>
+    <div className={ styles.container } highlight={ highlight } >
+      <div title={ title } className={ styles.text }>{ title }</div>
     </div>
   </div>;
 };
@@ -112,14 +148,18 @@ const Item = ({ mindmap, mode, title, occurrences }) =>
 Item.propTypes = {
   mindmap: PropTypes.object.isRequired,
   mode: PropTypes.string.isRequired,
-  title: PropTypes.string.isRequired,
-  occurrences: PropTypes.array.isRequired
+  highlight: PropTypes.string,
+  item: PropTypes.object.isRequired,
+  title: PropTypes.string.isRequired
 };
 
 const styles = createStyle({
   wrapper: {
     display: 'flex',
     alignItems: 'center',
+
+    color: colors.blackText,
+    backgroundColor: colors.whiteBackground,
 
     minHeight: '26px',
     maxHeight: '50px',
@@ -130,6 +170,7 @@ const styles = createStyle({
 
     margin: 'auto',
 
+    // acts as margin between rows
     borderTop: `6px solid ${colors.whiteBackground}`,
     borderBottom: `6px solid ${colors.whiteBackground}`
   },
@@ -144,7 +185,11 @@ const styles = createStyle({
     width: 'calc(110px / 10)',
 
     borderTop: `calc(6px / 10) solid ${colors.whiteBackground}`,
-    borderBottom: `calc(6px / 10) solid ${colors.whiteBackground}`
+    borderBottom: `calc(6px / 10) solid ${colors.whiteBackground}`,
+
+    '[highlight="remove"]': {
+      backgroundColor: colors.red
+    }
   },
 
   container: {
@@ -154,7 +199,13 @@ const styles = createStyle({
     overflow: 'hidden',
 
     borderRadius: '3px',
-    border: `${colors.accent} 1px solid`
+    border: `${colors.accent} 1px solid`,
+
+    '[highlight="remove"]': {
+      color: colors.whiteText,
+      backgroundColor: colors.red,
+      border: `${colors.red} 1px solid`
+    }
   },
 
   miniContainer: {
