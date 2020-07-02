@@ -51,6 +51,7 @@ const rightClick = (e, mindmap, item) =>
         {
           title: 'Insert',
           icon: InsertStepIcon,
+          hidden: (!item.children) ? true : false,
           callback: () => mindmap.addStepAfter(occurrences, 'insert')
         }
       ] },

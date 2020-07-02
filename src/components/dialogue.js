@@ -54,8 +54,7 @@ class Dialogue extends React.Component
     
     const _done = this.props.done;
 
-    if (_done)
-      _done(undefined, action, value);
+    _done?.call(undefined, action, value);
     
     unmount();
   }

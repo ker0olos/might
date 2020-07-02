@@ -28,10 +28,21 @@ const click = (e) =>
 };
 
 /**
+* @typedef { Object } ContextMenuItem
+* @property { string } title
+* @property { JSX.Element } icon
+* @property { boolean } hidden
+* @property { () => void } enter
+* @property { () => void } leave
+* @property { () => void } callback
+* @property { ContextMenuItem[] } actions
+*/
+
+/**
 * @param { {
 *    x: number,
 *    y: number,
-*    actions: { title: string, icon: JSX.Element, actions: { title: string, icon: string, enter: () => void, leave: () => void, callback: () => void }[]], enter: () => void, leave: () => void, callback: () => void }[]
+*    actions: ContextMenuItem[]
 *  } } param0
 */
 const ContextMenu = ({ x, y, actions }) =>
@@ -77,13 +88,21 @@ const ContextMenu = ({ x, y, actions }) =>
       // title padding
       height = height + 10;
 
+      let length = 0;
+
+      action.actions.forEach((a) =>
+      {
+        if (!a.hidden)
+          length = length + 1;
+      });
+
       // actions height
-      height = height + (22 * action.actions.length);
+      height = height + (22 * length);
 
       // actions padding
-      height = height + (20 * action.actions.length);
+      height = height + (20 * length);
     }
-    else
+    else if (!action.hidden)
     {
       // action height
       height = 22;
@@ -122,6 +141,9 @@ const ContextMenu = ({ x, y, actions }) =>
                 {
                   action.actions.map((action, i) =>
                   {
+                    if (action.hidden)
+                      return <div key={ i }/>;
+                    
                     const icon = (action.icon) ? <action.icon className={ styles.icon }/> : <div/>;
 
                     return <div key={ i } className={ styles.action } onMouseEnter={ action.enter } onMouseLeave={ action.leave } onClick={ () => click(action) }>
@@ -135,6 +157,9 @@ const ContextMenu = ({ x, y, actions }) =>
           }
           else
           {
+            if (action.hidden)
+              return <div key={ i }/>;
+            
             const icon = (action.icon) ? <action.icon className={ styles.icon }/> : <div/>;
 
             return <div key={ i } className={ styles.action } onMouseEnter={ action.enter } onMouseLeave={ action.leave } onClick={ () => click(action) }>
