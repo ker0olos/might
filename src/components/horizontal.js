@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 
 import PropTypes from 'prop-types';
 
@@ -7,81 +6,21 @@ import { createStyle } from 'flcss';
 
 import getTheme from '../colors.js';
 
-import ContextMenu from './contextMenu.js';
-
 const colors = getTheme();
 
-let clickTimestamp = 0;
-
-/**
-* @param { React.SyntheticEvent } e
-* @param { () => void } callback
-*/
-const rightClick = (e, callback) =>
-{
-  // prevent the native browser context menu and
-  // and the normal mindmap menu from showing
-  e.stopPropagation();
-  e.preventDefault();
-
-  // mount the context menu
-  ReactDOM.render(<ContextMenu
-    x={ e.nativeEvent.pageX }
-    y={ e.nativeEvent.pageY }
-    actions={ [
-      { title: 'Edit', icon: 'edit', callback }
-    ] }
-  />, document.querySelector('#contextMenu'));
-};
-
-/**
-* @param { React.SyntheticEvent } e
-* @param { () => void } callback
-*/
-const leftClick = (e, callback) =>
-{
-  const now = Date.now();
-
-  // this a global check
-  // meaning it can be tricked if the user clicks 2 different items
-  // in that small time window.
-  // this can be fixed with some react hooks magic but it's not that big of an issue.
-
-  // double click to open the edit dialogue (350ms window)
-  if ((now - clickTimestamp) <= 350)
-    callback();
-
-  // update timestamp
-  clickTimestamp = now;
-};
-
-const Horizontal = ({ mode, title, highlight, onClick }) =>
+const Horizontal = ({ mode, highlight }) =>
 {
   const s = {
     container: (mode === 'full') ? styles.container : styles.miniContainer,
     title: (mode === 'full') ? styles.title : styles.miniTitle
   };
 
-  if (title)
-  {
-    return <div className={ s.container } highlight={ highlight }>
-      <div
-        title={ title }
-        className={ s.title }
-        onClick={ (e) => leftClick(e, onClick) }
-        onContextMenu={ (e) => rightClick(e, onClick) }
-      >{ title }</div>
-    </div>;
-  }
-
   return <div className={ s.container } highlight={ highlight }/>;
 };
 
 Horizontal.propTypes = {
   mode: PropTypes.string.isRequired,
-  title: PropTypes.string,
-  highlight: PropTypes.string,
-  onClick: PropTypes.func
+  highlight: PropTypes.string
 };
 
 const styles = createStyle({
@@ -92,6 +31,7 @@ const styles = createStyle({
     color: colors.accent,
     backgroundColor: colors.accent,
 
+    width: '80px',
     height: '1px',
 
     padding: '0 30px',
@@ -111,37 +51,10 @@ const styles = createStyle({
   miniContainer: {
     extend: 'container',
 
+    width: 'calc(80px / 10)',
     height: '1px',
+
     padding: '0 calc(30px / 10)'
-  },
-
-  title: {
-    fontSize: '11px',
-
-    userSelect: 'none',
-    overflow: 'hidden',
-
-    textAlign: 'center',
-    textOverflow: 'ellipsis',
-
-    minWidth: '60px',
-    maxWidth: '160px',
-    width: 'auto',
-
-    whiteSpace: 'nowrap',
-    margin: '0 0 5px 0'
-  },
-
-  miniTitle: {
-    extend: 'title',
-
-    color: colors.transparent,
-    fontSize: 'calc(11px / 10)',
-
-    minWidth: 'calc(60px / 10)',
-    maxWidth: 'calc(160px / 10)',
-
-    margin: 0
   }
 });
 

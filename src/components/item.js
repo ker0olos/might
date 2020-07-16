@@ -24,10 +24,40 @@ let clickTimestamp = 0;
 /**
 * @param { React.SyntheticEvent } e
 * @param { {} } mindmap
-* @param { 'mini' | 'full' } mode
+* @param { import('./mindmap.js').FamilizedItem } item
+* @param { 'test' | 'item' } mode
+*/
+const leftClick = (e, mindmap, item, mode) =>
+{
+  // stops a click going though test title to the item itself
+  e.stopPropagation();
+
+  const now = Date.now();
+
+  // this a global check
+  // meaning it can be tricked if the user clicks 2 different items
+  // in that small time window.
+  // this can be fixed with some react hooks magic but it's not that big of an issue.
+
+  // double click to open the edit dialogue (350ms window)
+  if ((now - clickTimestamp) <= 250)
+  {
+    if (mode === 'test')
+      mindmap.editTitle(item.occurrences[0].testIndex);
+    else
+      mindmap.editStep(item.occurrences);
+  }
+
+  // update timestamp
+  clickTimestamp = now;
+};
+
+/**
+* @param { React.SyntheticEvent } e
+* @param { {} } mindmap
 * @param { import('./mindmap.js').FamilizedItem } item
 */
-const rightClick = (e, mindmap, item) =>
+const itemRightClick = (e, mindmap, item) =>
 {
   // prevent the native browser context menu and
   // and the normal mindmap menu from showing
@@ -41,7 +71,16 @@ const rightClick = (e, mindmap, item) =>
     x={ e.nativeEvent.pageX }
     y={ e.nativeEvent.pageY }
     actions={ [
-      { title: 'Edit', icon: EditIcon, callback: () => mindmap.editStep(occurrences) },
+      {
+        title: 'Step',
+        actions: [
+          {
+            title: 'Edit',
+            icon: EditIcon,
+            callback: () => mindmap.editStep(occurrences)
+          }
+        ]
+      },
       { title: 'Add', actions: [
         {
           title: 'New',
@@ -124,6 +163,7 @@ const rightClick = (e, mindmap, item) =>
         {
           title: 'Branch',
           icon: RemoveBranchIcon,
+          hidden: (!item.children) ? true : false,
           // highlights the entire branch
           // that will be deleted
           enter: () =>
@@ -144,24 +184,34 @@ const rightClick = (e, mindmap, item) =>
 };
 
 /**
+* @param { React.SyntheticEvent } e
 * @param { {} } mindmap
 * @param { import('./mindmap.js').FamilizedItem } item
 */
-const leftClick = (mindmap, item) =>
+const testRightClick = (e, mindmap, item) =>
 {
-  const now = Date.now();
+  // prevent the native browser context menu and
+  // and the normal mindmap menu from showing
+  e.stopPropagation();
+  e.preventDefault();
 
-  // this a global check
-  // meaning it can be tricked if the user clicks 2 different items
-  // in that small time window.
-  // this can be fixed with some react hooks magic but it's not that big of an issue.
-
-  // double click to open the edit dialogue (350ms window)
-  if ((now - clickTimestamp) <= 350)
-    mindmap.editStep(item.occurrences);
-
-  // update timestamp
-  clickTimestamp = now;
+  // mount the context menu
+  ReactDOM.render(<ContextMenu
+    x={ e.nativeEvent.pageX }
+    y={ e.nativeEvent.pageY }
+    actions={ [
+      {
+        title: 'Test',
+        actions: [
+          {
+            title: 'Edit',
+            icon: EditIcon,
+            callback: () => mindmap.editTitle(item.occurrences[0].testIndex)
+          }
+        ]
+      }
+    ] }
+  />, document.querySelector('#contextMenu'));
 };
 
 /**
@@ -173,23 +223,33 @@ const leftClick = (mindmap, item) =>
 *   item: import('./mindmap.js').FamilizedItem
 *  } } param0
 */
-const Item = ({ mindmap, mode, title, highlight, item }) =>
+const Item = ({ mindmap, mode, content, highlight, item }) =>
 {
   if (mode === 'mini')
   
-    return <div className={ styles.miniWrapper } highlight={ highlight }>
+    return <div className={ styles.miniItemWrapper } highlight={ highlight }>
       <div className={ styles.miniContainer }>
-        <div className={ styles.miniText }>{ title }</div>
+        <div className={ styles.miniContent }>{ content }</div>
       </div>
     </div>;
 
   return <div
-    className={ styles.wrapper }
-    onClick={ () => leftClick(mindmap, item) }
-    onContextMenu={ (e) => rightClick(e, mindmap, item) }
+    className={ styles.itemWrapper }
+    onClick={ (e) => leftClick(e, mindmap, item, 'item') }
+    onContextMenu={ (e) => itemRightClick(e, mindmap, item) }
   >
-    <div className={ styles.container } highlight={ highlight } >
-      <div title={ title } className={ styles.text }>{ title }</div>
+    <div
+      title={ item.title }
+      highlight={ highlight }
+      className={ styles.title }
+      onClick={ (e) => leftClick(e, mindmap, item, 'test') }
+      onContextMenu={ (e) => testRightClick(e, mindmap, item) }
+    >
+      { item.title }
+    </div>
+
+    <div className={ styles.container } highlight={ highlight }>
+      <div title={ content } className={ styles.content }>{ content }</div>
     </div>
   </div>;
 };
@@ -199,12 +259,14 @@ Item.propTypes = {
   mode: PropTypes.string.isRequired,
   highlight: PropTypes.string,
   item: PropTypes.object.isRequired,
-  title: PropTypes.string.isRequired
+  content: PropTypes.string.isRequired
 };
 
 const styles = createStyle({
-  wrapper: {
+  itemWrapper: {
     display: 'flex',
+    position: 'relative',
+
     alignItems: 'center',
 
     color: colors.blackText,
@@ -224,8 +286,8 @@ const styles = createStyle({
     borderBottom: `6px solid ${colors.whiteBackground}`
   },
 
-  miniWrapper: {
-    extend: 'wrapper',
+  miniItemWrapper: {
+    extend: 'itemWrapper',
 
     backgroundColor: colors.accent,
 
@@ -274,7 +336,7 @@ const styles = createStyle({
     border: 0
   },
 
-  text: {
+  content: {
     maxHeight: '45px',
     
     overflow: 'hidden',
@@ -284,14 +346,40 @@ const styles = createStyle({
     margin: '5px 10px'
   },
 
-  miniText: {
-    extend: 'text',
+  miniContent: {
+    extend: 'content',
 
     color: colors.transparent,
     maxHeight: 'unset',
     
     fontSize: '1px',
     margin: '1px'
+  },
+
+  title: {
+    position: 'absolute',
+    
+    color: colors.accent,
+    
+    top: '-10px',
+    left: 'calc(50% - 70px)',
+
+    width: '140px',
+
+    fontSize: '10px',
+    
+    userSelect: 'none',
+    overflow: 'hidden',
+
+    textAlign: 'center',
+    textOverflow: 'ellipsis',
+
+    whiteSpace: 'nowrap',
+    padding: '1px 0',
+
+    '[highlight="remove"]': {
+      color: colors.redder
+    }
   }
 });
 

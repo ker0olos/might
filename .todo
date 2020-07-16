@@ -1,29 +1,22 @@
 Performance Issues and Bugs:
-  ☐ research changing might-core map to be familized and get rid of the duplicate issues
-
   ☐ test duplicated test steps (same test, same title twice in map.json)
     ☐ test with different titles (same test, different titles)
 
   ☐ some items can exceed map size
 
-  ☐ marking what steps are tests are what are not is a huge mess to handle
-
 UI/UX:
-  ☐ improve the dialogue UX
-    ✔ enter to apply
-    ☐ better UI to the focused input box
+  ☐ marking what steps are tests are what are not is a huge mess to handle @high 
 
-  ☐ saving additional data about the gui state in disk (can be saved inside map file for now) @low
-    ☐ load last scroll position
+  - improve the dialogue UX
+    ☐ better UI to the focused input box
 
   ☐ searching for tests using their titles for actions @low
     - scrolls to the first result but highlight all results in both maps
 
 General:
   - file system access
-  ☐ rendering screenshots of tests (needs a directory handle of the project)
-  - loading the map file automatically at the start
-    (not available using the native filesystem api yet,
-    but might happen in the feature since a lot of apps how need access to files
-    also need a similar feature like IDEs)
-      
+    - loading the map file automatically at the start
+      (not available using the native filesystem api yet,
+      but might happen in the feature since a lot of apps how need access to files
+      also need a similar feature like IDEs)
+        

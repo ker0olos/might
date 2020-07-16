@@ -8,34 +8,21 @@ import getTheme from '../colors.js';
 
 const colors = getTheme();
 
-const Vertical = ({ reverse, half, mode, highlight }) =>
+const Vertical = ({ reverse, half, highlight }) =>
 {
-  const normal = {
-    container: (mode === 'full') ? styles.container : styles.miniContainer
-  };
-
-  const sHalf = {
-    container: (mode === 'full') ? styles.half : styles.miniHalf
-  };
-
-  const sHalfReverse = {
-    container: (mode === 'full') ? styles.reverse : styles.miniReverse
-  };
-
-  let s = normal;
+  let s = styles.container;
 
   if (half && reverse)
-    s = sHalfReverse;
+    s = styles.reverse;
   else if (half)
-    s = sHalf;
+    s = styles.half;
 
-  return <div className={ s.container } highlight={ highlight }/>;
+  return <div className={ s } highlight={ highlight }/>;
 };
 
 Vertical.propTypes = {
   reverse: PropTypes.bool.isRequired,
   half: PropTypes.bool.isRequired,
-  mode: PropTypes.string.isRequired,
   highlight: PropTypes.string
 };
 
@@ -44,9 +31,7 @@ const styles = createStyle({
     position: 'relative',
     backgroundColor: colors.accent,
 
-    top: 0,
     width: '1px',
-    height: '100%',
 
     '[highlight="remove"]': {
       backgroundColor: colors.red
@@ -57,32 +42,12 @@ const styles = createStyle({
     }
   },
 
-  miniContainer: {
-    extend: 'container',
-
-    top: 0,
-    height: '100%'
-  },
-
   half: {
     extend: 'container',
     height: '50%'
   },
-
-  miniHalf: {
-    extend: 'container',
-
-    height: '50%'
-  },
-
+  
   reverse: {
-    extend: 'container',
-
-    top: '50%',
-    height: '50%'
-  },
-
-  miniReverse: {
     extend: 'container',
 
     top: '50%',

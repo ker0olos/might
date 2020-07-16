@@ -108,10 +108,10 @@ class Mindmap extends React.Component
     document.body.addEventListener('keydown', this.onKeyDown);
 
     // REMOVE (test group)
-    this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]}]}').data, true);
+    // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]}]}').data, true);
 
     // REMOVE (test group 2)
-    // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]}, {"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello Mars"}]}]}').data, true);
+    this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]}, {"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello Mars"}]}]}').data, true);
 
     // REMOVE (test group 3)
     // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"},{"action":"click"}]}]}').data, true);
@@ -637,11 +637,11 @@ class Mindmap extends React.Component
             // first line should be rotated upside down (reversed)
             // first and last child get half vertical lines
             // all other children get full vertical lines
-            <Vertical reverse={ index === 0 } half={ index === 0 || index === children.length - 1 } mode={ mode } highlight={ highlight }/> :
+            <Vertical reverse={ index === 0 } half={ index === 0 || index === children.length - 1 } highlight={ highlight }/> :
             <div/>
         }
 
-        <Horizontal mode={ mode } title={ item.title } highlight={ highlight } onClick={ () => this.editTitle(item.occurrences[0].testIndex) }/>
+        <Horizontal mode={ mode } highlight={ highlight }/>
       </div>;
     };
 
@@ -724,7 +724,7 @@ class Mindmap extends React.Component
                 (continuation) ? handlePreLines(keys, index, item, mode, preLinesHighlight) : undefined
               }
 
-              <Item mindmap={ this } mode={ mode } title={ step } highlight={ highlight } item={ item }/>
+              <Item mindmap={ this } mode={ mode } content={ step } highlight={ highlight } item={ item }/>
 
               { handlePostLines(Object.keys(item.children || {}), mode, postLinesHighlight) }
 
