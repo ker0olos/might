@@ -5,7 +5,7 @@
   "scripts": {
     "prepare": "npm run build",
     "postpublish": "npm version patch --no-git",
-    "svgo": "svgo --config='{ \"plugins\": [ { \"removeAttrs\": { \"attrs\": \"(fill|stroke)\" } }, { \"removeViewBox\": false } ] }' public/icons",
+    "svgo": "svgo --config='{ \"plugins\": [ { \"removeAttrs\": { \"attrs\": \"(fill|stroke)\" } }, { \"removeViewBox\": false } ] }' icons",
     "build": "webpack --config webpack.config.prod.js --mode production",
     "start": "webpack-dev-server --config webpack.config.dev.js --mode development"
   },
@@ -26,15 +26,15 @@
     "react-dom": "^16.13.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.10.3",
-    "@babel/preset-env": "^7.10.3",
-    "@babel/preset-react": "^7.10.1",
+    "@babel/core": "^7.10.5",
+    "@babel/preset-env": "^7.10.4",
+    "@babel/preset-react": "^7.10.4",
     "@svgr/webpack": "^5.4.0",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.1.0",
-    "eslint": "^7.3.1",
-    "eslint-plugin-react": "^7.20.0",
-    "eslint-plugin-react-hooks": "^4.0.4",
+    "eslint": "^7.4.0",
+    "eslint-plugin-react": "^7.20.3",
+    "eslint-plugin-react-hooks": "^4.0.8",
     "eslint-plugin-security": "^1.4.0",
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.12",

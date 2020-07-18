@@ -11,6 +11,9 @@ import ContextMenu from './contextMenu.js';
 
 import EditIcon from '../../icons/edit.svg';
 
+import TestIcon from '../../icons/test.svg';
+import RemoveTestIcon from '../../icons/remove-test.svg';
+
 import NewStepIcon from '../../icons/new-step.svg';
 import InsertStepIcon from '../../icons/insert-step.svg';
 
@@ -29,6 +32,9 @@ let clickTimestamp = 0;
 */
 const leftClick = (e, mindmap, item, mode) =>
 {
+  if (mode === 'test' && !item.title)
+    return;
+
   // stops a click going though test title to the item itself
   e.stopPropagation();
 
@@ -80,6 +86,23 @@ const itemRightClick = (e, mindmap, item) =>
             callback: () => mindmap.editStep(occurrences)
           }
         ]
+      },
+      {
+        title: 'Mark As Test',
+        icon: TestIcon,
+        // if it has children but not a test title
+        hidden: (!item.root && item.children && !item.title) ? false : true,
+        enter: () =>
+        {
+          item.hover = 'new-test';
+          mindmap.forceUpdate();
+        },
+        leave: () =>
+        {
+          item.hover = undefined;
+          mindmap.forceUpdate();
+        },
+        callback: () => mindmap.markTest(occurrences)
       },
       { title: 'Add', actions: [
         {
@@ -190,10 +213,15 @@ const itemRightClick = (e, mindmap, item) =>
 */
 const testRightClick = (e, mindmap, item) =>
 {
+  if (!item.title)
+    return;
+
   // prevent the native browser context menu and
   // and the normal mindmap menu from showing
   e.stopPropagation();
   e.preventDefault();
+
+  const { occurrences } = item;
 
   // mount the context menu
   ReactDOM.render(<ContextMenu
@@ -207,6 +235,23 @@ const testRightClick = (e, mindmap, item) =>
             title: 'Edit',
             icon: EditIcon,
             callback: () => mindmap.editTitle(item.occurrences[0].testIndex)
+          },
+          {
+            title: 'Remove',
+            icon: RemoveTestIcon,
+            // if it has children and has a test title
+            hidden: (item.children && item.title?.length) ? false : true,
+            enter: () =>
+            {
+              item.hover = 'remove-test';
+              mindmap.forceUpdate();
+            },
+            leave: () =>
+            {
+              item.hover = undefined;
+              mindmap.forceUpdate();
+            },
+            callback: () => mindmap.unmarkTest(occurrences)
           }
         ]
       }
@@ -218,7 +263,7 @@ const testRightClick = (e, mindmap, item) =>
 * @param { {
 *   mindmap: {},
 *   mode: 'mini' | 'full',
-*   title: string,
+*   content: string,
 *   highlight: string,
 *   item: import('./mindmap.js').FamilizedItem
 *  } } param0
@@ -233,11 +278,7 @@ const Item = ({ mindmap, mode, content, highlight, item }) =>
       </div>
     </div>;
 
-  return <div
-    className={ styles.itemWrapper }
-    onClick={ (e) => leftClick(e, mindmap, item, 'item') }
-    onContextMenu={ (e) => itemRightClick(e, mindmap, item) }
-  >
+  return <div className={ styles.itemWrapper }>
     <div
       title={ item.title }
       highlight={ highlight }
@@ -248,8 +289,14 @@ const Item = ({ mindmap, mode, content, highlight, item }) =>
       { item.title }
     </div>
 
-    <div className={ styles.container } highlight={ highlight }>
-      <div title={ content } className={ styles.content }>{ content }</div>
+    <div
+      title={ content }
+      highlight={ highlight }
+      className={ styles.container }
+      onClick={ (e) => leftClick(e, mindmap, item, 'item') }
+      onContextMenu={ (e) => itemRightClick(e, mindmap, item) }
+    >
+      <div className={ styles.content }>{ content }</div>
     </div>
   </div>;
 };
@@ -362,7 +409,7 @@ const styles = createStyle({
     color: colors.accent,
     
     top: '-10px',
-    left: 'calc(50% - 70px)',
+    left: 'calc(50% - 73px)',
 
     width: '140px',
 
@@ -374,11 +421,27 @@ const styles = createStyle({
     textAlign: 'center',
     textOverflow: 'ellipsis',
 
+    borderRadius: '5px',
+
     whiteSpace: 'nowrap',
-    padding: '1px 0',
+    padding: '1px 3px',
 
     '[highlight="remove"]': {
-      color: colors.redder
+      color: colors.transparent
+    },
+
+    '[highlight="new-test"]': {
+      color: colors.whiteText,
+      backgroundColor: colors.blue,
+
+      ':before': {
+        content: '"+"'
+      }
+    },
+
+    '[highlight="remove-test"]': {
+      color: colors.whiteText,
+      backgroundColor: colors.red
     }
   }
 });

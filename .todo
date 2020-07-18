@@ -5,8 +5,6 @@ Performance Issues and Bugs:
   ☐ some items can exceed map size
 
 UI/UX:
-  ☐ marking what steps are tests are what are not is a huge mess to handle @high 
-
   - improve the dialogue UX
     ☐ better UI to the focused input box
 

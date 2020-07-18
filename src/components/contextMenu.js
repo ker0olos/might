@@ -146,7 +146,7 @@ const ContextMenu = ({ x, y, actions }) =>
                     
                     const icon = (action.icon) ? <action.icon className={ styles.icon }/> : <div/>;
 
-                    return <div key={ i } className={ styles.action } onMouseEnter={ action.enter } onMouseLeave={ action.leave } onClick={ () => click(action) }>
+                    return <div key={ i } className={ styles.action } onMouseEnter={ action.enter } onMouseLeave={ action.leave } onContextMenu={ action.leave } onClick={ () => click(action) }>
                       <div className={ styles.title }>{ action.title }</div>
                       { icon }
                     </div>;
@@ -162,7 +162,7 @@ const ContextMenu = ({ x, y, actions }) =>
             
             const icon = (action.icon) ? <action.icon className={ styles.icon }/> : <div/>;
 
-            return <div key={ i } className={ styles.action } onMouseEnter={ action.enter } onMouseLeave={ action.leave } onClick={ () => click(action) }>
+            return <div key={ i } className={ styles.action } onMouseEnter={ action.enter } onMouseLeave={ action.leave } onContextMenu={ action.leave } onClick={ () => click(action) }>
               <div className={ styles.title }>{ action.title }</div>
               { icon }
             </div>;

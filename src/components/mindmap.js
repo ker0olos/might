@@ -27,6 +27,7 @@ const mindMapRef = React.createRef();
 * @typedef { Object } FamilizedItem
 * @property { { testIndex: number, stepIndex: number }[] } occurrences
 * @property { string } title
+* @property { boolean } root
 * @property { 'remove-step' | 'remove-branch' } hover
 * @property { string } action
 * @property { string } value
@@ -108,10 +109,10 @@ class Mindmap extends React.Component
     document.body.addEventListener('keydown', this.onKeyDown);
 
     // REMOVE (test group)
-    // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]}]}').data, true);
+    this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]}]}').data, true);
 
     // REMOVE (test group 2)
-    this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]}, {"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello Mars"}]}]}').data, true);
+    // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]}, {"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello Mars"}]}]}').data, true);
 
     // REMOVE (test group 3)
     // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"},{"action":"click"}]}]}').data, true);
@@ -308,9 +309,8 @@ class Mindmap extends React.Component
         // that would mean that there are 2 completely identical tests
         // and we can filter them out and only leave the first one
 
-        // title are given to items that are the last in their branches only
-        // (for UI reasons)
-        // this is easier than doing a check on rendering
+        // titles are passed to items that are the last in their branches only
+        // because that item the only item that renders the title
         const title = (stepIndex === test.steps.length - 1) ? test.title : undefined;
 
         // if the step is the first in the test
@@ -328,7 +328,9 @@ class Mindmap extends React.Component
           if (familizedData[key] === undefined)
           {
             familizedData[key] = {
-              title,
+              // root items should never get a title
+              // that's why its not defined here
+              root: true,
               occurrences: [ { testIndex, stepIndex } ],
               ...step
             };
@@ -359,6 +361,11 @@ class Mindmap extends React.Component
           }
           else
           {
+            // TODO this is part of the duplicates issue
+            // how to handle two extract tests with different titles
+            if (!obj[key].title && title)
+              obj[key].title = title;
+            
             obj[key].occurrences.push({ testIndex, stepIndex });
           }
 
@@ -425,6 +432,58 @@ class Mindmap extends React.Component
 
   /**
   * @param { { testIndex: number, stepIndex: number }[] } occurrences
+  */
+  markTest(occurrences)
+  {
+    const data = this.state.data;
+
+    const done = (action, value) =>
+    {
+      // copy test
+      const test = { ...data[occurrences[0].testIndex] };
+
+      // set the title for the test
+      test.title = value || 'Untitled Test';
+
+      // slice the steps to remove the unneeded ones
+      test.steps = test.steps.slice(0, occurrences[0].stepIndex + 1);
+
+      // push new test
+      data.push(test);
+
+      // re-create the mindmap with the new data
+      this.loadMap(data);
+    };
+
+    // open dialog to edit the test title
+    ReactDOM.render(<Dialogue type={ 'edit-title' } title={ 'Untitled Test' } done={ done }/>, document.querySelector('#dialogue'));
+  }
+
+  /**
+  * @param { { testIndex: number, stepIndex: number }[] } occurrences
+  */
+  unmarkTest(occurrences)
+  {
+    const data = this.state.data;
+
+    // delete all occurrences where the step is
+    // the last one in its branch
+
+    occurrences.forEach((occurrence) =>
+    {
+      const { testIndex, stepIndex } = occurrence;
+
+      if (data[testIndex].steps.length === stepIndex + 1)
+        delete data[testIndex];
+    });
+
+    // re-create the mindmap with the new data
+    this.loadMap(data);
+  }
+
+
+  /**
+  * @param { { testIndex: number, stepIndex: number }[] } occurrences
   * @param { 'new' | 'insert' } mode
   */
   addStepAfter(occurrences, mode)
@@ -450,7 +509,7 @@ class Mindmap extends React.Component
         // set a new empty title for the test
         test.title = 'Untitled Test';
 
-        // slice the steps to removed unneeded steps
+        // slice the steps to remove the unneeded ones
         test.steps = test.steps.slice(0, occurrences[0].stepIndex + 1);
 
         // push new step
@@ -671,10 +730,9 @@ class Mindmap extends React.Component
     /**
     * @param { FamilizedObject } children
     * @param { 'mini' | 'full' } mode
-    * @param { boolean } continuation
     * @param { string } hover
     */
-    const handleItems = (children, mode, continuation, hover) =>
+    const handleItems = (children, mode, hover) =>
     {
       // nothing to be rendered
       if (!children)
@@ -713,22 +771,27 @@ class Mindmap extends React.Component
             {
               highlight = 'remove';
             }
+            else
+            {
+              highlight = item.hover;
+            }
 
             return <div key={ index } className={ styles.row }>
 
               {/*
-                no continuation means that the item is the first in the branch and
-                does not need any pre-lines
+                A root item is the first item in a branch
+                therefore it has no previous items connected to it
+                and does not need any pre-lines
               */}
               {
-                (continuation) ? handlePreLines(keys, index, item, mode, preLinesHighlight) : undefined
+                (!item.root) ? handlePreLines(keys, index, item, mode, preLinesHighlight) : undefined
               }
 
               <Item mindmap={ this } mode={ mode } content={ step } highlight={ highlight } item={ item }/>
 
               { handlePostLines(Object.keys(item.children || {}), mode, postLinesHighlight) }
 
-              { handleItems(item.children, mode, true, hover || item.hover) }
+              { handleItems(item.children, mode, hover || item.hover) }
             </div>;
           })
         }
