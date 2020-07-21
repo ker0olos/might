@@ -276,10 +276,31 @@ class Mindmap extends React.Component
   */
   loadMap(data, file)
   {
-    // when loaded
-    // reset the first stack to the initial load data
-    // else the fist stack always is empty
-    
+    const ids = [];
+
+    // filtering duplicate tests
+    for (let i = 0; i < data.length; i++)
+    {
+      const test = data[i];
+
+      const id = JSON.stringify(test.steps);
+      
+      if (ids.includes(id))
+      {
+        // remove the test from the data
+        data.splice(i, 1);
+
+        // lower the index to adopt to
+        // the fact that an item was removed
+        i = i - 1;
+      }
+      else
+      {
+        // push the id to the array
+        ids.push(id);
+      }
+    }
+
     /**
     * @type { FamilizedObject }
     */
@@ -293,21 +314,16 @@ class Mindmap extends React.Component
       */
       let parent;
 
+      //
+      const id = JSON.stringify(test.steps);
+
+      console.log(id);
+      //
+
       // for step in test
       test.steps.forEach((step, stepIndex) =>
       {
         const key = this.serializeStep(step);
-
-        // if this step is the last in a full test
-        // it should be have the test's title to mark the path of the test
-
-        // title should not be an issue
-        // on duplicated steps
-
-        // TODO handle identical tests (duplicates)
-        // there never should be a step that needs two different titles
-        // that would mean that there are 2 completely identical tests
-        // and we can filter them out and only leave the first one
 
         // titles are passed to items that are the last in their branches only
         // because that item the only item that renders the title
@@ -380,6 +396,7 @@ class Mindmap extends React.Component
       // the change stack array should to emptied
       // the first stack should be set to the initial state of the loaded file
       // meaning it will replace the default empty stack
+      // else the fist stack always is empty
       this.changeStack.splice(0);
     }
 

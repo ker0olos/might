@@ -1,13 +1,7 @@
 Performance Issues and Bugs:
-  ☐ test duplicated test steps (same test, same title twice in map.json)
-    ☐ test with different titles (same test, different titles)
-
   ☐ some items can exceed map size
 
 UI/UX:
-  - improve the dialogue UX
-    ☐ better UI to the focused input box
-
   ☐ searching for tests using their titles for actions @low
     - scrolls to the first result but highlight all results in both maps
 
@@ -15,6 +9,6 @@ General:
   - file system access
     - loading the map file automatically at the start
       (not available using the native filesystem api yet,
-      but might happen in the feature since a lot of apps how need access to files
+      but might happen in the future, since a lot of apps that need access to files
       also need a similar feature like IDEs)
         
