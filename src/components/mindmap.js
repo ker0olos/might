@@ -314,12 +314,6 @@ class Mindmap extends React.Component
       */
       let parent;
 
-      //
-      const id = JSON.stringify(test.steps);
-
-      console.log(id);
-      //
-
       // for step in test
       test.steps.forEach((step, stepIndex) =>
       {
