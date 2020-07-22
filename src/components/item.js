@@ -329,8 +329,8 @@ const styles = createStyle({
     margin: 'auto',
 
     // acts as margin between rows
-    borderTop: `6px solid ${colors.whiteBackground}`,
-    borderBottom: `6px solid ${colors.whiteBackground}`
+    borderTop: `10px solid ${colors.whiteBackground}`,
+    borderBottom: `10px solid ${colors.whiteBackground}`
   },
 
   miniItemWrapper: {
@@ -342,8 +342,8 @@ const styles = createStyle({
     maxHeight: 'calc(50px / 10)',
     width: 'calc(110px / 10)',
 
-    borderTop: `calc(6px / 10) solid ${colors.whiteBackground}`,
-    borderBottom: `calc(6px / 10) solid ${colors.whiteBackground}`,
+    borderTop: `calc(10px / 10) solid ${colors.whiteBackground}`,
+    borderBottom: `calc(10px / 10) solid ${colors.whiteBackground}`,
 
     '[highlight="remove"]': {
       backgroundColor: colors.red
@@ -424,7 +424,9 @@ const styles = createStyle({
     borderRadius: '5px',
 
     whiteSpace: 'nowrap',
-    padding: '1px 3px',
+
+    padding: '0 3px',
+    margin: '-4px 0',
 
     '[highlight="remove"]': {
       color: colors.transparent

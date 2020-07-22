@@ -87,14 +87,8 @@ class Mindmap extends React.Component
 
   componentDidMount()
   {
-    const maxWidth = 260;
-    const maxHeight = 157;
-
-    const minWidth = 180;
-    const minHeight = 104;
-
-    const miniMapWidth = Math.min(maxWidth, Math.max(window.innerWidth * 0.25, minWidth));
-    const miniMapHeight = Math.min(maxHeight, Math.max(window.innerWidth * 0.15, minHeight));
+    const miniMapWidth = 260;
+    const miniMapHeight = 157;
 
     const mapWidth = miniMapWidth * 10 -  window.innerWidth;
     const mapHeight = miniMapHeight * 10 -  window.innerHeight;
@@ -109,7 +103,7 @@ class Mindmap extends React.Component
     document.body.addEventListener('keydown', this.onKeyDown);
 
     // REMOVE (test group)
-    this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]}]}').data, true);
+    // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]}]}').data, true);
 
     // REMOVE (test group 2)
     // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]}, {"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello Mars"}]}]}').data, true);
@@ -492,7 +486,6 @@ class Mindmap extends React.Component
     this.loadMap(data);
   }
 
-
   /**
   * @param { { testIndex: number, stepIndex: number }[] } occurrences
   * @param { 'new' | 'insert' } mode
@@ -843,14 +836,8 @@ const styles = createStyle({
   wrapper: {
     backgroundColor: colors.whiteBackground,
 
-    maxWidth: 'calc(260px * 10)',
-    maxHeight: 'calc(157px * 10)',
-
-    minWidth: 'calc(180px * 10)',
-    minHeight: 'calc(104px * 10)',
-
-    width: 'calc(25vw * 10)',
-    height: 'calc(15vw * 10)'
+    width: 'calc(260px * 10)',
+    height: 'calc(157px * 10)'
   },
 
   container: {

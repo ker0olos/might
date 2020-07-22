@@ -37,23 +37,10 @@ class MinimapIndicator extends React.Component
     this.mindMapElem.removeEventListener('scroll', this.onScroll);
   }
 
-  minMaxScroll()
-  {
-    return {
-
-    };
-  }
-
   onScroll()
   {
-    const maxWidth = 260;
-    const maxHeight = 157;
-    
-    const minWidth = 180;
-    const minHeight = 104;
-    
-    const miniMapWidth = Math.min(maxWidth, Math.max(window.innerWidth * 0.25, minWidth));
-    const miniMapHeight = Math.min(maxHeight, Math.max(window.innerWidth * 0.15, minHeight));
+    const miniMapWidth = 260;
+    const miniMapHeight = 157;
 
     const mapWidth = miniMapWidth * 10 -  window.innerWidth;
     const mapHeight = miniMapHeight * 10 -  window.innerHeight;
@@ -85,6 +72,7 @@ class MinimapIndicator extends React.Component
 
 const styles = createStyle({
   container: {
+    zIndex: 1,
     position: 'absolute',
 
     backgroundColor: colors.transparent,

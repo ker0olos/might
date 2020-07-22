@@ -43,14 +43,8 @@ class Minimap extends React.Component
     if (!mindMapRef)
       return;
 
-    const maxWidth = 260;
-    const maxHeight = 157;
-
-    const minWidth = 180;
-    const minHeight = 104;
-
-    const miniMapWidth = Math.min(maxWidth, Math.max(window.innerWidth * 0.25, minWidth));
-    const miniMapHeight = Math.min(maxHeight, Math.max(window.innerWidth * 0.15, minHeight));
+    const miniMapWidth = 260;
+    const miniMapHeight = 157;
 
     const indicatorWidth = window.innerWidth / 10;
     const indicatorHeight = window.innerHeight / 10;
@@ -151,14 +145,8 @@ const styles = createStyle({
 
     bottom: 0,
 
-    maxWidth: '260px',
-    maxHeight: '157px',
-
-    minWidth: '180px',
-    minHeight: '104px',
-
-    width: '25vw',
-    height: '15vw',
+    width: '260px',
+    height: '157px',
 
     padding: '15px'
   },

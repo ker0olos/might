@@ -1,5 +1,5 @@
 Performance Issues and Bugs:
-  ☐ some items can exceed map size
+  ☐ items can exceed default map size @low
 
 UI/UX:
   ☐ searching for tests using their titles for actions @low
