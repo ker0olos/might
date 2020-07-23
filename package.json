@@ -9,6 +9,9 @@
     "build": "webpack --config webpack.config.prod.js --mode production",
     "start": "webpack-dev-server --config webpack.config.dev.js --mode development"
   },
+  "bin": {
+    "might-ui": "index.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ItsKerolos/might.git"
@@ -20,7 +23,9 @@
   },
   "homepage": "https://github.com/ItsKerolos/might#readme",
   "dependencies": {
+    "express": "^4.17.1",
     "flcss": "^0.1.2",
+    "opn": "^6.0.0",
     "prop-types": "^15.7.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1"
@@ -32,7 +37,7 @@
     "@svgr/webpack": "^5.4.0",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.1.0",
-    "eslint": "^7.4.0",
+    "eslint": "^7.5.0",
     "eslint-plugin-react": "^7.20.3",
     "eslint-plugin-react-hooks": "^4.0.8",
     "eslint-plugin-security": "^1.4.0",
