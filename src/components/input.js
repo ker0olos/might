@@ -4,20 +4,23 @@ import PropTypes from 'prop-types';
 
 import { createStyle } from 'flcss';
 
-import getTheme, { opacity } from '../colors.js';
+import getTheme from '../colors.js';
 
 const colors = getTheme();
 
 /**
 * @param { {
 *    defaultValue: string,
-*    suffix: { content: string, title: string },
+*    valid: boolean,
 *    autoFocus: boolean,
 *    onChange: (newValue: string) => string
 *  } } param0
 */
-const Input = ({ defaultValue, suffix, autoFocus, onChange }) =>
+const Input = ({ defaultValue, valid, autoFocus, onChange }) =>
 {
+  if (valid === undefined)
+    valid = true;
+  
   const change = (e) =>
   {
     if (onChange)
@@ -25,14 +28,13 @@ const Input = ({ defaultValue, suffix, autoFocus, onChange }) =>
   };
 
   return <div className={ styles.container }>
-    <input autoFocus={ autoFocus } className={ styles.input } spellCheck={ false } defaultValue={ defaultValue } type={ 'text' }  onInput={ change }/>
-    <div className={ styles.suffix } title={ suffix?.title }>{ suffix?.content }</div>
+    <input valid={ valid.toString() } autoFocus={ autoFocus } className={ styles.input } spellCheck={ false } defaultValue={ defaultValue } type={ 'text' }  onInput={ change }/>
   </div>;
 };
 
 Input.propTypes = {
+  valid: PropTypes.bool,
   defaultValue: PropTypes.any,
-  suffix: PropTypes.object,
   autoFocus: PropTypes.bool,
   onChange: PropTypes.func
 };
@@ -59,40 +61,16 @@ const styles = createStyle({
 
     transition: 'border-bottom 0.1s',
 
-    ':invalid': {
-      borderBottom: `${colors.red} 3px solid`
-    },
-
     ':focus': {
-      borderBottom: `${colors.blue} 3px solid`,
-
       outline: 0
-    }
-  },
+    },
 
-  suffix: {
-    userSelect: 'none',
-
-    fontSize: '14px',
-    padding: '10px',
-
-    border: 0,
-    borderBottom: `${colors.blackText} 1px solid`,
-
-    transition: 'border-bottom 0.1s',
-
-    'input:invalid ~ %this':
-    {
+    '[valid="false"]': {
       borderBottom: `${colors.red} 3px solid`
     },
 
-    'input:focus ~ %this':
-    {
-      borderBottom: `${colors.blue} 3px solid`
-    },
-
-    ':empty': {
-      margin: 0
+    '[valid="true"]:focus': {
+      borderBottom: `${colors.blue} 3px solid`,
     }
   }
 });

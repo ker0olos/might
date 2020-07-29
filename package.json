@@ -25,6 +25,7 @@
   "dependencies": {
     "express": "^4.17.1",
     "flcss": "^0.1.2",
+    "might-core": "^0.2.1",
     "opn": "^6.0.0",
     "prop-types": "^15.7.2",
     "react": "^16.13.1",
@@ -38,10 +39,10 @@
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.1.0",
     "eslint": "^7.5.0",
-    "eslint-plugin-react": "^7.20.3",
+    "eslint-plugin-react": "^7.20.4",
     "eslint-plugin-react-hooks": "^4.0.8",
     "eslint-plugin-security": "^1.4.0",
-    "webpack": "^4.43.0",
+    "webpack": "^4.44.0",
     "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3.11.0"
   }

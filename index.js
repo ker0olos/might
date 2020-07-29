@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 const open = require('opn');
 
 const { join } = require('path');

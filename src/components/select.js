@@ -84,26 +84,14 @@ const styles = createStyle({
     border: 0,
     borderBottom: `${colors.blackText} 1px solid`,
 
-    ':hover': {
-      color: colors.whiteText,
-      backgroundColor: colors.accent,
-
-      borderBottom: `${colors.accent} 1px solid`,
-
-      ' svg': {
-        fill: colors.whiteText
-      }
-    },
+    transition: 'border-bottom 0.1s',
 
     ' svg': {
       fill: colors.blackText
     },
 
     '[shown="true"]': {
-      color: colors.whiteText,
-      backgroundColor: colors.accent,
-
-      borderBottom: `${colors.accent} 1px solid`
+      borderBottom: `${colors.blue} 3px solid`
     }
   },
 
@@ -146,6 +134,8 @@ const styles = createStyle({
     display: 'none',
     position: 'absolute',
     
+    overflow: 'auto',
+
     flexDirection: 'column',
     backgroundColor: colors.whiteBackground,
 
@@ -153,6 +143,8 @@ const styles = createStyle({
     left: '-5px',
 
     minHeight: '40px',
+    maxHeight: '200px',
+
     width: 'calc(100% + 10px)',
     height: 'fit-content',
 
@@ -160,6 +152,15 @@ const styles = createStyle({
     
     '[shown="true"]': {
       display: 'flex'
+    },
+
+    '::-webkit-scrollbar': {
+      width: '5px',
+      background: colors.whiteBackground
+    },
+
+    '::-webkit-scrollbar-thumb': {
+      background: colors.accent
     }
   },
 

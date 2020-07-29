@@ -5,6 +5,8 @@ import PropTypes from 'prop-types';
 
 import { createStyle } from 'flcss';
 
+import { actions } from 'might-core';
+
 import getTheme, { opacity } from '../colors.js';
 
 import Select from './select.js';
@@ -12,9 +14,11 @@ import Input from './input.js';
 
 const colors = getTheme();
 
-const actions = [ 'wait', 'select', 'click', 'type' ];
-
 const unmount = () => ReactDOM.unmountComponentAtNode(document.querySelector('#dialogue'));
+
+/**
+* @typedef { import('might-core').Step } Step
+*/
 
 class Dialogue extends React.Component
 {
@@ -22,7 +26,9 @@ class Dialogue extends React.Component
   {
     super();
 
-    this.state = {};
+    this.state = {
+      masterKey: 0
+    };
 
     this.onKeyDown = this.onKeyDown.bind(this);
     
@@ -44,7 +50,12 @@ class Dialogue extends React.Component
     if (e.key === 'Escape')
       unmount();
 
-    if (e.key === 'Enter')
+    if (
+      e.key === 'Enter' &&
+      // not the best way to check if apply is enabled or not
+      // but the least headache-y, someone should probably change it in the future
+      !document.querySelector(`.${styles.button}[invalid="true"]`)
+    )
       this.done();
   }
 
@@ -52,22 +63,60 @@ class Dialogue extends React.Component
   {
     const { action, value } = this.state;
     
-    const _done = this.props.done;
-
-    _done?.call(undefined, action, value);
+    // send the final results of the dialogue to the parent
+    this.props.done?.call(undefined, action, value);
     
+    // remove this dialogue element from dom
     unmount();
+  }
+
+  parseNumber(s)
+  {
+    const number = parseInt(s);
+
+    if (
+      !isNaN(number) &&
+      number.toString().length === s.length
+    )
+      return number;
+    else
+      return s;
+  }
+
+  testNumber(s)
+  {
+    const number = parseInt(s);
+
+    if (
+      !isNaN(number) &&
+      number.toString().length === s.length
+    )
+      return true;
+    else
+      return false;
+  }
+
+  testSelector(s)
+  {
+    try
+    {
+      document.body.querySelector(s);
+    }
+    catch
+    {
+      return false;
+    }
+    
+    return true;
   }
 
   render()
   {
-    const { action } = this.state;
-
     /**
     * @type { {
-    * type: 'edit-title' | 'edit-step'
+    * type: 'edit-test' | 'edit-step'
     * title: string
-    * step: { action: string, value: string }
+    * step: Step
     * done: () => void
     * } }
     */
@@ -75,7 +124,7 @@ class Dialogue extends React.Component
 
     // Types of Dialogue
 
-    const Title = () =>
+    const Test = () =>
     {
       let defaultTitle = '';
 
@@ -85,10 +134,14 @@ class Dialogue extends React.Component
       const onInput = (value) => this.setState({ value });
 
       return <div className={ styles.container }>
-        <div className={ styles.title }>Title:</div>
+        <div className={ styles.title }>Test</div>
     
         <div className={ styles.options }>
-          <Input defaultValue={ defaultTitle } autoFocus={ true } onChange={ onInput }/>
+          <div className={ styles.label }>Title</div>
+
+          <div className={ styles.option }>
+            <Input defaultValue={ defaultTitle } autoFocus={ true } onChange={ onInput }/>
+          </div>
         </div>
 
         <div className={ styles.buttons }>
@@ -101,55 +154,146 @@ class Dialogue extends React.Component
     const Step = () =>
     {
       let defaultAction = 0;
-      let defaultValue = '';
 
-      let suffix;
-      let suffixTitle;
+      /**
+      * @type { Step }
+      */
+      const s = {
+        action: (this.state.action === undefined) ? step.action : this.state.action,
+        value: (this.state.value === undefined) ? step.value : this.state.value
+      };
 
-      if (action === 'wait')
-      {
-        suffix = 'S';
-        suffixTitle = 'Seconds';
-      }
-  
-      if (step)
-      {
-        defaultAction = actions.indexOf(step.action);
-        defaultValue = step.value;
-
-        if (!action && defaultAction === 0)
-        {
-          suffix = 'S';
-          suffixTitle = 'Seconds';
-        }
-      }
-
-      const onSelect = (action) => this.setState({ action });
+      const onSelect = (action) => this.setState({
+        action,
+        masterKey: this.state.masterKey + 1,
+        value: ''
+      });
 
       const onInput = (value) =>
       {
-        // TODO validate the value based on the action
-        // like if wait action had characters that weren't number in its value
-        this.setState({ value });
+        // we need to parse the value here because
+        // the runner decides what to wait for based on the value type
+        if (s.action === 'wait')
+          this.setState({ value: this.parseNumber(value) });
+        else
+          this.setState({ value });
       };
 
+      // set hints & validate value
+
+      let field = {};
+
+      if (s.action === 'wait')
+      {
+        const duration = (typeof s.value === 'number');
+
+        field = {
+          label: (duration) ? 'Duration' : 'Selector',
+          valid: (!duration) ? this.testSelector(s.value) : true,
+          hint: `Wait for an element to appear, or for a duration of time.\n
+                Duration takes time in seconds, while elements take a CSS selector.`
+        };
+      }
+      else if (s.action === 'viewport')
+      {
+        const dimensions = s.value.split('x');
+
+        const valid = (
+          dimensions.length === 2 &&
+          this.testNumber(dimensions[0]) &&
+          this.testNumber(dimensions[1])
+        );
+
+        field = {
+          valid,
+          label: 'Dimensions',
+          hint: `Change the viewport of the page.\n
+                Dimensions take width [x] height. For Example: (1280x720).`
+        };
+      }
+      else if (s.action === 'select')
+      {
+        field = {
+          label: 'Selector',
+          valid: this.testSelector(s.value),
+          hint: 'Select an element using a CSS selector.'
+        };
+      }
+      else if (s.action === 'hover')
+      {
+        field = {
+          valid: true,
+          hint: `Hover over an element.\n
+          An element needs to be previously selected with the Select action.`
+        };
+      }
+      else if (s.action === 'click')
+      {
+        field = {
+          valid: true,
+          hint: `Click on an element.\n
+          An element needs to be previously selected with the Select action.`
+        };
+      }
+      else if (s.action === 'type')
+      {
+        field = {
+          label: 'Value',
+          valid: true,
+          hint: `Type anything inside an input element.\n
+          An element needs to be previously selected with the Select action.`
+        };
+      }
+
+      // change the input label to reflect that the
+      // current value is invalid
+      if (!field.valid)
+        field.label  = `Invalid ${field.label}`;
+
+      // when the dialog is first opened
+      // it has no action or value
+      // so we use this defaults from the parent
+      if (step)
+        defaultAction = actions.indexOf(step.action);
+
       return <div className={ styles.container }>
-        <div className={ styles.title }>Action:</div>
+        <div className={ styles.title }>Step</div>
     
         <div className={ styles.options }>
-          <Select defaultIndex={ defaultAction } options={ actions } onChange={ onSelect }/>
-          <Input defaultValue={ defaultValue } suffix={ { content: suffix, title: suffixTitle } } autoFocus={ true } onChange={ onInput }/>
+          <div className={ styles.label }>Action</div>
+
+          <div className={ styles.option }>
+            <Select defaultIndex={ defaultAction } options={ actions } onChange={ onSelect }/>
+          </div>
+
+          {
+            (field.label) ?
+              <div key={ this.state.masterKey }>
+                <div className={ styles.label } valid={ field.valid.toString() }>{ field.label }</div>
+
+                <div className={ styles.option }>
+                  <Input
+                    valid={ field.valid }
+                    defaultValue={ s.value }
+                    autoFocus={ true }
+                    onChange={ onInput }
+                  />
+                </div>
+              </div> : <div/>
+          }
+
+          <div className={ styles.hint }>{ field.hint }</div>
         </div>
 
         <div className={ styles.buttons }>
-          <div className={ styles.button } onClick={ this.done }>Apply</div>
+          <div invalid={ (!field.valid).toString() } className={ styles.button } onClick={ this.done }>Apply</div>
           <div className={ styles.button } onClick={ unmount }>Cancel</div>
         </div>
       </div>;
     };
 
     return <div className={ styles.wrapper }>
-      { (type === 'edit-step') ? Step() : Title() }
+      { (type === 'edit-step') ? Step() : Test() }
     </div>;
   }
 }
@@ -197,17 +341,45 @@ const styles = createStyle({
   },
 
   title: {
+    color: colors.blackText,
+
+    fontSize: '11px',
     userSelect: 'none',
-    margin: '25px 15px 10px 15px'
+    
+    margin: '25px 15px'
+  },
+
+  label: {
+    color: colors.accent,
+
+    fontSize: '11px',
+    userSelect: 'none',
+
+    margin: '0 15px -15px 15px',
+
+    '[valid="false"]': {
+      color: colors.red
+    }
+  },
+
+  hint: {
+    color: opacity(colors.blackText, 0.65),
+
+    fontSize: '13px',
+    
+    userSelect: 'none',
+    whiteSpace: 'pre-line',
+
+    margin: '15px'
   },
 
   options: {
     flexGrow: 1,
-    minHeight: '360px',
+    minHeight: '360px'
+  },
 
-    '> div': {
-      margin: '15px'
-    }
+  option: {
+    margin: '15px'
   },
   
   buttons: {
@@ -234,6 +406,11 @@ const styles = createStyle({
 
     ':active': {
       transform: 'scale(0.95)'
+    },
+
+    '[invalid="true"]': {
+      color: colors.red,
+      pointerEvents: 'none'
     }
   }
 });

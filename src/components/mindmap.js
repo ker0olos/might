@@ -5,6 +5,8 @@ import ReactDOM from 'react-dom';
 
 import { createStyle } from 'flcss';
 
+import { serializeStep } from 'might-core';
+
 import getTheme from '../colors.js';
 
 import TopBar from './topBar.js';
@@ -102,23 +104,8 @@ class Mindmap extends React.Component
 
     document.body.addEventListener('keydown', this.onKeyDown);
 
-    // REMOVE (test group)
+    // REMOVE (for testing purposes)
     // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]}]}').data, true);
-
-    // REMOVE (test group 2)
-    // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]}, {"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello Mars"}]}]}').data, true);
-
-    // REMOVE (test group 3)
-    // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"},{"action":"click"}]}]}').data, true);
-
-    // REMOVE (one group)
-    // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 4","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"}]},{"title":"test search-bar input 5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"click"}]}]}').data, true);
-
-    // REMOVE (one group 2)
-    // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 4","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"}]},{"title":"test search-bar input 4.5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"},{"action":"click"}]},{"title":"test search-bar input 5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"click"}]}]}').data, true);
-
-    // REMOVE (three group)
-    // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"},{"action":"click"}]},{"title":"test search-bar input 2","steps":[{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello World"}]},{"title":"test search-bar input 3","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-button"},{"action":"click"}]},{"title":"test search-bar input 4","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"type","value":"Hello Mars"}]},{"title":"test search-bar input 5","steps":[{"action":"wait","value":2},{"action":"select","value":"input.js-search-input"},{"action":"click"}]}]}').data, true);
   }
 
   componentWillUnmount()
@@ -206,18 +193,6 @@ class Mindmap extends React.Component
         this.loadMap(json.data, true);
       })
       .catch((err) => console.error(err));
-  }
-
-  serializeStep(step)
-  {
-    if (step.action === 'wait')
-      return `Wait ${step.value}s`;
-    else if (step.action === 'select')
-      return `Select ${step.value}`;
-    else if (step.action === 'click')
-      return 'Click';
-    else if (step.action === 'type')
-      return `Type ${step.value}`;
   }
 
   onUndo()
@@ -311,7 +286,7 @@ class Mindmap extends React.Component
       // for step in test
       test.steps.forEach((step, stepIndex) =>
       {
-        const key = this.serializeStep(step);
+        const key = serializeStep(step);
 
         // titles are passed to items that are the last in their branches only
         // because that item the only item that renders the title
@@ -365,8 +340,6 @@ class Mindmap extends React.Component
           }
           else
           {
-            // TODO this is part of the duplicates issue
-            // how to handle two extract tests with different titles
             if (!obj[key].title && title)
               obj[key].title = title;
             
@@ -461,7 +434,7 @@ class Mindmap extends React.Component
     };
 
     // open dialog to edit the test title
-    ReactDOM.render(<Dialogue type={ 'edit-title' } title={ 'Untitled Test' } done={ done }/>, document.querySelector('#dialogue'));
+    ReactDOM.render(<Dialogue type={ 'edit-test' } title={ 'Untitled Test' } done={ done }/>, document.querySelector('#dialogue'));
   }
 
   /**
@@ -587,8 +560,6 @@ class Mindmap extends React.Component
   */
   editStep(occurrences)
   {
-    // TODO there should be a visual feedback that the changes were applied
-
     const data = this.state.data;
 
     const done = (action, value) =>
@@ -634,7 +605,7 @@ class Mindmap extends React.Component
     };
     
     // open a dialogue that edits just the title
-    ReactDOM.render(<Dialogue type={ 'edit-title' } title={ data[testIndex].title } done={ done }/>, document.querySelector('#dialogue'));
+    ReactDOM.render(<Dialogue type={ 'edit-test' } title={ data[testIndex].title } done={ done }/>, document.querySelector('#dialogue'));
   }
 
   /**
