@@ -17,7 +17,7 @@ Might is an easy way to create, manage and edit tests, it was designed to make t
 
 #### IMPORTANT: This project depends on the experimental [Native File System API](https://web.dev/native-file-system/) which is currently only supported by Chrome 83+ and requires ```chrome://flags/#native-file-system-api``` to be enabled manually.
 
-`npm install --save-dev might-gi`
+`npm install --save-dev might-ui`
 
 ## Usage
 
