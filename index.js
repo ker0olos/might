@@ -3,7 +3,7 @@
 
 /* eslint-disable no-console */
 
-const open = require('opn');
+const open = require('open');
 
 const { join } = require('path');
 
