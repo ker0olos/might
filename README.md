@@ -1,4 +1,4 @@
-![npm (tag)](https://img.shields.io/npm/v/might-ui/latest)
+[![npm (tag)](https://img.shields.io/npm/v/might-ui/latest)](http://npmjs.com/package/might-ui)
 ![npm](https://img.shields.io/npm/dm/might-ui)
 
 **This project is still in-development, it might be unstable.**
@@ -25,6 +25,6 @@ Might is an easy way to create, manage and edit tests, it was designed to make t
 
 After that it opens automatically in your browser, **(but to actually run the tests you need to install [might-cli](https://github.com/ItsKerolos/might-cli)).**
 
-[![](./screenshots/1.png)]()
+[![](./screenshots/1.png)](https://github.com/ItsKerolos/Might/raw/master/screenshots/1.png)
 
-[![](./screenshots/2.png)]()
+[![](./screenshots/2.png)](https://github.com/ItsKerolos/Might/raw/master/screenshots/2.png)
