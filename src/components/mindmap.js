@@ -26,8 +26,16 @@ const colors = getTheme();
 const mindMapRef = React.createRef();
 
 /**
+* @typedef { Object } Occurrence
+* @property { string } key
+* @property { FamilizedObject } parent
+* @property { number } testIndex
+* @property { number } stepIndex
+*/
+
+/**
 * @typedef { Object } FamilizedItem
-* @property { { testIndex: number, stepIndex: number }[] } occurrences
+* @property { Occurrence[] } occurrences
 * @property { string } title
 * @property { boolean } root
 * @property { 'remove-step' | 'remove-branch' } hover
@@ -310,7 +318,12 @@ class Mindmap extends React.Component
               // root items should never get a title
               // that's why its not defined here
               root: true,
-              occurrences: [ { testIndex, stepIndex } ],
+              occurrences: [ {
+                key,
+                parent: familizedData,
+                testIndex,
+                stepIndex
+              } ],
               ...step
             };
           }
@@ -334,7 +347,12 @@ class Mindmap extends React.Component
           {
             obj[key] = {
               title,
-              occurrences: [ { testIndex, stepIndex } ],
+              occurrences: [ {
+                key,
+                parent: obj,
+                testIndex,
+                stepIndex
+              } ],
               ...step
             };
           }
@@ -343,7 +361,12 @@ class Mindmap extends React.Component
             if (!obj[key].title && title)
               obj[key].title = title;
             
-            obj[key].occurrences.push({ testIndex, stepIndex });
+            obj[key].occurrences.push({
+              key,
+              parent: obj,
+              testIndex,
+              stepIndex
+            });
           }
 
           parent = obj[key];
@@ -409,7 +432,7 @@ class Mindmap extends React.Component
   }
 
   /**
-  * @param { { testIndex: number, stepIndex: number }[] } occurrences
+  * @param { Occurrence[] } occurrences
   */
   markTest(occurrences)
   {
@@ -438,7 +461,7 @@ class Mindmap extends React.Component
   }
 
   /**
-  * @param { { testIndex: number, stepIndex: number }[] } occurrences
+  * @param { Occurrence[] } occurrences
   */
   unmarkTest(occurrences)
   {
@@ -455,12 +478,25 @@ class Mindmap extends React.Component
         delete data[testIndex];
     });
 
+    // clean deleted spots
+    for (let i = 0; i < data.length; i++)
+    {
+      if (data[i] === undefined)
+      {
+        // remove the test from the array
+        data.splice(i, 1);
+
+        // fix the loop after the test is removed
+        i = i - 1;
+      }
+    }
+
     // re-create the mindmap with the new data
     this.loadMap(data);
   }
 
   /**
-  * @param { { testIndex: number, stepIndex: number }[] } occurrences
+  * @param { Occurrence[] } occurrences
   * @param { 'new' | 'insert' } mode
   */
   addStepAfter(occurrences, mode)
@@ -480,8 +516,12 @@ class Mindmap extends React.Component
         
       if (mode === 'new')
       {
+        const original = data[occurrences[0].testIndex];
+
+        const children = occurrences[0].parent[occurrences[0].key].children;
+
         // copy test
-        const test = { ...data[occurrences[0].testIndex] };
+        const test = { ...original };
 
         // set a new empty title for the test
         test.title = 'Untitled Test';
@@ -492,8 +532,19 @@ class Mindmap extends React.Component
         // push new step
         test.steps.push(step);
 
-        // push new test
-        data.push(test);
+        // if the original test has only 1 step
+        // or it has the default test title and no children
+        // then replace it with the new test instead
+        if (
+          original.steps.length === 1 ||
+          (Object.keys(children).length === 0 && original.title === 'Untitled Test')
+        )
+        {
+          data[occurrences[0].testIndex] = test;
+        }
+        // else push the new test
+        else
+          data.push(test);
       }
       else
       {
@@ -556,7 +607,7 @@ class Mindmap extends React.Component
   }
 
   /**
-  * @param { { testIndex: number, stepIndex: number }[] } occurrences
+  * @param { Occurrence[] } occurrences
   */
   editStep(occurrences)
   {
@@ -609,7 +660,7 @@ class Mindmap extends React.Component
   }
 
   /**
-  * @param { { testIndex: number, stepIndex: number }[] } occurrences
+  * @param { Occurrence[] } occurrences
   * @param { 'this' | 'branch' } mode
   */
   deleteStep(occurrences, mode)
