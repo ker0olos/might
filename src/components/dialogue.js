@@ -64,7 +64,7 @@ class Dialogue extends React.Component
     const { action, value } = this.state;
     
     // send the final results of the dialogue to the parent
-    this.props.done?.call(undefined, action, value);
+    this.props.done?.call(undefined, action, value?.trim());
     
     // remove this dialogue element from dom
     unmount();
@@ -126,10 +126,7 @@ class Dialogue extends React.Component
 
     const Test = () =>
     {
-      let defaultTitle = '';
-
-      if (title)
-        defaultTitle = title;
+      const defaultTitle = title || '';
 
       const onInput = (value) => this.setState({ value });
 

@@ -32,7 +32,7 @@ let clickTimestamp = 0;
 */
 const leftClick = (e, mindmap, item, mode) =>
 {
-  if (mode === 'test' && !item.title)
+  if (mode === 'test' && item.title === undefined)
     return;
 
   // stops a click going though test title to the item itself
@@ -49,7 +49,7 @@ const leftClick = (e, mindmap, item, mode) =>
   if ((now - clickTimestamp) <= 250)
   {
     if (mode === 'test')
-      mindmap.editTitle(item.occurrences[0].testIndex);
+      mindmap.editTest(item.occurrences[0].testIndex);
     else
       mindmap.editStep(item.occurrences);
   }
@@ -91,7 +91,7 @@ const itemRightClick = (e, mindmap, item) =>
         title: 'Mark As Test',
         icon: TestIcon,
         // if it has children but not a test title
-        hidden: (!item.root && item.children && !item.title) ? false : true,
+        hidden: (!item.root && item.children && item.title === undefined) ? false : true,
         enter: () =>
         {
           item.hover = 'new-test';
@@ -213,7 +213,7 @@ const itemRightClick = (e, mindmap, item) =>
 */
 const testRightClick = (e, mindmap, item) =>
 {
-  if (!item.title)
+  if (item.title === undefined)
     return;
 
   // prevent the native browser context menu and
@@ -234,13 +234,13 @@ const testRightClick = (e, mindmap, item) =>
           {
             title: 'Edit',
             icon: EditIcon,
-            callback: () => mindmap.editTitle(item.occurrences[0].testIndex)
+            callback: () => mindmap.editTest(item.occurrences[0].testIndex)
           },
           {
             title: 'Remove',
             icon: RemoveTestIcon,
             // if it has children and has a test title
-            hidden: (item.children && item.title?.length) ? false : true,
+            hidden: (item.children && item.title !== undefined) ? false : true,
             enter: () =>
             {
               item.hover = 'remove-test';
@@ -278,15 +278,24 @@ const Item = ({ mindmap, mode, content, highlight, item }) =>
       </div>
     </div>;
 
+  let title = item.title, untitled;
+
+  if (item.title === '')
+  {
+    untitled = 'true';
+    title = 'Untitled Test';
+  }
+ 
   return <div className={ styles.itemWrapper }>
     <div
-      title={ item.title }
+      title={ title }
+      untitled={ untitled }
       highlight={ highlight }
       className={ styles.title }
       onClick={ (e) => leftClick(e, mindmap, item, 'test') }
       onContextMenu={ (e) => testRightClick(e, mindmap, item) }
     >
-      { item.title }
+      { title }
     </div>
 
     <div
@@ -427,6 +436,10 @@ const styles = createStyle({
 
     padding: '0 3px',
     margin: '-4px 0',
+
+    '[untitled="true"]': {
+      fontStyle: 'italic'
+    },
 
     '[highlight="remove"]': {
       color: colors.transparent

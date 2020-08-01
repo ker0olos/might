@@ -149,7 +149,8 @@ class Mindmap extends React.Component
 
   onFileSave()
   {
-    const content = JSON.stringify({ data: this.state.data });
+    // pretty-printed json file
+    const content = JSON.stringify({ data: this.state.data }, undefined, 2);
     
     // shows the user the pick file dialogue
     window.chooseFileSystemEntries({
@@ -358,7 +359,10 @@ class Mindmap extends React.Component
           }
           else
           {
-            if (!obj[key].title && title)
+            if (
+              obj[key].title === undefined &&
+              title !== undefined
+            )
               obj[key].title = title;
             
             obj[key].occurrences.push({
@@ -444,7 +448,7 @@ class Mindmap extends React.Component
       const test = { ...data[occurrences[0].testIndex] };
 
       // set the title for the test
-      test.title = value || 'Untitled Test';
+      test.title = value || '';
 
       // slice the steps to remove the unneeded ones
       test.steps = test.steps.slice(0, occurrences[0].stepIndex + 1);
@@ -457,7 +461,7 @@ class Mindmap extends React.Component
     };
 
     // open dialog to edit the test title
-    ReactDOM.render(<Dialogue type={ 'edit-test' } title={ 'Untitled Test' } done={ done }/>, document.querySelector('#dialogue'));
+    ReactDOM.render(<Dialogue type={ 'edit-test' } title={ '' } done={ done }/>, document.querySelector('#dialogue'));
   }
 
   /**
@@ -524,7 +528,7 @@ class Mindmap extends React.Component
         const test = { ...original };
 
         // set a new empty title for the test
-        test.title = 'Untitled Test';
+        test.title = '';
 
         // slice the steps to remove the unneeded ones
         test.steps = test.steps.slice(0, occurrences[0].stepIndex + 1);
@@ -537,7 +541,7 @@ class Mindmap extends React.Component
         // then replace it with the new test instead
         if (
           original.steps.length === 1 ||
-          (Object.keys(children).length === 0 && original.title === 'Untitled Test')
+          (Object.keys(children).length === 0 && !original.title)
         )
         {
           data[occurrences[0].testIndex] = test;
@@ -590,7 +594,7 @@ class Mindmap extends React.Component
         step.value = value;
 
       const test = {
-        title: 'Untitled Test',
+        title: '',
         steps: [
           step
         ]
@@ -641,14 +645,14 @@ class Mindmap extends React.Component
   /**
   * @param { number } testIndex
   */
-  editTitle(testIndex)
+  editTest(testIndex)
   {
     const data = this.state.data;
 
     const done = (action, value) =>
     {
       // validate title
-      if (typeof value === 'string' && value.length > 0)
+      if (typeof value === 'string')
         data[testIndex].title = value;
 
       // re-create the mindmap with the new data
