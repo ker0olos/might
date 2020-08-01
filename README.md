@@ -1,7 +1,7 @@
 [![npm (tag)](https://img.shields.io/npm/v/might-ui/latest)](http://npmjs.com/package/might-ui)
 ![npm](https://img.shields.io/npm/dm/might-ui)
 
-**This project is still in-development, it might be unstable.**
+**This project is still new, issues are to be expected.**
 
 ## The Problem
 
@@ -25,6 +25,14 @@ Might is an easy way to create, manage and edit tests, it was designed to make t
 
 After that it opens automatically in your browser, **(but to actually run the tests you need to install [might-cli](https://github.com/ItsKerolos/might-cli)).**
 
-[![](./screenshots/1.png)](https://github.com/ItsKerolos/Might/raw/master/screenshots/1.png)
+ - [Waiting](https://github.com/ItsKerolos/Might/raw/master/src/documentation/wait.md)
+ - [Changing the Viewport](https://github.com/ItsKerolos/Might/raw/master/src/documentation/viewport.md)
+ - [Setting Media Features](https://github.com/ItsKerolos/Might/raw/master/src/documentation/media.md)
+ - [Keypresses](https://github.com/ItsKerolos/Might/raw/master/src/documentation/click.md)
+ - [Hovering](https://github.com/ItsKerolos/Might/raw/master/src/documentation/hover.md)
+ - [Clicking](https://github.com/ItsKerolos/Might/raw/master/src/documentation/select.md)
+ - [Typing](https://github.com/ItsKerolos/Might/raw/master/src/documentation/keyboard.md)
+
+[![](./screenshots/1.png)](https://github.com/ItsKerolos/Might/raw/master/screenshots/type.png)
 
 [![](./screenshots/2.png)](https://github.com/ItsKerolos/Might/raw/master/screenshots/2.png)
