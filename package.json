@@ -34,11 +34,13 @@
   "dependencies": {
     "express": "^4.17.1",
     "flcss": "^0.1.2",
-    "might-core": "^0.2.1",
+    "might-core": "^0.2.2",
     "open": "^7.1.0",
     "prop-types": "^15.7.2",
+    "raw-loader": "^4.0.1",
     "react": "^16.13.1",
-    "react-dom": "^16.13.1"
+    "react-dom": "^16.13.1",
+    "react-markdown": "^4.3.1"
   },
   "devDependencies": {
     "@babel/core": "^7.10.5",

@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import Markdown from 'react-markdown';
+
 import PropTypes from 'prop-types';
 
 import { createStyle } from 'flcss';
@@ -11,6 +13,18 @@ import getTheme, { opacity } from '../colors.js';
 
 import Select from './select.js';
 import Input from './input.js';
+
+import WaitAction from '../documentation/wait.md';
+
+import ViewportAction from '../documentation/viewport.md';
+import MediaAction from '../documentation/media.md';
+
+import SelectAction from '../documentation/select.md';
+import HoverAction from '../documentation/hover.md';
+import ClickAction from '../documentation/click.md';
+
+import KeyboardAction from '../documentation/keyboard.md';
+import TypeAction from '../documentation/type.md';
 
 const colors = getTheme();
 
@@ -187,8 +201,7 @@ class Dialogue extends React.Component
         field = {
           label: (duration) ? 'Duration' : 'Selector',
           valid: (!duration) ? this.testSelector(s.value) : true,
-          hint: `Wait for an element to appear, or for a duration of time.\n
-                Duration takes time in seconds, while elements take a CSS selector.`
+          hint: WaitAction
         };
       }
       else if (s.action === 'viewport')
@@ -204,8 +217,23 @@ class Dialogue extends React.Component
         field = {
           valid,
           label: 'Dimensions',
-          hint: `Change the viewport of the page.\n
-                Dimensions take width [x] height. For Example: (1280x720).`
+          hint: ViewportAction
+        };
+      }
+      else if (s.action === 'media')
+      {
+        const value = s.value.split(':');
+
+        const valid = (
+          value.length === 2 &&
+          value[0]?.trim().length > 0 &&
+          value[1]?.trim().length > 0
+        );
+
+        field = {
+          valid,
+          label: 'Feature',
+          hint: MediaAction
         };
       }
       else if (s.action === 'select')
@@ -213,23 +241,42 @@ class Dialogue extends React.Component
         field = {
           label: 'Selector',
           valid: this.testSelector(s.value),
-          hint: 'Select an element using a CSS selector.'
+          hint: SelectAction
         };
       }
       else if (s.action === 'hover')
       {
         field = {
           valid: true,
-          hint: `Hover over an element.\n
-          An element needs to be previously selected with the Select action.`
+          hint: HoverAction
         };
       }
       else if (s.action === 'click')
       {
         field = {
           valid: true,
-          hint: `Click on an element.\n
-          An element needs to be previously selected with the Select action.`
+          hint: ClickAction
+        };
+      }
+      else if (s.action === 'keyboard')
+      {
+        let valid = true;
+
+        const split = s.value.replace('++', '+NumpadAdd').split('+');
+
+        if (split.length <= 0)
+          valid = false;
+        
+        split.forEach((s) =>
+        {
+          if (!s)
+            valid = false;
+        });
+
+        field = {
+          label: 'Combination',
+          valid: valid,
+          hint: KeyboardAction
         };
       }
       else if (s.action === 'type')
@@ -237,8 +284,7 @@ class Dialogue extends React.Component
         field = {
           label: 'Value',
           valid: true,
-          hint: `Type anything inside an input element.\n
-          An element needs to be previously selected with the Select action.`
+          hint: TypeAction
         };
       }
 
@@ -279,7 +325,7 @@ class Dialogue extends React.Component
               </div> : <div/>
           }
 
-          <div className={ styles.hint }>{ field.hint }</div>
+          <Markdown className={ styles.hint } source={ field.hint }/>
         </div>
 
         <div className={ styles.buttons }>
@@ -362,12 +408,24 @@ const styles = createStyle({
   hint: {
     color: opacity(colors.blackText, 0.65),
 
+    fontWeight: 'normal',
     fontSize: '13px',
     
-    userSelect: 'none',
-    whiteSpace: 'pre-line',
+    margin: '15px',
 
-    margin: '15px'
+    ' a': {
+      color: colors.blue,
+      textDecoration: 'none'
+    },
+
+    ' a:hover': {
+      color: colors.blue,
+      textDecoration: 'underline'
+    },
+
+    ' a:visited': {
+      color: colors.blue
+    }
   },
 
   options: {
