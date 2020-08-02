@@ -14,6 +14,8 @@ import getTheme, { opacity } from '../colors.js';
 import Select from './select.js';
 import Input from './input.js';
 
+import Toggle from './toggle.js';
+
 import WaitAction from '../documentation/wait.md';
 
 import ViewportAction from '../documentation/viewport.md';
@@ -75,7 +77,29 @@ class Dialogue extends React.Component
 
   done()
   {
-    const { action, value } = this.state;
+    const { toggle, action } = this.state;
+
+    let { value } = this.state;
+
+    // handle how the toggle effect the end value
+    if (toggle !== undefined)
+    {
+      /**
+      * @type { Step }
+      */
+      const s = {
+        action: (this.state.action === undefined) ? this.props.step.action : this.state.action,
+        value: (this.state.value === undefined) ? this.props.step.value : this.state.value
+      };
+
+      if (s.action === 'viewport')
+      {
+        if (toggle && !s.value.endsWith('t'))
+          value = s.value + 't';
+        else if (!toggle && s.value.endsWith('t'))
+          value = s.value.substring(0, s.value.length - 1);
+      }
+    }
     
     // send the final results of the dialogue to the parent
     this.props.done?.call(undefined, action, value?.trim());
@@ -174,10 +198,28 @@ class Dialogue extends React.Component
         value: (this.state.value === undefined) ? step.value : this.state.value
       };
 
+      let { toggle } = this.state;
+
+      // determine if toggle should be enabled
+      // at the very start of the dialogue
+      if (s.action === 'viewport' && s.value.endsWith('t'))
+      {
+        if (toggle === undefined)
+          toggle = s.value.endsWith('t');
+
+        s.value = s.value.substring(0, s.value.length - 1);
+      }
+
+      // reset value and toggle every new select
       const onSelect = (action) => this.setState({
         action,
         masterKey: this.state.masterKey + 1,
+        toggle: false,
         value: ''
+      });
+
+      const onToggle = (toggle) => this.setState({
+        toggle
       });
 
       const onInput = (value) =>
@@ -217,6 +259,10 @@ class Dialogue extends React.Component
         field = {
           valid,
           label: 'Dimensions',
+
+          toggle: true,
+          toggleLabel: 'Touch',
+
           hint: ViewportAction
         };
       }
@@ -312,7 +358,13 @@ class Dialogue extends React.Component
           {
             (field.label) ?
               <div key={ this.state.masterKey }>
-                <div className={ styles.label } valid={ field.valid.toString() }>{ field.label }</div>
+                <div className={ styles.firstLabel } valid={ field.valid.toString() }>{ field.label }</div>
+
+                {
+                  (field.toggle) ?
+                    <div className={ styles.secondLabel }>{ field.toggleLabel }</div> :
+                    <div/>
+                }
 
                 <div className={ styles.option }>
                   <Input
@@ -321,6 +373,17 @@ class Dialogue extends React.Component
                     autoFocus={ true }
                     onChange={ onInput }
                   />
+
+                  {
+                    (field.toggle) ?
+                      <Toggle
+                        value={ toggle }
+                        trueText={ field.toggleTrue }
+                        falseText={ field.toggleFalse }
+                        onToggle={ onToggle }
+                      /> :
+                      <div/>
+                  }
                 </div>
               </div> : <div/>
           }
@@ -398,17 +461,27 @@ const styles = createStyle({
     fontSize: '11px',
     userSelect: 'none',
 
-    margin: '0 15px -15px 15px',
+    margin: '0 15px -15px 15px'
+  },
+
+  firstLabel: {
+    extend: 'label',
 
     '[valid="false"]': {
       color: colors.red
     }
   },
 
+  secondLabel: {
+    extend: 'label',
+
+    textAlign: 'right'
+  },
+
   hint: {
     color: opacity(colors.blackText, 0.65),
 
-    fontWeight: 'normal',
+    fontWeight: 300,
     fontSize: '13px',
     
     margin: '15px',
@@ -434,6 +507,7 @@ const styles = createStyle({
   },
 
   option: {
+    display: 'flex',
     margin: '15px'
   },
   

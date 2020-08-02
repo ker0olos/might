@@ -44,6 +44,7 @@ const styles = createStyle({
     display: 'flex',
     backgroundColor: colors.whiteBackground,
 
+    width: '100%',
     height: '40px'
   },
 
