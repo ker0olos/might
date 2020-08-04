@@ -10,6 +10,8 @@ import DownIcon from '../../icons/down.svg';
 
 const colors = getTheme();
 
+const inputRef = React.createRef();
+
 class Select extends React.Component
 {
   constructor({ options, defaultIndex })
@@ -25,6 +27,7 @@ class Select extends React.Component
     this.toggle = this.toggle.bind(this);
     
     this.onKeyDown = this.onKeyDown.bind(this);
+    this.onSearch = this.onSearch.bind(this);
   }
 
   componentDidMount()
@@ -40,16 +43,36 @@ class Select extends React.Component
   toggle()
   {
     const { shown } = this.state;
-
+    
     this.setState({
-      index: undefined,
-      shown: !shown
+      shown: !shown,
+      query: undefined,
+      index: undefined
+    }, () =>
+    {
+      if (inputRef.current)
+      {
+        // clear search
+        inputRef.current.value = '';
+
+        // auto-focus on search input
+        if (this.state.shown)
+          inputRef.current?.focus();
+      }
     });
   }
 
   highlight(i)
   {
-    const { options } = this.props;
+    let { options } = this.props;
+
+    const { query } = this.state;
+
+    if (query)
+      options = query;
+
+    if (options.length <= 0)
+      return;
 
     if (i >= options.length)
       i = 0;
@@ -73,17 +96,20 @@ class Select extends React.Component
   */
   onKeyDown(e)
   {
-    const { options } = this.props;
+    let { options } = this.props;
 
-    const { shown, index } = this.state;
+    const { shown, query, index } = this.state;
 
     if (!shown)
       return;
 
+    if (query)
+      options = query;
+
     // disable dialogue controls
     e.stopImmediatePropagation();
 
-    if (e.key === 'Enter' && index !== undefined)
+    if (e.key === 'Enter' && index !== undefined && options.length > index)
       // eslint-disable-next-line security/detect-object-injection
       this.onChange(options[index]);
 
@@ -95,6 +121,18 @@ class Select extends React.Component
     
     else if (e.key === 'ArrowDown')
       this.highlight((index ?? -1) + 1);
+  }
+
+  onSearch()
+  {
+    const { options } = this.props;
+
+    const query = inputRef.current?.value;
+
+    this.setState({
+      index: 0,
+      query: (query) ? options.filter(s => s.includes(query)) : undefined
+    });
   }
 
   onChange(opt)
@@ -111,9 +149,9 @@ class Select extends React.Component
 
   render()
   {
-    const { shown, value, index } = this.state;
+    const { shown, value, query, index } = this.state;
     
-    const { options  } = this.props;
+    const { options } = this.props;
 
     return <div shown={ shown.toString() } className={ styles.container } onClick={ this.toggle }>
 
@@ -124,16 +162,23 @@ class Select extends React.Component
       <div shown={ shown.toString() } className={ styles.block } onClick={ this.toggle }/>
 
       <div shown={ shown.toString() } className={ styles.menu }>
-        {
-          options.map((opt, i) =>
-          {
-            const highlighted = index === i;
 
-            return <div key={ i } highlighted={ highlighted.toString() } className={ styles.option } onClick={ () => this.onChange(opt) }>
-              { opt }
-            </div>;
-          })
-        }
+        <div className={ styles.search } onClick={ (e) => e.stopPropagation() }>
+          <input ref={ inputRef } onInput={ this.onSearch }/>
+        </div>
+
+        <div className={ styles.options }>
+          {
+            (query ?? options).map((opt, i) =>
+            {
+              const highlighted = index === i;
+
+              return <div key={ i } highlighted={ highlighted.toString() } className={ styles.option } onClick={ () => this.onChange(opt) }>
+                { opt }
+              </div>;
+            })
+          }
+        </div>
       </div>
 
     </div>;
@@ -216,14 +261,13 @@ const styles = createStyle({
     
     overflow: 'auto',
 
-    flexDirection: 'column',
     backgroundColor: colors.whiteBackground,
 
     top: '50px',
     left: '-5px',
 
-    minHeight: '50px',
-    maxHeight: '200px',
+    minHeight: '40px',
+    maxHeight: '240px',
 
     width: 'calc(100% + 10px)',
     height: 'auto',
@@ -231,8 +275,7 @@ const styles = createStyle({
     border: `${colors.accent} 1px solid`,
     
     '[shown="true"]': {
-      display: 'grid',
-      gridAutoRows: '50px'
+      display: 'block'
     },
 
     '::-webkit-scrollbar': {
@@ -243,6 +286,33 @@ const styles = createStyle({
     '::-webkit-scrollbar-thumb': {
       background: colors.accent
     }
+  },
+
+  search: {
+    height: '30px',
+    margin: '5px 0',
+
+    '> input': {
+      color: colors.accent,
+
+      fontSize: '12px',
+      fontFamily: 'Noto Sans',
+      fontWeight: 700,
+
+      textAlign: 'center',
+
+      width: '100%',
+      height: '100%',
+
+      border: 0,
+      outline: 0,
+      padding: 0
+    }
+  },
+
+  options: {
+    display: 'grid',
+    gridAutoRows: '50px'
   },
 
   option: {

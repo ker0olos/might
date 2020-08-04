@@ -22,6 +22,8 @@ Might is an easy way to create, manage and edit tests, it was designed to make t
 ## Usage
 
 `npx might-ui`
+or `npx might -m` if you have might-cli installed.
+
 
 After that it opens automatically in your browser, **(but to actually run the tests you need to install [might-cli](https://github.com/ItsKerolos/might-cli)).**
 
