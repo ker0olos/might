@@ -525,7 +525,7 @@ const styles = createStyle({
 
     gridTemplateColumns: '100%',
     gridTemplateRows: 'auto 1fr auto',
-    gridTemplateAreas: '." "." ".',
+    gridTemplateAreas: '"." "." "."',
 
     fontSize: '14px',
     fontFamily: 'Noto Sans',

@@ -25,15 +25,15 @@ Might is an easy way to create, manage and edit tests, it was designed to make t
 
 After that it opens automatically in your browser, **(but to actually run the tests you need to install [might-cli](https://github.com/ItsKerolos/might-cli)).**
 
- - [Waiting](https://github.com/ItsKerolos/Might/raw/master/src/documentation/wait.md)
- - [Changing the Viewport](https://github.com/ItsKerolos/Might/raw/master/src/documentation/viewport.md)
- - [Setting Media Features](https://github.com/ItsKerolos/Might/raw/master/src/documentation/media.md)
- - [Keypresses](https://github.com/ItsKerolos/Might/raw/master/src/documentation/click.md)
- - [Hovering](https://github.com/ItsKerolos/Might/raw/master/src/documentation/hover.md)
- - [Clicking](https://github.com/ItsKerolos/Might/raw/master/src/documentation/select.md)
-- [Dragging Elements](https://github.com/ItsKerolos/Might/raw/master/src/documentation/drag.md)
-- [Swiping the Screen](https://github.com/ItsKerolos/Might/raw/master/src/documentation/swipe.md)
-- [Typing](https://github.com/ItsKerolos/Might/raw/master/src/documentation/keyboard.md)
+- [Waiting](https://github.com/ItsKerolos/Might/blob/master/src/documentation/wait.md)
+- [Changing the Viewport](https://github.com/ItsKerolos/Might/blob/master/src/documentation/viewport.md)
+- [Setting Media Features](https://github.com/ItsKerolos/Might/blob/master/src/documentation/media.md)
+- [Keypresses](https://github.com/ItsKerolos/Might/blob/master/src/documentation/click.md)
+- [Hovering](https://github.com/ItsKerolos/Might/blob/master/src/documentation/hover.md)
+- [Clicking](https://github.com/ItsKerolos/Might/blob/master/src/documentation/select.md)
+- [Dragging Elements](https://github.com/ItsKerolos/Might/blob/master/src/documentation/drag.md)
+- [Swiping the Screen](https://github.com/ItsKerolos/Might/blob/master/src/documentation/swipe.md)
+- [Typing](https://github.com/ItsKerolos/Might/blob/master/src/documentation/keyboard.md)
 
 [![](./screenshots/1.png)](https://github.com/ItsKerolos/Might/raw/master/screenshots/type.png)
 
