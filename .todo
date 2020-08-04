@@ -4,15 +4,15 @@ Performance Issues and Bugs:
 Documentation:
 
 UI/UX:
-  ☐ more complex <Select/> with search, suggestions and groups
-  
   ☐ searching for tests using their titles for actions @low
     - scrolls to the first result but highlight all results in both maps
 
 General:
   - file system access
+    ☐ saving can remember the entry and save again without prompt @high 
+      - saving can remember the entry from load too
+    
     - loading the map file automatically at the start
       (not available using the native filesystem api yet,
       but might happen in the future, since a lot of apps that need access to files
       also need a similar feature like IDEs)
-        

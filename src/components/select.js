@@ -18,10 +18,23 @@ class Select extends React.Component
 
     this.state = {
       shown: false,
+      index: undefined,
       value: options[defaultIndex ?? 0]
     };
 
     this.toggle = this.toggle.bind(this);
+    
+    this.onKeyDown = this.onKeyDown.bind(this);
+  }
+
+  componentDidMount()
+  {
+    window.addEventListener('keydown', this.onKeyDown);
+  }
+
+  componentWillUnmount()
+  {
+    window.removeEventListener('keydown', this.onKeyDown);
   }
 
   toggle()
@@ -29,8 +42,59 @@ class Select extends React.Component
     const { shown } = this.state;
 
     this.setState({
+      index: undefined,
       shown: !shown
     });
+  }
+
+  highlight(i)
+  {
+    const { options } = this.props;
+
+    if (i >= options.length)
+      i = 0;
+    else if (i <= -1)
+      i = options.length - 1;
+
+    this.setState({
+      index: i
+    }, () =>
+    {
+      // scroll to the new highlighted option
+      document.body.querySelector(`.${styles.option}[highlighted="true"]`).scrollIntoView({
+        block: 'nearest'
+      });
+    });
+
+  }
+
+  /**
+  * @param { KeyboardEvent } e
+  */
+  onKeyDown(e)
+  {
+    const { options } = this.props;
+
+    const { shown, index } = this.state;
+
+    if (!shown)
+      return;
+
+    // disable dialogue controls
+    e.stopImmediatePropagation();
+
+    if (e.key === 'Enter' && index !== undefined)
+      // eslint-disable-next-line security/detect-object-injection
+      this.onChange(options[index]);
+
+    else if (e.key === 'Escape')
+      this.toggle();
+    
+    else if (e.key === 'ArrowUp')
+      this.highlight((index ?? 0) - 1);
+    
+    else if (e.key === 'ArrowDown')
+      this.highlight((index ?? -1) + 1);
   }
 
   onChange(opt)
@@ -47,7 +111,7 @@ class Select extends React.Component
 
   render()
   {
-    const { shown, value } = this.state;
+    const { shown, value, index } = this.state;
     
     const { options  } = this.props;
 
@@ -63,7 +127,9 @@ class Select extends React.Component
         {
           options.map((opt, i) =>
           {
-            return <div key={ i } className={ styles.option } onClick={ () => this.onChange(opt) }>
+            const highlighted = index === i;
+
+            return <div key={ i } highlighted={ highlighted.toString() } className={ styles.option } onClick={ () => this.onChange(opt) }>
               { opt }
             </div>;
           })
@@ -156,16 +222,17 @@ const styles = createStyle({
     top: '50px',
     left: '-5px',
 
-    minHeight: '40px',
+    minHeight: '50px',
     maxHeight: '200px',
 
     width: 'calc(100% + 10px)',
-    height: 'fit-content',
+    height: 'auto',
 
     border: `${colors.accent} 1px solid`,
     
     '[shown="true"]': {
-      display: 'flex'
+      display: 'grid',
+      gridAutoRows: '50px'
     },
 
     '::-webkit-scrollbar': {
@@ -179,14 +246,22 @@ const styles = createStyle({
   },
 
   option: {
+    display: 'flex',
+    alignItems: 'center',
+
     color: colors.blackText,
     backgroundColor: colors.whiteBackground,
 
     textTransform: 'capitalize',
 
-    padding: '15px',
+    padding: '0 15px',
 
     ':hover': {
+      color: colors.whiteText,
+      backgroundColor: colors.accent
+    },
+
+    '[highlighted="true"]': {
       color: colors.whiteText,
       backgroundColor: colors.accent
     }
