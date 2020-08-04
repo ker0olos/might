@@ -111,7 +111,7 @@ class Dialogue extends React.Component
     }
 
     // trim value if it's a string
-    if (value.trim)
+    if (value?.trim)
       value = value.trim();
     
     // send the final results of the dialogue to the parent

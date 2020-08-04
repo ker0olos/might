@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import PropTypes from 'prop-types';
 
@@ -10,56 +10,69 @@ import DownIcon from '../../icons/down.svg';
 
 const colors = getTheme();
 
-/**
-* @param { {
-*    defaultIndex: number,
-*    options: Array<string>,
-*    onChange: (newValue: string) => void
-*  } } param0
-*/
-const Select = ({ defaultIndex, options, onChange }) =>
+class Select extends React.Component
 {
-  const [ shown, setShown ] = useState(false);
-  const [ value, setValue ] = useState(options[defaultIndex || 0]);
-
-  const show = () =>
+  constructor({ options, defaultIndex })
   {
-    if (shown)
-      return;
+    super();
 
-    setShown(true);
-  };
+    this.state = {
+      shown: false,
+      value: options[defaultIndex ?? 0]
+    };
 
-  const change = (opt) =>
+    this.toggle = this.toggle.bind(this);
+  }
+
+  toggle()
   {
-    setShown(false);
-    setValue(opt);
+    const { shown } = this.state;
 
-    if (onChange)
-      onChange.call(undefined, opt);
-  };
+    this.setState({
+      shown: !shown
+    });
+  }
 
-  return <div shown={ shown.toString() } className={ styles.container } onClick={ show }>
+  onChange(opt)
+  {
+    const { onChange } = this.props;
 
-    <div className={ styles.label }>{ value }</div>
+    this.setState({
+      shown: false,
+      value: opt
+    });
 
-    <DownIcon className={ styles.icon }/>
+    onChange?.call(undefined, opt);
+  }
 
-    <div shown={ shown.toString() } className={ styles.wrapper } onClick={ () => setShown(false) }/>
+  render()
+  {
+    const { shown, value } = this.state;
+    
+    const { options  } = this.props;
 
-    <div shown={ shown.toString() } className={ styles.menu }>
-      {
-        options.map((opt, i) =>
+    return <div shown={ shown.toString() } className={ styles.container } onClick={ this.toggle }>
+
+      <div className={ styles.selected }>{ value }</div>
+
+      <DownIcon className={ styles.extend }/>
+
+      <div shown={ shown.toString() } className={ styles.block } onClick={ this.toggle }/>
+
+      <div shown={ shown.toString() } className={ styles.menu }>
         {
-          return <div key={ i } className={ styles.option } onClick={ ()  => change(opt) }>
-            { opt }
-          </div>;
-        })
-      }
-    </div>
+          options.map((opt, i) =>
+          {
+            return <div key={ i } className={ styles.option } onClick={ () => this.onChange(opt) }>
+              { opt }
+            </div>;
+          })
+        }
+      </div>
 
-  </div>;
-};
+    </div>;
+  }
+}
 
 Select.propTypes = {
   defaultIndex: PropTypes.number,
@@ -96,7 +109,7 @@ const styles = createStyle({
     }
   },
 
-  label: {
+  selected: {
     flexGrow: 1,
     textTransform: 'capitalize',
 
@@ -104,14 +117,14 @@ const styles = createStyle({
     margin: 'auto 10px'
   },
 
-  icon: {
+  extend: {
     width: '20px',
     height: '20px',
 
     margin: 'auto 10px'
   },
 
-  wrapper: {
+  block: {
     display: 'none',
     position: 'fixed',
 
@@ -127,7 +140,7 @@ const styles = createStyle({
     height: '100vh',
 
     '[shown="true"]': {
-      display: 'flex'
+      display: 'block'
     }
   },
 
