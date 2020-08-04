@@ -25,6 +25,9 @@ import SelectAction from '../documentation/select.md';
 import HoverAction from '../documentation/hover.md';
 import ClickAction from '../documentation/click.md';
 
+import DragAction from '../documentation/drag.md';
+import SwipeAction from '../documentation/swipe.md';
+
 import KeyboardAction from '../documentation/keyboard.md';
 import TypeAction from '../documentation/type.md';
 
@@ -81,17 +84,17 @@ class Dialogue extends React.Component
 
     let { value } = this.state;
 
+    /**
+    * @type { Step }
+    */
+    const s = {
+      action: (this.state.action === undefined) ? this.props.step?.action : this.state.action,
+      value: (this.state.value === undefined) ? this.props.step?.value : this.state.value
+    };
+
     // handle how the toggle effect the end value
     if (toggle !== undefined)
     {
-      /**
-      * @type { Step }
-      */
-      const s = {
-        action: (this.state.action === undefined) ? this.props.step.action : this.state.action,
-        value: (this.state.value === undefined) ? this.props.step.value : this.state.value
-      };
-
       if (s.action === 'viewport')
       {
         if (toggle && !s.value.endsWith('t'))
@@ -100,9 +103,19 @@ class Dialogue extends React.Component
           value = s.value.substring(0, s.value.length - 1);
       }
     }
+
+    // handle converting coords to an array
+    if (s.action === 'drag' || s.action === 'swipe')
+    {
+      value = s.value.split(',').map(s => s.trim());
+    }
+
+    // trim value if it's a string
+    if (value.trim)
+      value = value.trim();
     
     // send the final results of the dialogue to the parent
-    this.props.done?.call(undefined, action, value?.trim());
+    this.props.done?.call(undefined, action, value);
     
     // remove this dialogue element from dom
     unmount();
@@ -119,6 +132,16 @@ class Dialogue extends React.Component
       return number;
     else
       return s;
+  }
+
+  filterNumber(s)
+  {
+    const number = parseInt(s);
+
+    if (isNaN(number))
+      return undefined;
+    else
+      return s.trim().replace(number.toString(), '');
   }
 
   testNumber(s)
@@ -215,6 +238,7 @@ class Dialogue extends React.Component
         action,
         masterKey: this.state.masterKey + 1,
         toggle: false,
+        pure: undefined,
         value: ''
       });
 
@@ -229,7 +253,7 @@ class Dialogue extends React.Component
         if (s.action === 'wait')
           this.setState({ value: this.parseNumber(value) });
         else
-          this.setState({ value });
+          this.setState({ value, pure: value });
       };
 
       // set hints & validate value
@@ -248,7 +272,7 @@ class Dialogue extends React.Component
       }
       else if (s.action === 'viewport')
       {
-        const dimensions = s.value.split('x');
+        const dimensions = (this.state.pure ?? s.value).split('x');
 
         const valid = (
           dimensions.length === 2 &&
@@ -268,7 +292,7 @@ class Dialogue extends React.Component
       }
       else if (s.action === 'media')
       {
-        const value = s.value.split(':');
+        const value = (this.state.pure ?? s.value).split(':');
 
         const valid = (
           value.length === 2 &&
@@ -304,11 +328,73 @@ class Dialogue extends React.Component
           hint: ClickAction
         };
       }
+      else if (s.action === 'drag')
+      {
+        const coordinates =
+        Array.isArray(s.value) ?
+          s.value :
+          (this.state.pure ?? s.value).split(',');
+
+        let valid = true;
+
+        if (coordinates.length === 2)
+        {
+          for (let i = 0; i < coordinates.length; i++)
+          {
+            // eslint-disable-next-line security/detect-object-injection
+            const result = this.filterNumber(coordinates[i]);
+    
+            if (result !== '' && result !== 'f' && result !== 'v')
+              valid = false;
+          }
+        }
+        else
+        {
+          valid = false;
+        }
+
+        field = {
+          valid,
+          label: 'Coordinates',
+          hint: DragAction
+        };
+      }
+      else if (s.action === 'swipe')
+      {
+        const coordinates =
+        Array.isArray(s.value) ?
+          s.value :
+          (this.state.pure ?? s.value).split(',');
+
+        let valid = true;
+
+        if (coordinates.length === 4)
+        {
+          for (let i = 0; i < coordinates.length; i++)
+          {
+            // eslint-disable-next-line security/detect-object-injection
+            const result = this.filterNumber(coordinates[i]);
+  
+            if (result !== '' && result !== 'v')
+              valid = false;
+          }
+        }
+        else
+        {
+          valid = false;
+        }
+
+        field = {
+          valid,
+          label: 'Coordinates',
+          hint: SwipeAction
+        };
+      }
       else if (s.action === 'keyboard')
       {
         let valid = true;
 
-        const split = s.value.replace('++', '+NumpadAdd').split('+');
+        const split = (this.state.pure ?? s.value).replace('++', '+NumpadAdd').split('+');
 
         if (split.length <= 0)
           valid = false;
@@ -344,6 +430,10 @@ class Dialogue extends React.Component
       // so we use this defaults from the parent
       if (step)
         defaultAction = actions.indexOf(step.action);
+
+      // prettify the default value of arrays
+      if (Array.isArray(s.value))
+        s.value = s.value.join(', ');
 
       return <div className={ styles.container }>
         <div className={ styles.title }>Step</div>
@@ -431,8 +521,11 @@ const styles = createStyle({
   },
 
   container: {
-    display: 'flex',
-    flexDirection: 'column',
+    display: 'grid',
+
+    gridTemplateColumns: '100%',
+    gridTemplateRows: 'auto 1fr auto',
+    gridTemplateAreas: '." "." ".',
 
     fontSize: '14px',
     fontFamily: 'Noto Sans',
@@ -440,8 +533,11 @@ const styles = createStyle({
 
     backgroundColor: colors.whiteBackground,
 
-    width: '350px',
-    
+    width: '100%',
+    height: '100%',
+    maxWidth: '350px',
+    maxHeight: '500px',
+
     overflow: 'hidden',
     borderRadius: '5px'
   },
@@ -453,6 +549,15 @@ const styles = createStyle({
     userSelect: 'none',
     
     margin: '25px 15px'
+  },
+
+  options: {
+    flexGrow: 1,
+
+    display: 'flex',
+    flexDirection: 'column',
+
+    minHeight: '360px'
   },
 
   label: {
@@ -479,12 +584,24 @@ const styles = createStyle({
   },
 
   hint: {
+    flexGrow: 1,
+
     color: opacity(colors.blackText, 0.65),
 
     fontWeight: 300,
     fontSize: '13px',
-    
-    margin: '15px',
+
+    overflow: 'auto',
+    margin: '0 15px',
+
+    '::-webkit-scrollbar': {
+      width: '5px',
+      background: colors.whiteBackground
+    },
+
+    '::-webkit-scrollbar-thumb': {
+      background: colors.accent
+    },
 
     ' a': {
       color: colors.blue,
@@ -499,11 +616,6 @@ const styles = createStyle({
     ' a:visited': {
       color: colors.blue
     }
-  },
-
-  options: {
-    flexGrow: 1,
-    minHeight: '360px'
   },
 
   option: {

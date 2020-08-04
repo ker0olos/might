@@ -31,7 +31,9 @@ After that it opens automatically in your browser, **(but to actually run the te
  - [Keypresses](https://github.com/ItsKerolos/Might/raw/master/src/documentation/click.md)
  - [Hovering](https://github.com/ItsKerolos/Might/raw/master/src/documentation/hover.md)
  - [Clicking](https://github.com/ItsKerolos/Might/raw/master/src/documentation/select.md)
- - [Typing](https://github.com/ItsKerolos/Might/raw/master/src/documentation/keyboard.md)
+- [Dragging Elements](https://github.com/ItsKerolos/Might/raw/master/src/documentation/drag.md)
+- [Swiping the Screen](https://github.com/ItsKerolos/Might/raw/master/src/documentation/swipe.md)
+- [Typing](https://github.com/ItsKerolos/Might/raw/master/src/documentation/keyboard.md)
 
 [![](./screenshots/1.png)](https://github.com/ItsKerolos/Might/raw/master/screenshots/type.png)
 

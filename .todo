@@ -4,6 +4,8 @@ Performance Issues and Bugs:
 Documentation:
 
 UI/UX:
+  ☐ more complex <Select/> with search, suggestions and groups
+  
   ☐ searching for tests using their titles for actions @low
     - scrolls to the first result but highlight all results in both maps
 

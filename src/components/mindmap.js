@@ -295,7 +295,7 @@ class Mindmap extends React.Component
       // for step in test
       test.steps.forEach((step, stepIndex) =>
       {
-        const key = serializeStep(step);
+        const key = serializeStep(step, true);
 
         // titles are passed to items that are the last in their branches only
         // because that item the only item that renders the title

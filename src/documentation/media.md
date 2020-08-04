@@ -2,6 +2,6 @@ Emulate a media feature.
 
 Feature takes a CSS media feature name(:)value.
 
-#### Example
+#### Examples
 
 - prefers-color-scheme: dark

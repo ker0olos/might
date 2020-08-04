@@ -4,6 +4,6 @@ Dimensions take width(x)height.
 
 Touch controls the availability of touch events inside the viewport.
 
-#### Example
+#### Examples
 
 - 1280x720
