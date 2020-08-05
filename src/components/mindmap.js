@@ -80,11 +80,11 @@ class Mindmap extends React.Component
 
     this.onKeyDown = this.onKeyDown.bind(this);
 
-    this.onFileSave = this.onFileSave.bind(this);
-    this.onFileLoad = this.onFileLoad.bind(this);
+    this.saveFile = this.saveFile.bind(this);
+    this.loadFile = this.loadFile.bind(this);
 
-    this.onUndo = this.onUndo.bind(this);
-    this.onRedo = this.onRedo.bind(this);
+    this.undo = this.undo.bind(this);
+    this.redo = this.redo.bind(this);
 
     this.onContextMenu = this.onContextMenu.bind(this);
 
@@ -130,33 +130,41 @@ class Mindmap extends React.Component
     {
       e.preventDefault();
 
-      this.onFileSave();
+      this.saveFile();
     }
 
     if (e.ctrlKey && e.key.toLowerCase() === 'o')
     {
       e.preventDefault();
 
-      this.onFileLoad();
+      this.loadFile();
     }
 
     if (e.ctrlKey && e.key.toLowerCase() === 'z')
-      this.onUndo();
+      this.undo();
 
     if (e.ctrlKey && e.key.toLowerCase() === 'y')
-      this.onRedo();
+      this.redo();
   }
 
-  onFileSave()
+  storeHandle(fileHandle)
+  {
+    // store the handle for the current session
+    this.fileHandle = fileHandle;
+
+    return fileHandle;
+  }
+
+  saveFile()
   {
     // pretty-printed json file
     const content = JSON.stringify({ data: this.state.data }, undefined, 2);
     
-    const getFile = () =>
+    const getHandle = () =>
     {
       // get the saved file handle
       if (this.fileHandle)
-        return Promise.resolve(this.fileHandle);
+        return Promise.resolve(this.fileHandle.createWritable());
       
       // shows the user the pick file dialogue
       return window.chooseFileSystemEntries({
@@ -166,53 +174,49 @@ class Mindmap extends React.Component
           extensions: [ 'json' ],
           mimeTypes: [ 'application/json' ]
         } ]
-      });
+      })
+        // get a writeable stream
+        .then(fileHandle => this.storeHandle(fileHandle).createWritable());
     };
 
-    // shows the user the pick file dialogue
-    getFile()
-      // get a writeable stream
-      .then((fileHandle) =>
-      {
-        this.fileHandle = fileHandle;
-
-        return fileHandle.createWritable();
-      })
+    // get file handle
+    getHandle()
       // add data to the stream
       .then((writable) =>
       {
         writable.write(content);
       
-        return writable;
+        // close the stream (writes the data to disk)
+        return writable.close();
       })
-      // close the stream (writes the data to disk)
-      .then((writable) => writable.close())
-      // set dirty state
+      // update dirty state
       .then(() => this.setState({ dirty: false }))
-      .catch((err) => console.error(err));
+      .catch(err => console.error(err));
   }
 
-  onFileLoad()
+  loadFile()
   {
-    // shows the user the pick file dialogue
-    window.chooseFileSystemEntries({
-      type: 'open-file',
-      multiple: false,
-      accepts: [ {
-        description: 'Might Map File (.json)',
-        extensions: [ 'json' ],
-        mimeTypes: [ 'application/json' ]
-      } ]
-    })
-      // get a readable stream
-      .then((fileHandle) =>
-      {
-        this.fileHandle = fileHandle;
-
-        return fileHandle.getFile();
+    const getHandle = () =>
+    {
+      // get a readable stream from the provided file handle
+      // shows the user the pick file dialogue
+      return window.chooseFileSystemEntries({
+        type: 'open-file',
+        multiple: false,
+        accepts: [ {
+          description: 'Might Map File (.json)',
+          extensions: [ 'json' ],
+          mimeTypes: [ 'application/json' ]
+        } ]
       })
+        // get a readable stream
+        .then(fileHandle => this.storeHandle(fileHandle).getFile());
+    };
+
+    // get file handle
+    getHandle()
       // get some readable text from the stream
-      .then((file) => file.text())
+      .then(file => file.text())
       .then((content) =>
       {
         // parse the text
@@ -221,10 +225,10 @@ class Mindmap extends React.Component
         // load the data
         this.loadMap(json.data, true);
       })
-      .catch((err) => console.error(err));
+      .catch(err => console.error(err));
   }
 
-  onUndo()
+  undo()
   {
     let { stackIndex } = this.state;
 
@@ -246,7 +250,7 @@ class Mindmap extends React.Component
     });
   }
 
-  onRedo()
+  redo()
   {
     let { stackIndex } = this.state;
 
@@ -858,10 +862,10 @@ class Mindmap extends React.Component
       <TopBar
         dirty={ this.state.dirty }
         stack={ { undo, redo } }
-        onFileSave={ this.onFileSave }
-        onFileLoad={ this.onFileLoad }
-        onUndo={ this.onUndo }
-        onRedo={ this.onRedo }
+        onFileSave={ this.saveFile }
+        onFileLoad={ this.loadFile }
+        onUndo={ this.undo }
+        onRedo={ this.redo }
       />
 
       {/* Mini-map */}
