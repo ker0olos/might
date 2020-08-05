@@ -152,17 +152,32 @@ class Mindmap extends React.Component
     // pretty-printed json file
     const content = JSON.stringify({ data: this.state.data }, undefined, 2);
     
+    const getFile = () =>
+    {
+      // get the saved file handle
+      if (this.fileHandle)
+        return Promise.resolve(this.fileHandle);
+      
+      // shows the user the pick file dialogue
+      return window.chooseFileSystemEntries({
+        type: 'save-file',
+        accepts: [ {
+          description: 'Might Map File (.json)',
+          extensions: [ 'json' ],
+          mimeTypes: [ 'application/json' ]
+        } ]
+      });
+    };
+
     // shows the user the pick file dialogue
-    window.chooseFileSystemEntries({
-      type: 'save-file',
-      accepts: [ {
-        description: 'Might Map File (.json)',
-        extensions: [ 'json' ],
-        mimeTypes: [ 'application/json' ]
-      } ]
-    })
+    getFile()
       // get a writeable stream
-      .then((fileHandle) => fileHandle.createWritable())
+      .then((fileHandle) =>
+      {
+        this.fileHandle = fileHandle;
+
+        return fileHandle.createWritable();
+      })
       // add data to the stream
       .then((writable) =>
       {
@@ -190,7 +205,12 @@ class Mindmap extends React.Component
       } ]
     })
       // get a readable stream
-      .then((fileHandle) => fileHandle.getFile())
+      .then((fileHandle) =>
+      {
+        this.fileHandle = fileHandle;
+
+        return fileHandle.getFile();
+      })
       // get some readable text from the stream
       .then((file) => file.text())
       .then((content) =>

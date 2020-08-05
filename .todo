@@ -9,9 +9,6 @@ UI/UX:
 
 General:
   - file system access
-    ☐ saving can remember the entry and save again without prompt @high 
-      - saving can remember the entry from load too
-    
     - loading the map file automatically at the start
       (not available using the native filesystem api yet,
       but might happen in the future, since a lot of apps that need access to files
