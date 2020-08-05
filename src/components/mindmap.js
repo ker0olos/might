@@ -3,6 +3,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import Dexie from 'dexie';
+
 import { createStyle } from 'flcss';
 
 import { serializeStep } from 'might-core';
@@ -78,6 +80,12 @@ class Mindmap extends React.Component
       familizedData: {}
     } ];
 
+    this.db = new Dexie('database');
+
+    this.db.version(1).stores({
+      files: 'id,fileHandle'
+    });
+
     this.onKeyDown = this.onKeyDown.bind(this);
 
     this.saveFile = this.saveFile.bind(this);
@@ -111,6 +119,10 @@ class Mindmap extends React.Component
     });
 
     document.body.addEventListener('keydown', this.onKeyDown);
+
+    // automatically load the file handle from previous session
+    // if it exists
+    this.loadHandle();
 
     // REMOVE (for testing purposes)
     // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]}]}').data, true);
@@ -149,10 +161,35 @@ class Mindmap extends React.Component
 
   storeHandle(fileHandle)
   {
+    // store the handle for the future sessions
+    this.db.table('files').put({ id: 0, fileHandle });
+
     // store the handle for the current session
     this.fileHandle = fileHandle;
 
     return fileHandle;
+  }
+
+  loadHandle()
+  {
+    // get the stored file handle from a previous session
+    this.db.table('files').get(0).then(({ fileHandle }) =>
+    {
+      fileHandle.requestPermission().then((response) =>
+      {
+        if (response === 'granted')
+        {
+          this.fileHandle = fileHandle;
+
+          this.loadFile(undefined, fileHandle);
+        }
+        else
+        {
+          // if rejected then delete the stored file handle
+          this.db.table('files').delete(0);
+        }
+      });
+    }).catch(() => undefined);
   }
 
   saveFile()
@@ -194,11 +231,14 @@ class Mindmap extends React.Component
       .catch(err => console.error(err));
   }
 
-  loadFile()
+  loadFile(e, fileHandle)
   {
-    const getHandle = () =>
+    const getHandle = (fileHandle) =>
     {
       // get a readable stream from the provided file handle
+      if (fileHandle)
+        return Promise.resolve(fileHandle.getFile());
+      
       // shows the user the pick file dialogue
       return window.chooseFileSystemEntries({
         type: 'open-file',
@@ -214,7 +254,7 @@ class Mindmap extends React.Component
     };
 
     // get file handle
-    getHandle()
+    getHandle(fileHandle)
       // get some readable text from the stream
       .then(file => file.text())
       .then((content) =>
