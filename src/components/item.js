@@ -133,7 +133,7 @@ const itemRightClick = (e, mindmap, item) =>
             
             mindmap.forceUpdate();
           },
-          callback: () => mindmap.addStepAfter(occurrences, 'new')
+          callback: () => mindmap.addStepAfter(occurrences, Object.keys(item.children).length, 'new')
         },
         {
           title: 'Insert',
@@ -162,7 +162,7 @@ const itemRightClick = (e, mindmap, item) =>
             
             mindmap.forceUpdate();
           },
-          callback: () => mindmap.addStepAfter(occurrences, 'insert')
+          callback: () => mindmap.addStepAfter(occurrences, undefined, 'insert')
         }
       ] },
       { title: 'Remove', actions: [

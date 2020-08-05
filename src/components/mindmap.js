@@ -345,7 +345,6 @@ class Mindmap extends React.Component
               root: true,
               occurrences: [ {
                 key,
-                parent: familizedData,
                 testIndex,
                 stepIndex
               } ],
@@ -374,7 +373,6 @@ class Mindmap extends React.Component
               title,
               occurrences: [ {
                 key,
-                parent: obj,
                 testIndex,
                 stepIndex
               } ],
@@ -391,7 +389,6 @@ class Mindmap extends React.Component
             
             obj[key].occurrences.push({
               key,
-              parent: obj,
               testIndex,
               stepIndex
             });
@@ -440,7 +437,13 @@ class Mindmap extends React.Component
 
     // push the new data to the stack
 
-    this.changeStack.push({ data: [ ...data ], familizedData: { ...familizedData } });
+    this.changeStack.push({
+      // TODO spread operator seems to not copy data correctly
+      // anc caused (reference issues) where old arrays get updated with new changes
+      // we'll this JSOn workaround until and we find a better fix
+      data: JSON.parse(JSON.stringify(data)),
+      familizedData: JSON.parse(JSON.stringify(familizedData))
+    });
   }
 
   /**
@@ -525,9 +528,10 @@ class Mindmap extends React.Component
 
   /**
   * @param { Occurrence[] } occurrences
+  * @param { number } children
   * @param { 'new' | 'insert' } mode
   */
-  addStepAfter(occurrences, mode)
+  addStepAfter(occurrences, children, mode)
   {
     const data = this.state.data;
 
@@ -546,8 +550,6 @@ class Mindmap extends React.Component
       {
         const original = data[occurrences[0].testIndex];
 
-        const children = occurrences[0].parent[occurrences[0].key].children;
-
         // copy test
         const test = { ...original };
 
@@ -561,11 +563,11 @@ class Mindmap extends React.Component
         test.steps.push(step);
 
         // if the original test has only 1 step
-        // or it has the default test title and no children
+        // or it untitled with and no children
         // then replace it with the new test instead
         if (
           original.steps.length === 1 ||
-          (Object.keys(children).length === 0 && !original.title)
+          (children === 0 && !original.title)
         )
         {
           data[occurrences[0].testIndex] = test;

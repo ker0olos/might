@@ -1,4 +1,6 @@
 Performance Issues and Bugs:
+  ☐ fix change stack data cloning @high 
+
   ☐ items can exceed default map size @low
 
 Documentation:
@@ -8,8 +10,4 @@ UI/UX:
     - scrolls to the first result but highlight all results in both maps
 
 General:
-  - file system access
-    - loading the map file automatically at the start
-      (not available using the native filesystem api yet,
-      but might happen in the future, since a lot of apps that need access to files
-      also need a similar feature like IDEs)
+  - loading the map file automatically at the start
