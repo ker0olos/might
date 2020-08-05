@@ -175,17 +175,19 @@ class Mindmap extends React.Component
     // get the stored file handle from a previous session
     this.db.table('files').get(0).then(({ fileHandle }) =>
     {
+      // ask the user for a permission to view the file
       fileHandle.requestPermission().then((response) =>
       {
+        // permission granted load the file
         if (response === 'granted')
         {
           this.fileHandle = fileHandle;
 
           this.loadFile(undefined, fileHandle);
         }
+        // if rejected then delete the stored file handle
         else
         {
-          // if rejected then delete the stored file handle
           this.db.table('files').delete(0);
         }
       });

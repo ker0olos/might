@@ -5,13 +5,13 @@
 
 ## The Problem
 
-End-to-end testing can get very complicated and can be overwhelming; especially if you want to start testing a huge app, that would take a lot of time and afford, and will boring and repetitive.
+End-to-end testing can get very complicated and overwhelming; especially if you want to start testing a huge app, that would take a lot of time and afford, and will be boring and repetitive.
 
 ## The Solution
 
-A no-code (almost zero-config) method to perform end-to-end tests, handling most of the mess in the background.
+A no-code (almost zero-config) method to perform and manage end-to-end tests, handling most of the mess in the background.
 
-Might is an easy way to create, manage and edit tests, it was designed to make the whole process easier and faster.
+Might is an easy way to create, manage, edit and run tests, it was designed to make the whole process easier and way faster.
 
 ## Installation
 
@@ -23,7 +23,6 @@ Might is an easy way to create, manage and edit tests, it was designed to make t
 
 `npx might-ui`
 or `npx might -m` if you have might-cli installed.
-
 
 After that it opens automatically in your browser, **(but to actually run the tests you need to install [might-cli](https://github.com/ItsKerolos/might-cli)).**
 
@@ -37,6 +36,6 @@ After that it opens automatically in your browser, **(but to actually run the te
 - [Swiping the Screen](https://github.com/ItsKerolos/Might/blob/master/src/documentation/swipe.md)
 - [Typing](https://github.com/ItsKerolos/Might/blob/master/src/documentation/keyboard.md)
 
-[![](./screenshots/1.png)](https://github.com/ItsKerolos/Might/raw/master/screenshots/type.png)
+[![](./screenshots/1.png)](https://github.com/ItsKerolos/Might/raw/master/screenshots/1.png)
 
 [![](./screenshots/2.png)](https://github.com/ItsKerolos/Might/raw/master/screenshots/2.png)
