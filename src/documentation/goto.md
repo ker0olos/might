@@ -7,3 +7,7 @@ This should be rarely used, users mostly navigate trough web apps with buttons a
 - **/about** - Goto a different page on the default URL.
 
 - **https://google.com** - Goto a different site entirely.
+
+- **back** - Go back in history.
+
+- **forward** - Go forward in history.
