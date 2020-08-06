@@ -28,6 +28,7 @@ After that it opens automatically in your browser, **(but to actually run the te
 
 - [Waiting](https://github.com/ItsKerolos/Might/blob/master/src/documentation/wait.md)
 - [Changing the Viewport](https://github.com/ItsKerolos/Might/blob/master/src/documentation/viewport.md)
+- [Going to Different Pages](https://github.com/ItsKerolos/Might/blob/master/src/documentation/goto.md)
 - [Setting Media Features](https://github.com/ItsKerolos/Might/blob/master/src/documentation/media.md)
 - [Keypresses](https://github.com/ItsKerolos/Might/blob/master/src/documentation/click.md)
 - [Hovering](https://github.com/ItsKerolos/Might/blob/master/src/documentation/hover.md)

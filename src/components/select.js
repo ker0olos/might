@@ -165,6 +165,8 @@ class Select extends React.Component
 
         <div className={ styles.search } onClick={ (e) => e.stopPropagation() }>
           <input ref={ inputRef } onInput={ this.onSearch }/>
+          
+          <div className={ styles.border }/>
         </div>
 
         <div className={ styles.options }>
@@ -308,6 +310,16 @@ const styles = createStyle({
       outline: 0,
       padding: 0
     }
+  },
+
+  border: {
+    position: 'relative',
+    backgroundColor: colors.accent,
+
+    width: '60%',
+    height: '1px',
+    
+    margin: '0 auto'
   },
 
   options: {

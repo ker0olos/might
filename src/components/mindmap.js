@@ -7,7 +7,7 @@ import Dexie from 'dexie';
 
 import { createStyle } from 'flcss';
 
-import { serializeStep } from 'might-core';
+import { stringifyStep } from 'might-core';
 
 import getTheme from '../colors.js';
 
@@ -29,8 +29,6 @@ const mindMapRef = React.createRef();
 
 /**
 * @typedef { Object } Occurrence
-* @property { string } key
-* @property { FamilizedObject } parent
 * @property { number } testIndex
 * @property { number } stepIndex
 */
@@ -361,7 +359,7 @@ class Mindmap extends React.Component
       // for step in test
       test.steps.forEach((step, stepIndex) =>
       {
-        const key = serializeStep(step, true);
+        const key = stringifyStep(step, { pretty: true });
 
         // titles are passed to items that are the last in their branches only
         // because that item the only item that renders the title
@@ -386,7 +384,6 @@ class Mindmap extends React.Component
               // that's why its not defined here
               root: true,
               occurrences: [ {
-                key,
                 testIndex,
                 stepIndex
               } ],
@@ -414,7 +411,6 @@ class Mindmap extends React.Component
             obj[key] = {
               title,
               occurrences: [ {
-                key,
                 testIndex,
                 stepIndex
               } ],
@@ -430,7 +426,6 @@ class Mindmap extends React.Component
               obj[key].title = title;
             
             obj[key].occurrences.push({
-              key,
               testIndex,
               stepIndex
             });

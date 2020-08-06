@@ -19,6 +19,7 @@ import Toggle from './toggle.js';
 import WaitAction from '../documentation/wait.md';
 
 import ViewportAction from '../documentation/viewport.md';
+import GotoAction from '../documentation/goto.md';
 import MediaAction from '../documentation/media.md';
 
 import SelectAction from '../documentation/select.md';
@@ -288,6 +289,15 @@ class Dialogue extends React.Component
           toggleLabel: 'Touch',
 
           hint: ViewportAction
+        };
+      }
+      else if (s.action === 'goto')
+      {
+        field = {
+          valid: (s.value.length > 0),
+          label: 'URL',
+
+          hint: GotoAction
         };
       }
       else if (s.action === 'media')
