@@ -47,7 +47,8 @@ class Dialogue extends React.Component
     super();
 
     this.state = {
-      masterKey: 0
+      masterKey: 0,
+      toggles: {}
     };
 
     this.onKeyDown = this.onKeyDown.bind(this);
@@ -81,7 +82,7 @@ class Dialogue extends React.Component
 
   done()
   {
-    const { toggle, action } = this.state;
+    const { toggles, action } = this.state;
 
     let { value } = this.state;
 
@@ -93,16 +94,22 @@ class Dialogue extends React.Component
       value: (this.state.value === undefined) ? this.props.step?.value : this.state.value
     };
 
-    // handle how the toggle effect the end value
-    if (toggle !== undefined)
+    // handle how the toggles effect the end value
+    if (s.action === 'viewport')
     {
-      if (s.action === 'viewport')
-      {
-        if (toggle && !s.value.endsWith('t'))
-          value = s.value + 't';
-        else if (!toggle && s.value.endsWith('t'))
-          value = s.value.substring(0, s.value.length - 1);
-      }
+      let v = s.value;
+
+      if (toggles['touch'])
+        v = v.includes('t') ? v : (v + 't');
+      else
+        v = v.replace(/t/g, '');
+
+      if (toggles['full'])
+        v = v.includes('f') ? v : (v + 'f');
+      else
+        v = v.replace(/f/g, '');
+      
+      value = v;
     }
 
     // handle converting coords to an array
@@ -222,30 +229,41 @@ class Dialogue extends React.Component
         value: (this.state.value === undefined) ? step.value : this.state.value
       };
 
-      let { toggle } = this.state;
+      const { toggles } = this.state;
 
-      // determine if toggle should be enabled
+      // determine if toggles should be enabled
       // at the very start of the dialogue
-      if (s.action === 'viewport' && s.value.endsWith('t'))
+      if (s.action === 'viewport')
       {
-        if (toggle === undefined)
-          toggle = s.value.endsWith('t');
+        if (toggles['touch'] === undefined && s.value.includes('t'))
+          toggles['touch'] = true;
 
-        s.value = s.value.substring(0, s.value.length - 1);
+        if (toggles['full'] === undefined && s.value.includes('f'))
+          toggles['full'] = true;
+
+        s.value = s.value.replace(/t/g, '').replace(/f/g, '');
       }
 
-      // reset value and toggle every new select
+      // reset value and toggles every new select
       const onSelect = (action) => this.setState({
         action,
         masterKey: this.state.masterKey + 1,
-        toggle: false,
+        toggles: {},
         pure: undefined,
         value: ''
       });
 
-      const onToggle = (toggle) => this.setState({
-        toggle
-      });
+      const onToggle = (value, key) =>
+      {
+        const { toggles } = this.state;
+
+        // eslint-disable-next-line security/detect-object-injection
+        toggles[key] = value;
+
+        this.setState({
+          toggles
+        });
+      };
 
       const onInput = (value) =>
       {
@@ -273,20 +291,42 @@ class Dialogue extends React.Component
       }
       else if (s.action === 'viewport')
       {
-        const dimensions = (this.state.pure ?? s.value).split('x');
+        const v = this.state.pure ?? s.value;
 
-        const valid = (
-          dimensions.length === 2 &&
-          this.testNumber(dimensions[0]) &&
-          this.testNumber(dimensions[1])
-        );
+        const dimensions = v.split('x');
+
+        let valid = false;
+
+        if (v.length === 0)
+        {
+          valid = true;
+        }
+        else if (dimensions.length === 2)
+        {
+          const [ w, h ] = dimensions;
+
+          if (this.testNumber(w) && this.testNumber(h))
+            valid = true;
+          else if (this.testNumber(w) && !h)
+            valid = true;
+          else if (this.testNumber(h) && !w)
+            valid = true;
+        }
 
         field = {
           valid,
           label: 'Dimensions',
 
-          toggle: true,
-          toggleLabel: 'Touch',
+          toggles: [
+            {
+              label: 'Touch',
+              value: false
+            },
+            {
+              label: 'Full',
+              value: false
+            }
+          ],
 
           hint: ViewportAction
         };
@@ -458,7 +498,7 @@ class Dialogue extends React.Component
         <div className={ styles.title }>Step</div>
     
         <div className={ styles.options }>
-          <div className={ styles.label }>Action</div>
+          <div className={ styles.actionLabel }>Action</div>
 
           <div className={ styles.option }>
             <Select defaultIndex={ defaultAction } options={ actions } onChange={ onSelect }/>
@@ -467,13 +507,17 @@ class Dialogue extends React.Component
           {
             (field.label) ?
               <div key={ this.state.masterKey }>
-                <div className={ styles.firstLabel } valid={ field.valid.toString() }>{ field.label }</div>
 
-                {
-                  (field.toggle) ?
-                    <div className={ styles.secondLabel }>{ field.toggleLabel }</div> :
-                    <div/>
-                }
+                <div className={ styles.labels }>
+                  <div className={ styles.valueLabel } valid={ field.valid.toString() }>{ field.label }</div>
+
+                  {
+                    (field.toggles ?? []).map((toggle, i) =>
+                    {
+                      return <div key={ i } className={ styles.additionalLabel }>{ toggle.label }</div>;
+                    })
+                  }
+                </div>
 
                 <div className={ styles.option }>
                   <Input
@@ -484,14 +528,19 @@ class Dialogue extends React.Component
                   />
 
                   {
-                    (field.toggle) ?
-                      <Toggle
-                        value={ toggle }
-                        trueText={ field.toggleTrue }
-                        falseText={ field.toggleFalse }
-                        onToggle={ onToggle }
-                      /> :
-                      <div/>
+                    (field.toggles ?? []).map((toggle, i) =>
+                    {
+                      const key = toggle.label.toLowerCase();
+
+                      return <Toggle
+                        key={ i }
+                        // eslint-disable-next-line security/detect-object-injection
+                        value={ toggles[key] ?? toggle.value }
+                        trueText={ toggle.true }
+                        falseText={ toggle.false }
+                        onToggle={ (value) => onToggle(value, key) }
+                      />;
+                    })
                   }
                 </div>
               </div> : <div/>
@@ -579,7 +628,9 @@ const styles = createStyle({
     minHeight: '360px'
   },
 
-  label: {
+  labels: {
+    display: 'flex',
+
     color: colors.accent,
 
     fontSize: '11px',
@@ -588,18 +639,28 @@ const styles = createStyle({
     margin: '0 15px -15px 15px'
   },
 
-  firstLabel: {
-    extend: 'label',
+  actionLabel: {
+    color: colors.accent,
+
+    fontSize: '11px',
+    userSelect: 'none',
+
+    margin: '0 15px -15px 15px'
+  },
+
+  valueLabel: {
+    flexGrow: 1,
 
     '[valid="false"]': {
       color: colors.red
     }
   },
 
-  secondLabel: {
-    extend: 'label',
+  additionalLabel: {
+    textAlign: 'center',
 
-    textAlign: 'right'
+    width: '40px',
+    margin: '0px 0 0 10px'
   },
 
   hint: {

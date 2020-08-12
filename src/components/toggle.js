@@ -59,6 +59,8 @@ const styles = createStyle({
     alignItems: 'center',
     justifyContent: 'center',
 
+    width: '40px',
+
     border: 0,
     borderBottom: `${colors.blackText} 1px solid`,
     
