@@ -203,7 +203,7 @@ class Dialogue extends React.Component
         <div className={ styles.title }>Test</div>
     
         <div className={ styles.options }>
-          <div className={ styles.label }>Title</div>
+          <div className={ styles.actionLabel }>Title</div>
 
           <div className={ styles.option }>
             <Input defaultValue={ defaultTitle } autoFocus={ true } onChange={ onInput }/>
