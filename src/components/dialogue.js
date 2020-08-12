@@ -333,8 +333,17 @@ class Dialogue extends React.Component
       }
       else if (s.action === 'click')
       {
+        const value = this.state.pure ?? s.value;
+
+        const valid = (
+          value === 'left' ||
+          value === 'middle' ||
+          value === 'right'
+        );
+
         field = {
-          valid: true,
+          valid,
+          label: 'Type',
           hint: ClickAction
         };
       }
