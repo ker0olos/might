@@ -1,6 +1,6 @@
 {
   "name": "might-ui",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "description": "A no-code solution for performing end-to-end tests",
   "scripts": {
     "prepare": "npm run build",
