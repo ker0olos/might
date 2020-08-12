@@ -91,7 +91,7 @@ const itemRightClick = (e, mindmap, item) =>
         title: 'Mark As Test',
         icon: TestIcon,
         // if it has children but not a test title
-        hidden: (item.children && item.title === undefined) ? false : true,
+        hidden: (Object.keys(item.children ?? {}).length && item.title === undefined) ? false : true,
         enter: () =>
         {
           item.hover = 'new-test';
@@ -138,7 +138,7 @@ const itemRightClick = (e, mindmap, item) =>
         {
           title: 'Insert',
           icon: InsertStepIcon,
-          hidden: (!item.children) ? true : false,
+          hidden: (Object.keys(item.children ?? {}).length) ? false : true,
           // highlights where the step will be added
           enter: () =>
           {
@@ -186,7 +186,7 @@ const itemRightClick = (e, mindmap, item) =>
         {
           title: 'Branch',
           icon: RemoveBranchIcon,
-          hidden: (!item.children) ? true : false,
+          hidden: (Object.keys(item.children ?? {}).length) ? false : true,
           // highlights the entire branch
           // that will be deleted
           enter: () =>
@@ -240,7 +240,7 @@ const testRightClick = (e, mindmap, item) =>
             title: 'Remove',
             icon: RemoveTestIcon,
             // if it has children and has a test title
-            hidden: (item.children && item.title !== undefined) ? false : true,
+            hidden: (Object.keys(item.children ?? {}).length && item.title !== undefined) ? false : true,
             enter: () =>
             {
               item.hover = 'remove-test';
