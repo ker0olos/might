@@ -605,11 +605,10 @@ class Mindmap extends React.Component
         // push new step
         test.steps.push(step);
 
-        // if the original test has only 1 step
-        // or it untitled with and no children
+        // if the original test
+        // is untitled with and no children
         // then replace it with the new test instead
         if (
-          original.steps.length === 1 ||
           (children === 0 && !original.title)
         )
         {
