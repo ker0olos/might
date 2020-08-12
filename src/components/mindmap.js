@@ -361,8 +361,7 @@ class Mindmap extends React.Component
       {
         const key = stringifyStep(step, { pretty: true });
 
-        // titles are passed to items that are the last in their branches only
-        // because that item the only item that renders the title
+        // titles are passed to items that are the last step in their individual test object
         const title = (stepIndex === test.steps.length - 1) ? test.title : undefined;
 
         // if the step is the first in the test
@@ -383,6 +382,7 @@ class Mindmap extends React.Component
               // root items should never get a title
               // that's why its not defined here
               root: true,
+              title,
               occurrences: [ {
                 testIndex,
                 stepIndex
@@ -392,7 +392,16 @@ class Mindmap extends React.Component
           }
           else
           {
-            familizedData[key].occurrences.push({ testIndex, stepIndex });
+            if (
+              familizedData[key].title === undefined &&
+              title !== undefined
+            )
+              familizedData[key].title = title;
+
+            familizedData[key].occurrences.push({
+              testIndex,
+              stepIndex
+            });
           }
 
           // set this step as the new parent
@@ -475,9 +484,6 @@ class Mindmap extends React.Component
     // push the new data to the stack
 
     this.changeStack.push({
-      // TODO spread operator seems to not copy data correctly
-      // anc caused (reference issues) where old arrays get updated with new changes
-      // we'll this JSOn workaround until and we find a better fix
       data: JSON.parse(JSON.stringify(data)),
       familizedData: JSON.parse(JSON.stringify(familizedData))
     });
@@ -756,6 +762,13 @@ class Mindmap extends React.Component
         // delete just the step it self
         // leaving its children as is
         steps.splice(occurrence.stepIndex, 1);
+      }
+
+      // if all the steps of a test were removed
+      // remove the test
+      if (steps.length <= 0)
+      {
+        data.splice(occurrence.testIndex);
       }
     });
 

@@ -91,7 +91,7 @@ const itemRightClick = (e, mindmap, item) =>
         title: 'Mark As Test',
         icon: TestIcon,
         // if it has children but not a test title
-        hidden: (!item.root && item.children && item.title === undefined) ? false : true,
+        hidden: (item.children && item.title === undefined) ? false : true,
         enter: () =>
         {
           item.hover = 'new-test';

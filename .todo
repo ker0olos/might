@@ -1,6 +1,4 @@
 Performance Issues and Bugs:
-  ☐ fix change stack data cloning @high 
-
   ☐ items can exceed default map size @low
 
 Documentation:
