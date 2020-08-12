@@ -84,6 +84,7 @@ class Mindmap extends React.Component
       files: 'id,fileHandle'
     });
 
+    this.onBeforeUnload = this.onBeforeUnload.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
 
     this.saveFile = this.saveFile.bind(this);
@@ -116,6 +117,7 @@ class Mindmap extends React.Component
       behavior: 'auto'
     });
 
+    window.addEventListener('beforeunload', this.onBeforeUnload);
     document.body.addEventListener('keydown', this.onKeyDown);
 
     // automatically load the file handle from previous session
@@ -128,7 +130,25 @@ class Mindmap extends React.Component
 
   componentWillUnmount()
   {
+    window.removeEventListener('beforeunload', this.onBeforeUnload);
     document.body.removeEventListener('keydown', this.onKeyDown);
+  }
+
+  /**
+  * @param { BeforeUnloadEvent } e
+  */
+  onBeforeUnload(e)
+  {
+    const { dirty } = this.state;
+
+    const message = 'Changes you made may not be saved.';
+    
+    if (!dirty)
+      return;
+    
+    e.returnValue = message;
+
+    return message;
   }
 
   /**
