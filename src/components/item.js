@@ -27,12 +27,12 @@ let clickTimestamp = 0;
 /**
 * @param { React.SyntheticEvent } e
 * @param { {} } mindmap
-* @param { import('./mindmap.js').FamilizedItem } item
+* @param { import('./mindmap.js').FamilizedItem | number } item
 * @param { 'test' | 'item' } mode
 */
 const leftClick = (e, mindmap, item, mode) =>
 {
-  if (mode === 'test' && item.title === undefined)
+  if (mode === 'test' && typeof item !== 'number')
     return;
 
   // stops a click going though test title to the item itself
@@ -44,12 +44,12 @@ const leftClick = (e, mindmap, item, mode) =>
   // meaning it can be tricked if the user clicks 2 different items
   // in that small time window.
   // this can be fixed with some react hooks magic but it's not that big of an issue.
-
+  
   // double click to open the edit dialogue (350ms window)
   if ((now - clickTimestamp) <= 250)
   {
     if (mode === 'test')
-      mindmap.editTest(item.occurrences[0].testIndex);
+      mindmap.editTest(item);
     else
       mindmap.editStep(item.occurrences);
   }
@@ -210,8 +210,9 @@ const itemRightClick = (e, mindmap, item) =>
 * @param { React.SyntheticEvent } e
 * @param { {} } mindmap
 * @param { import('./mindmap.js').FamilizedItem } item
+* @param { number } testIndex
 */
-const testRightClick = (e, mindmap, item) =>
+const testRightClick = (e, mindmap, item, testIndex) =>
 {
   if (item.title === undefined)
     return;
@@ -234,7 +235,7 @@ const testRightClick = (e, mindmap, item) =>
           {
             title: 'Edit',
             icon: EditIcon,
-            callback: () => mindmap.editTest(item.occurrences[0].testIndex)
+            callback: () => mindmap.editTest(testIndex)
           },
           {
             title: 'Remove',
@@ -278,7 +279,12 @@ const Item = ({ mindmap, mode, content, highlight, item }) =>
       </div>
     </div>;
 
-  let title = item.title, untitled;
+
+  let untitled;
+
+  const { titleTestIndex } = item;
+
+  let { title } = item;
 
   if (item.title === '')
   {
@@ -292,8 +298,8 @@ const Item = ({ mindmap, mode, content, highlight, item }) =>
       untitled={ untitled }
       highlight={ highlight }
       className={ styles.title }
-      onClick={ (e) => leftClick(e, mindmap, item, 'test') }
-      onContextMenu={ (e) => testRightClick(e, mindmap, item) }
+      onClick={ (e) => leftClick(e, mindmap, titleTestIndex, 'test') }
+      onContextMenu={ (e) => testRightClick(e, mindmap, item, titleTestIndex) }
     >
       { title }
     </div>

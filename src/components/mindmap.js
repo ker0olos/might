@@ -37,6 +37,7 @@ const mindMapRef = React.createRef();
 * @typedef { Object } FamilizedItem
 * @property { Occurrence[] } occurrences
 * @property { string } title
+* @property { number } titleTestIndex
 * @property { boolean } root
 * @property { 'remove-step' | 'remove-branch' } hover
 * @property { string } action
@@ -453,8 +454,14 @@ class Mindmap extends React.Component
       {
         const key = stringifyStep(step, { pretty: true });
 
+        let title, titleTestIndex;
+        
         // titles are passed to items that are the last step in their individual test object
-        const title = (stepIndex === test.steps.length - 1) ? test.title : undefined;
+        if (stepIndex === test.steps.length - 1)
+        {
+          title = test.title;
+          titleTestIndex = testIndex;
+        }
 
         // if the step is the first in the test
         if (stepIndex === 0)
@@ -475,6 +482,7 @@ class Mindmap extends React.Component
               // that's why its not defined here
               root: true,
               title,
+              titleTestIndex,
               occurrences: [ {
                 testIndex,
                 stepIndex
@@ -488,7 +496,10 @@ class Mindmap extends React.Component
               familizedData[key].title === undefined &&
               title !== undefined
             )
+            {
               familizedData[key].title = title;
+              familizedData[key].titleTestIndex = titleTestIndex;
+            }
 
             familizedData[key].occurrences.push({
               testIndex,
@@ -511,6 +522,7 @@ class Mindmap extends React.Component
           {
             obj[key] = {
               title,
+              titleTestIndex,
               occurrences: [ {
                 testIndex,
                 stepIndex
@@ -524,8 +536,11 @@ class Mindmap extends React.Component
               obj[key].title === undefined &&
               title !== undefined
             )
+            {
               obj[key].title = title;
-            
+              obj[key].titleTestIndex = titleTestIndex;
+            }
+
             obj[key].occurrences.push({
               testIndex,
               stepIndex
