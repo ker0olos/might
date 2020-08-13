@@ -54,6 +54,8 @@ class Mindmap extends React.Component
   {
     super();
 
+    this.timestamp = 0;
+
     this.state = {
       dirty: false,
 
@@ -86,6 +88,12 @@ class Mindmap extends React.Component
 
     this.onBeforeUnload = this.onBeforeUnload.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
+
+    this.onMouseUp = this.onMouseUp.bind(this);
+    this.onMouseLeave = this.onMouseLeave.bind(this);
+    this.onMouseDown = this.onMouseDown.bind(this);
+
+    this.onMouseMove = this.onMouseMove.bind(this);
 
     this.saveFile = this.saveFile.bind(this);
     this.loadFile = this.loadFile.bind(this);
@@ -175,6 +183,70 @@ class Mindmap extends React.Component
 
     if (e.ctrlKey && e.key.toLowerCase() === 'y')
       this.redo();
+  }
+
+  onMouseUp()
+  {
+    this.down = false;
+    
+    this.lastX = this.lastY = undefined;
+  }
+
+  onMouseLeave()
+  {
+    if (this.down)
+      this.onMouseUp();
+  }
+
+  onMouseDown()
+  {
+    this.down = true;
+  }
+
+  /**
+ * @param { React.MouseEvent } e
+ */
+  onMouseMove(e)
+  {
+    if (!this.down)
+      return;
+
+    const delta = Date.now() - this.timestamp;
+
+    // small cooldown between each call
+    if (delta > 25)
+    {
+      this.handleMovement(e);
+
+      this.timestamp = Date.now();
+    }
+  }
+
+  /**
+  * @param { React.MouseEvent } e
+  */
+  handleMovement(e)
+  {
+    const x = e.clientX;
+    const y = e.clientY;
+
+    /**
+    * @type { HTMLElement }
+    */
+    const element = mindMapRef.current;
+
+    if (this.lastX !== undefined && this.lastY !== undefined)
+    {
+      const deltaX = this.lastX - x;
+      const deltaY = this.lastY - y;
+      
+      element.parentElement.scrollTo({
+        left: element.parentElement.scrollLeft + deltaX,
+        top: element.parentElement.scrollTop + deltaY
+      });
+    }
+
+    this.lastX = x, this.lastY = y;
   }
 
   storeHandle(fileHandle)
@@ -945,7 +1017,17 @@ class Mindmap extends React.Component
       </Minimap>
 
       {/* Full-map */}
-      <div className={ styles.container } onContextMenu={ this.onContextMenu }>
+      <div
+        className={ styles.container }
+
+        onMouseUp={ this.onMouseUp }
+        onMouseLeave={ this.onMouseLeave }
+        onMouseDown={ this.onMouseDown }
+
+        onMouseMove={ this.onMouseMove }
+        
+        onContextMenu={ this.onContextMenu }
+      >
         { handleItems(this.state.familizedData, 'full', false) }
       </div>
 

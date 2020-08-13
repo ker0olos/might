@@ -25,7 +25,9 @@ class Minimap extends React.Component
     this.timestamp = 0;
 
     this.onMouseUp = this.onMouseUp.bind(this);
+    this.onMouseLeave = this.onMouseLeave.bind(this);
     this.onMouseDown = this.onMouseDown.bind(this);
+
     this.onMouseMove = this.onMouseMove.bind(this);
   }
 
@@ -87,6 +89,15 @@ class Minimap extends React.Component
     this.handleMovement(e, true);
   }
 
+  /**
+  * @param { React.MouseEvent } e
+  */
+  onMouseLeave(e)
+  {
+    if (this.down)
+      this.onMouseUp(e);
+  }
+
   onMouseDown()
   {
     this.down = true;
@@ -115,8 +126,11 @@ class Minimap extends React.Component
   {
     return <div
       className={ styles.wrapper }
+      
       onMouseUp={ this.onMouseUp }
+      onMouseLeave={ this.onMouseLeave }
       onMouseDown={ this.onMouseDown }
+
       onMouseMove={ this.onMouseMove }
       onContextMenu={ this.props?.onContextMenu }
     >
