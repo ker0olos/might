@@ -26,6 +26,16 @@ class TopBar extends React.Component
 
     return (
       <div className={ styles.container }>
+        {
+          (typeof window.chooseFileSystemEntries !== 'function') ?
+            <div className={ styles.notice }>
+              <a href='https://web.dev/native-file-system'>Native File System API</a>
+              { ' is not enabled in your browser.' }
+              <br/>
+              { 'Saving and Loading won\'t work.' }
+            </div> : <div/>
+        }
+
         <div dirty={ this.props.dirty.toString() } className={ styles.button } title={ 'Ctrl+S' } onClick={ this.props.onFileSave }>
           <SaveIcon className={ styles.icon }/>
           <div className={ styles.title }>Save</div>
@@ -82,6 +92,33 @@ const styles = createStyle({
 
     borderBottom: '1px solid',
     borderColor: colors.blackShadow
+  },
+
+  notice: {
+    position: 'absolute',
+    color: colors.accent,
+    
+    top: '100%',
+
+    fontFamily: 'Noto Sans',
+    fontSize: '11px',
+    fontWeight: 700,
+
+    margin: '10px 0 0 0',
+
+    ' a': {
+      color: colors.blue,
+      textDecoration: 'none'
+    },
+
+    ' a:hover': {
+      color: colors.blue,
+      textDecoration: 'underline'
+    },
+
+    ' a:visited': {
+      color: colors.blue
+    }
   },
 
   button: {

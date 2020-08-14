@@ -23,13 +23,12 @@
   },
   "homepage": "https://github.com/ItsKerolos/Might#readme",
   "keywords": [
-    "test",
     "testing",
-    "ui",
+    "end-to-end-testing",
     "ui-testing",
-    "end-to-end-test",
+    "front-end-testing",
     "end-to-end-test-automation",
-    "end-to-end-testing"
+    "end-to-end-testing-interface"
   ],
   "dependencies": {
     "dexie": "^3.0.2",
