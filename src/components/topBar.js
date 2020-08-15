@@ -86,8 +86,6 @@ const styles = createStyle({
     fontFamily: 'Noto Sans',
     fontWeight: 700,
 
-    userSelect: 'none',
-
     padding: '0 10px',
 
     borderBottom: '1px solid',

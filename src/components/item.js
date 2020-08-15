@@ -339,8 +339,6 @@ const styles = createStyle({
     width: '110px',
     height: 'fit-content',
 
-    userSelect: 'none',
-
     margin: 'auto',
 
     // acts as margin between rows
@@ -430,7 +428,6 @@ const styles = createStyle({
 
     fontSize: '10px',
     
-    userSelect: 'none',
     overflow: 'hidden',
 
     textAlign: 'center',

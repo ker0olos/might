@@ -206,8 +206,6 @@ const styles = createStyle({
   },
 
   subTitle: {
-    userSelect: 'none',
-
     textTransform: 'uppercase',
 
     color: colors.accent,

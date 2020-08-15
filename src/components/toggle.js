@@ -45,9 +45,7 @@ const styles = createStyle({
     color: colors.blackText,
     backgroundColor: colors.whiteBackground,
 
-    height: '40px',
-
-    userSelect: 'none'
+    height: '40px'
   },
 
   container: {

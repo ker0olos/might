@@ -203,8 +203,6 @@ const styles = createStyle({
     color: colors.blackText,
     backgroundColor: colors.whiteBackground,
 
-    userSelect: 'none',
-
     width: '100%',
     height: '40px',
 

@@ -79,14 +79,20 @@ class Minimap extends React.Component
     });
   }
 
+  onMouseDown()
+  {
+    this.down = true;
+  }
+
   /**
   * @param { React.MouseEvent } e
   */
   onMouseUp(e)
   {
+    if (this.down)
+      this.handleMovement(e, true);
+      
     this.down = false;
-    
-    this.handleMovement(e, true);
   }
 
   /**
@@ -96,11 +102,6 @@ class Minimap extends React.Component
   {
     if (this.down)
       this.onMouseUp(e);
-  }
-
-  onMouseDown()
-  {
-    this.down = true;
   }
 
   /**

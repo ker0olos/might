@@ -186,6 +186,11 @@ class Mindmap extends React.Component
       this.redo();
   }
 
+  onMouseDown()
+  {
+    this.down = true;
+  }
+
   onMouseUp()
   {
     this.down = false;
@@ -197,11 +202,6 @@ class Mindmap extends React.Component
   {
     if (this.down)
       this.onMouseUp();
-  }
-
-  onMouseDown()
-  {
-    this.down = true;
   }
 
   /**

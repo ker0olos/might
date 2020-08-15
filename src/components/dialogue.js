@@ -614,7 +614,6 @@ const styles = createStyle({
     color: colors.blackText,
 
     fontSize: '11px',
-    userSelect: 'none',
     
     margin: '25px 15px'
   },
@@ -634,7 +633,6 @@ const styles = createStyle({
     color: colors.accent,
 
     fontSize: '11px',
-    userSelect: 'none',
 
     margin: '0 15px -15px 15px'
   },
@@ -643,7 +641,6 @@ const styles = createStyle({
     color: colors.accent,
 
     fontSize: '11px',
-    userSelect: 'none',
 
     margin: '0 15px -15px 15px'
   },
@@ -673,6 +670,10 @@ const styles = createStyle({
 
     overflow: 'auto',
     margin: '0 15px',
+
+    ' *': {
+      userSelect: 'text'
+    },
 
     '::-webkit-scrollbar': {
       width: '5px',
@@ -704,8 +705,7 @@ const styles = createStyle({
   },
   
   buttons: {
-    display: 'flex',
-    userSelect: 'none'
+    display: 'flex'
   },
 
   button: {
