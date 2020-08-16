@@ -16,7 +16,8 @@ and [Might CLI](https://github.com/ItsKerolos/might-cli) runs those tests.
 
 ## Installation
 
-##### IMPORTANT: This project depends on the experimental [Native File System API](https://web.dev/native-file-system/) which is currently only supported by Chrome 83+ and requires ```chrome://flags/#native-file-system-api``` to be enabled manually.
+#### To have the BEST possible experience with Might, please use a browser that supports the new [Native File System API](https://web.dev/native-file-system/);
+Like Chrome 83+ with `chrome://flags/#native-file-system-api` enabled manually or [any other browser that supports the api](https://caniuse.com/#feat=native-filesystem-api).
 
 `npm install --save-dev might-cli might-ui`
 

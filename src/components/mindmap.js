@@ -263,6 +263,10 @@ class Mindmap extends React.Component
 
   loadHandle()
   {
+    // auto-loading only works with the ntf api
+    if (typeof window.chooseFileSystemEntries !== 'function')
+      return;
+
     // get the stored file handle from a previous session
     this.db.table('files').get(0).then(({ fileHandle }) =>
     {
@@ -290,11 +294,20 @@ class Mindmap extends React.Component
     // pretty-printed json file
     const content = JSON.stringify({ data: this.state.data }, undefined, 2);
     
-    const getHandle = () =>
+    // use the nfs api
+    const getFromHandle = () =>
     {
-      // get the saved file handle
       if (this.fileHandle)
-        return Promise.resolve(this.fileHandle.createWritable());
+        // get the saved file handle
+        return Promise.resolve(this.fileHandle.createWritable())
+          // add data to the stream
+          .then((writable) =>
+          {
+            writable.write(content);
+          
+            // close the stream (writes the data to disk)
+            return writable.close();
+          });
       
       // shows the user the pick file dialogue
       return window.chooseFileSystemEntries({
@@ -306,19 +319,42 @@ class Mindmap extends React.Component
         } ]
       })
         // get a writeable stream
-        .then(fileHandle => this.storeHandle(fileHandle).createWritable());
+        .then(fileHandle => this.storeHandle(fileHandle).createWritable())
+        // add data to the stream
+        .then((writable) =>
+        {
+          writable.write(content);
+        
+          // close the stream (writes the data to disk)
+          return writable.close();
+        });
     };
 
-    // get file handle
-    getHandle()
-      // add data to the stream
-      .then((writable) =>
+    // fallback for no having the nfs api enabled
+    const getFromBlob = () =>
+    {
+      const a = document.createElement('a');
+
+      const blob = new Blob([ content ], { type: 'text/plain' });
+
+      a.download = 'might.map.json';
+
+      a.href = URL.createObjectURL(blob);
+
+      a.addEventListener('click', () =>
       {
-        writable.write(content);
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      });
       
-        // close the stream (writes the data to disk)
-        return writable.close();
-      })
+      a.click();
+
+      return Promise.resolve();
+    };
+
+    (typeof window.chooseFileSystemEntries === 'function'
+      ? getFromHandle()
+      : getFromBlob()
+    )
       // update dirty state
       .then(() => this.setState({ dirty: false }))
       .catch(err => console.error(err));
@@ -326,11 +362,14 @@ class Mindmap extends React.Component
 
   loadFile(e, fileHandle)
   {
-    const getHandle = (fileHandle) =>
+    // use the nfs api
+    const getFromHandle = (fileHandle) =>
     {
-      // get a readable stream from the provided file handle
       if (fileHandle)
-        return Promise.resolve(fileHandle.getFile());
+        // get a readable stream from the provided file handle
+        return Promise.resolve(fileHandle.getFile())
+          // get some readable text from the stream
+          .then(file => file.text());
       
       // shows the user the pick file dialogue
       return window.chooseFileSystemEntries({
@@ -343,13 +382,42 @@ class Mindmap extends React.Component
         } ]
       })
         // get a readable stream
-        .then(fileHandle => this.storeHandle(fileHandle).getFile());
+        .then(fileHandle => this.storeHandle(fileHandle).getFile())
+        // get some readable text from the stream
+        .then(file => file.text());
     };
 
-    // get file handle
-    getHandle(fileHandle)
-      // get some readable text from the stream
-      .then(file => file.text())
+    // fallback for no having the nfs api enabled
+    const getFromBlob = () =>
+    {
+      return new Promise((resolve) =>
+      {
+        const input = document.createElement('input');
+
+        input.type = 'file';
+  
+        input.multiple = false;
+        input.accept = 'application/json';
+  
+        input.addEventListener('change', () =>
+        {
+          const file = input.files[0];
+
+          const reader = new FileReader();
+
+          reader.addEventListener('load', event => resolve(event.target.result));
+
+          reader.readAsText(file);
+        });
+  
+        input.click();
+      });
+    };
+
+    (typeof window.chooseFileSystemEntries === 'function'
+      ? getFromHandle(fileHandle)
+      : getFromBlob()
+    )
       .then((content) =>
       {
         // parse the text
