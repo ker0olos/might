@@ -30,12 +30,12 @@ After that it opens automatically in your browser, **(to actually run the tests 
 - [Changing the Viewport](https://github.com/ItsKerolos/Might/blob/master/src/documentation/viewport.md)
 - [Going to Different Pages](https://github.com/ItsKerolos/Might/blob/master/src/documentation/goto.md)
 - [Setting Media Features](https://github.com/ItsKerolos/Might/blob/master/src/documentation/media.md)
-- [Keypresses](https://github.com/ItsKerolos/Might/blob/master/src/documentation/click.md)
+- [Keypresses](https://github.com/ItsKerolos/Might/blob/master/src/documentation/keyboard.md)
 - [Hovering](https://github.com/ItsKerolos/Might/blob/master/src/documentation/hover.md)
-- [Clicking](https://github.com/ItsKerolos/Might/blob/master/src/documentation/select.md)
+- [Clicking](https://github.com/ItsKerolos/Might/blob/master/src/documentation/click.md)
 - [Dragging Elements](https://github.com/ItsKerolos/Might/blob/master/src/documentation/drag.md)
 - [Swiping the Screen](https://github.com/ItsKerolos/Might/blob/master/src/documentation/swipe.md)
-- [Typing](https://github.com/ItsKerolos/Might/blob/master/src/documentation/keyboard.md)
+- [Typing](https://github.com/ItsKerolos/Might/blob/master/src/documentation/type.md)
 
 [![](./screenshots/1.png)](https://github.com/ItsKerolos/Might/raw/master/screenshots/1.png)
 
