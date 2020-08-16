@@ -3,25 +3,25 @@
 
 **This project is still new, issues are to be expected.**
 
-## The Problem
-
 End-to-end testing can get very complicated and overwhelming; especially if you need to start testing huge apps, that would take a lot of time and afford, and will be boring and repetitive.
 
-## The Solution
+### The Solution
 
 A no-code method to perform and manage end-to-end tests, handling all of the mess in the background.
 
 [Might UI](https://github.com/ItsKerolos/Might) is an easy way to create, manage and edit tests,
 and [Might CLI](https://github.com/ItsKerolos/might-cli) runs those tests.
 
-## Installation
+### Installation
 
-#### To have the BEST possible experience with Might, please use a browser that supports the new [Native File System API](https://web.dev/native-file-system/);
-Like Chrome 83+ with `chrome://flags/#native-file-system-api` enabled manually or [any other browser that supports the api](https://caniuse.com/#feat=native-filesystem-api).
+##### For the best possible experience with Might, please use a browser that supports the new [Native File System API](https://web.dev/native-file-system/);
+##### Like Chrome 83+ with `chrome://flags/#native-file-system-api` enabled manually or [any other browser that supports the api](https://caniuse.com/#feat=native-filesystem-api).
+
+</br>
 
 `npm install --save-dev might-cli might-ui`
 
-## Usage
+### Usage
 `npx might -m` or `npx might-ui`.
 
 After that it opens automatically in your browser, **(to actually run the tests you need to use [might-cli](https://github.com/ItsKerolos/might-cli)).**
