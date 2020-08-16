@@ -1,6 +1,6 @@
 Click on an element.
 
-An element needs to be previously selected with the **Select** action.
+previously selected with the **Select** action, (this is used on all the elements that match the selector).
 
 #### Examples
 
