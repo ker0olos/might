@@ -351,12 +351,12 @@ const styles = createStyle({
 
     backgroundColor: colors.accent,
 
-    minHeight: 'calc(26px / 10)',
-    maxHeight: 'calc(50px / 10)',
-    width: 'calc(110px / 10)',
+    minHeight: 'calc(26px / 20)',
+    maxHeight: 'calc(50px / 20)',
+    width: 'calc(110px / 20)',
 
-    borderTop: `calc(10px / 10) solid ${colors.whiteBackground}`,
-    borderBottom: `calc(10px / 10) solid ${colors.whiteBackground}`,
+    borderTop: `calc(10px / 20) solid ${colors.whiteBackground}`,
+    borderBottom: `calc(10px / 20) solid ${colors.whiteBackground}`,
 
     '[highlight="remove"]': {
       backgroundColor: colors.red

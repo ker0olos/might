@@ -51,10 +51,10 @@ const styles = createStyle({
   miniContainer: {
     extend: 'container',
 
-    width: 'calc(80px / 10)',
+    width: 'calc(80px / 20)',
     height: '1px',
 
-    padding: '0 calc(30px / 10)'
+    padding: '0 calc(30px / 20)'
   }
 });
 

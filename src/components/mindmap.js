@@ -116,8 +116,8 @@ class Mindmap extends React.Component
     const miniMapWidth = 260;
     const miniMapHeight = 157;
 
-    const mapWidth = miniMapWidth * 10 -  window.innerWidth;
-    const mapHeight = miniMapHeight * 10 -  window.innerHeight;
+    const mapWidth = miniMapWidth * 20 -  window.innerWidth;
+    const mapHeight = miniMapHeight * 20 -  window.innerHeight;
 
     // scroll to center of the map on start
     mindMapRef.current.parentElement.scrollTo({
@@ -1122,8 +1122,8 @@ const styles = createStyle({
   wrapper: {
     backgroundColor: colors.whiteBackground,
 
-    width: 'calc(260px * 10)',
-    height: 'calc(157px * 10)'
+    width: 'calc(260px * 20)',
+    height: 'calc(157px * 20)'
   },
 
   container: {

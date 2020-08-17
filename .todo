@@ -1,5 +1,6 @@
 Performance Issues and Bugs:
-  ☐ items can exceed default map size @low
+  ☐ auto expanding map sizes @high
+    - little hard since flcss does not support hot-reloading
 
 Documentation:
 
