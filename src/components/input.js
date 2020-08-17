@@ -10,13 +10,14 @@ const colors = getTheme();
 
 /**
 * @param { {
+*    id: string
 *    defaultValue: string,
 *    valid: boolean,
 *    autoFocus: boolean,
 *    onChange: (newValue: string) => string
 *  } } param0
 */
-const Input = ({ defaultValue, valid, autoFocus, onChange }) =>
+const Input = ({ id, defaultValue, valid, autoFocus, onChange }) =>
 {
   if (valid === undefined)
     valid = true;
@@ -28,11 +29,12 @@ const Input = ({ defaultValue, valid, autoFocus, onChange }) =>
   };
 
   return <div className={ styles.container }>
-    <input valid={ valid.toString() } autoFocus={ autoFocus } className={ styles.input } spellCheck={ false } defaultValue={ defaultValue } type={ 'text' }  onInput={ change }/>
+    <input id={ id } valid={ valid.toString() } autoFocus={ autoFocus } className={ styles.input } spellCheck={ false } defaultValue={ defaultValue } type={ 'text' }  onInput={ change }/>
   </div>;
 };
 
 Input.propTypes = {
+  id: PropTypes.string,
   valid: PropTypes.bool,
   defaultValue: PropTypes.any,
   autoFocus: PropTypes.bool,

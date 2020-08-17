@@ -134,7 +134,7 @@ class Mindmap extends React.Component
     this.loadHandle();
 
     // REMOVE (for testing purposes)
-    // this.loadMap(JSON.parse('{"data":[{"title":"test search-bar input 1","steps":[{"action":"wait","value":2},{"action":"type","value":"Hello World"}]}]}').data, true);
+    // this.loadMap(JSON.parse('{"data":[{"steps":[{"action":"wait","value":0},{"action":"select","value":"body"},{"action":"click","value":"left"}]}]}').data, true);
   }
 
   componentWillUnmount()
@@ -753,7 +753,7 @@ class Mindmap extends React.Component
   {
     const data = this.state.data;
 
-    const step = { action: 'type', value: 'New Step' };
+    const step = { action: 'select', value: '' };
     
     // emits when the step edit dialogue is done
     const done = (action, value) =>
@@ -825,7 +825,7 @@ class Mindmap extends React.Component
   {
     const data = this.state.data;
 
-    const step = { action: 'type', value: 'New Step' };
+    const step = { action: 'select', value: '' };
 
     // emits when the step edit dialogue is done
     const done = (action, value) =>

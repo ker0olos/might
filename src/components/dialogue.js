@@ -245,13 +245,45 @@ class Dialogue extends React.Component
       }
 
       // reset value and toggles every new select
-      const onSelect = (action) => this.setState({
-        action,
-        masterKey: this.state.masterKey + 1,
-        toggles: {},
-        pure: undefined,
-        value: ''
-      });
+      const onSelect = (action) =>
+      {
+        const oldAction = this.state.action ?? step.action;
+        const oldValue = this.state.value ?? step.value;
+
+        let value = '';
+
+        // select and wait are allowed to exchange values
+        if (
+          (oldAction === 'select' && action === 'wait') ||
+          (oldAction === 'wait' && action === 'select')
+        )
+          value = oldValue;
+
+        // click action gets the default value of 'left'
+        // on select
+        if (action === 'click')
+          value = 'left';
+
+        this.setState({
+          action,
+          value,
+          masterKey: this.state.masterKey + 1,
+          toggles: {},
+          pure: value || undefined
+        }, () =>
+        {
+          if (!value)
+            return;
+          
+          // if value was not cleared post-select
+          // then select all the text to make it easier
+          // for the user to clear if not required
+
+          const input = document.body.querySelector('#dialogue-action-value-input');
+
+          input?.setSelectionRange(0, value.length);
+        });
+      };
 
       const onToggle = (value, key) =>
       {
@@ -521,6 +553,7 @@ class Dialogue extends React.Component
 
                 <div className={ styles.option }>
                   <Input
+                    id={ 'dialogue-action-value-input' }
                     valid={ field.valid }
                     defaultValue={ s.value }
                     autoFocus={ true }
