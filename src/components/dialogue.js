@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { createRef } from 'react';
 import ReactDOM from 'react-dom';
 
 import Markdown from 'react-markdown';
@@ -50,6 +50,8 @@ class Dialogue extends React.Component
       masterKey: 0,
       toggles: {}
     };
+
+    this.inputRef = createRef();
 
     this.onKeyDown = this.onKeyDown.bind(this);
     
@@ -279,7 +281,7 @@ class Dialogue extends React.Component
           // then select all the text to make it easier
           // for the user to clear if not required
 
-          const input = document.body.querySelector('#dialogue-action-value-input');
+          const input = this.inputRef.current;
 
           input?.setSelectionRange(0, value.length);
         });
@@ -553,7 +555,7 @@ class Dialogue extends React.Component
 
                 <div className={ styles.option }>
                   <Input
-                    id={ 'dialogue-action-value-input' }
+                    inputRef = { this.inputRef }
                     valid={ field.valid }
                     defaultValue={ s.value }
                     autoFocus={ true }

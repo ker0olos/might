@@ -286,7 +286,10 @@ const Item = ({ mindmap, mode, content, highlight, item }) =>
 
   let { title } = item;
 
-  if (item.title === '')
+  if (
+    item.title === '' ||
+    (!item.title && typeof item.titleTestIndex === 'number')
+  )
   {
     untitled = 'true';
     title = 'Untitled Test';
