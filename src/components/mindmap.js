@@ -135,7 +135,7 @@ class Mindmap extends React.Component
     this.loadHandle();
 
     // REMOVE (for testing purposes)
-    this.loadMap(JSON.parse('{"data":[{"steps":[{"action":"wait","value":0},{"action":"select","value":"body"},{"action":"type","value":"hello"},{"action":"click","value":"left"},{"action":"keyboard","value":"Return"}]}]}').data, true);
+    // this.loadMap(JSON.parse('{"data":[{"steps":[{"action":"wait","value":0},{"action":"select","value":"body"},{"action":"click","value":"left"}]}]}').data, true);
   }
 
   componentWillUnmount()
@@ -553,6 +553,7 @@ class Mindmap extends React.Component
           obj = parent.children;
         }
 
+        // steps that can start a group
         if (
           step.action === 'select' ||
           (step.action === 'wait' && typeof step.value === 'string')
@@ -560,9 +561,15 @@ class Mindmap extends React.Component
         {
           groupState = 'parent';
         }
-
-        if (groupables[step.action])
+        // steps that can be part of a group
+        else if (groupables[step.action])
+        {
           groupState = 'child';
+        }
+
+        // style will change even if the group is interrupted
+        // by other actions, that's not an issue we need to fix
+        // because this is just meant as a way to make the mindmap more compact
 
         // we use the serialized step string as an identifier
         // to catch duplicated steps
@@ -931,6 +938,29 @@ class Mindmap extends React.Component
       if (steps.length <= 0)
       {
         data.splice(occurrence.testIndex);
+      }
+      // if the test is untitled
+      // and this is the last step in it
+      // delete it if its unnecessary
+      else if (occurrence.stepIndex === steps.length && !title)
+      {
+        /**
+        * @type { FamilizedItem }
+        */
+        let parent = this.state.familizedData;
+
+        // retrace steps to get to the parent of this step
+        for (const step of steps)
+        {
+          const key = stringifyStep(step, { pretty: true });
+
+          parent = parent[key].children;
+        }
+
+        // if there at least another one other test
+        // with the same steps, then remove this one
+        if (Object.keys(parent).length > 1)
+          data.splice(occurrence.testIndex);
       }
     });
 
