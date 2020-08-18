@@ -1202,7 +1202,8 @@ const styles = createStyle({
     display: 'flex',
     flexDirection: 'column',
 
-    alignItems: 'flex-start'
+    alignItems: 'flex-start',
+    justifyContent: 'center'
   },
 
   lines: {

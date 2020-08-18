@@ -35,7 +35,7 @@ const styles = createStyle({
     width: '80px',
     height: '1px',
 
-    padding: '0 30px',
+    padding: '0 20px',
     margin: 'auto',
 
     '[group="true"]': {
@@ -60,7 +60,7 @@ const styles = createStyle({
     width: 'calc(80px / 20)',
     height: '1px',
 
-    padding: '0 calc(30px / 20)',
+    padding: '0 calc(20px / 20)',
 
     '[group="true"]': {
       width: '1px',
