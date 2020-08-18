@@ -8,19 +8,20 @@ import getTheme from '../colors.js';
 
 const colors = getTheme();
 
-const Horizontal = ({ mode, highlight }) =>
+const Horizontal = ({ mode, highlight, group }) =>
 {
   const s = {
     container: (mode === 'full') ? styles.container : styles.miniContainer,
     title: (mode === 'full') ? styles.title : styles.miniTitle
   };
 
-  return <div className={ s.container } highlight={ highlight }/>;
+  return <div className={ s.container } highlight={ highlight } group={ group.toString() }/>;
 };
 
 Horizontal.propTypes = {
   mode: PropTypes.string.isRequired,
-  highlight: PropTypes.string
+  highlight: PropTypes.string,
+  group: PropTypes.bool
 };
 
 const styles = createStyle({
@@ -36,6 +37,11 @@ const styles = createStyle({
 
     padding: '0 30px',
     margin: 'auto',
+
+    '[group="true"]': {
+      width: '5px',
+      padding: '0 5px'
+    },
 
     '[highlight="remove"]': {
       color: colors.red,
@@ -54,7 +60,12 @@ const styles = createStyle({
     width: 'calc(80px / 20)',
     height: '1px',
 
-    padding: '0 calc(30px / 20)'
+    padding: '0 calc(30px / 20)',
+
+    '[group="true"]': {
+      width: '1px',
+      padding: '0'
+    }
   }
 });
 

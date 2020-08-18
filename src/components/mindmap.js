@@ -35,13 +35,14 @@ const mindMapRef = React.createRef();
 
 /**
 * @typedef { Object } FamilizedItem
-* @property { Occurrence[] } occurrences
+* @property { boolean } root
 * @property { string } title
 * @property { number } titleTestIndex
-* @property { boolean } root
+* @property { 'parent' | 'child' | '' } groupState
 * @property { 'remove-step' | 'remove-branch' } hover
 * @property { string } action
 * @property { string } value
+* @property { Occurrence[] } occurrences
 * @property { FamilizedObject } children
 */
 
@@ -134,7 +135,7 @@ class Mindmap extends React.Component
     this.loadHandle();
 
     // REMOVE (for testing purposes)
-    // this.loadMap(JSON.parse('{"data":[{"steps":[{"action":"wait","value":0},{"action":"select","value":"body"},{"action":"click","value":"left"}]}]}').data, true);
+    this.loadMap(JSON.parse('{"data":[{"steps":[{"action":"wait","value":0},{"action":"select","value":"body"},{"action":"type","value":"hello"},{"action":"click","value":"left"},{"action":"keyboard","value":"Return"}]}]}').data, true);
   }
 
   componentWillUnmount()
@@ -517,12 +518,19 @@ class Mindmap extends React.Component
       */
       let parent;
 
+      const groupables = {
+        click: true,
+        hover: true,
+        drag: true,
+        type: true
+      };
+
       // for step in test
       test.steps.forEach((step, stepIndex) =>
       {
         const key = stringifyStep(step, { pretty: true });
 
-        let title, titleTestIndex;
+        let root, title, titleTestIndex, obj, groupState;
         
         // titles are passed to items that are the last step in their individual test object
         if (stepIndex === test.steps.length - 1)
@@ -534,89 +542,74 @@ class Mindmap extends React.Component
         // if the step is the first in the test
         if (stepIndex === 0)
         {
-          // we use the serialized step string as an identifier
-          // to catch duplicated steps
-
-          // if step is not a duplicate
-          // create a new entry for it
-
-          // however if a step is a duplicate
-          // we should push new occurrence to the array
-
-          if (familizedData[key] === undefined)
-          {
-            familizedData[key] = {
-              // root items should never get a title
-              // that's why its not defined here
-              root: true,
-              title,
-              titleTestIndex,
-              occurrences: [ {
-                testIndex,
-                stepIndex
-              } ],
-              ...step
-            };
-          }
-          else
-          {
-            if (
-              familizedData[key].title === undefined &&
-              title !== undefined
-            )
-            {
-              familizedData[key].title = title;
-              familizedData[key].titleTestIndex = titleTestIndex;
-            }
-
-            familizedData[key].occurrences.push({
-              testIndex,
-              stepIndex
-            });
-          }
-
-          // set this step as the new parent
-          // going forward in a path until the last step in the test
-          parent = familizedData[key];
+          root = true;
+          obj = familizedData;
         }
         else
         {
           if (!parent.children)
             parent.children = {};
 
-          const obj = parent.children;
+          obj = parent.children;
+        }
 
-          if (obj[key] === undefined)
-          {
-            obj[key] = {
-              title,
-              titleTestIndex,
-              occurrences: [ {
-                testIndex,
-                stepIndex
-              } ],
-              ...step
-            };
-          }
-          else
-          {
-            if (
-              obj[key].title === undefined &&
-              title !== undefined
-            )
-            {
-              obj[key].title = title;
-              obj[key].titleTestIndex = titleTestIndex;
-            }
+        if (
+          step.action === 'select' ||
+          (step.action === 'wait' && typeof step.value === 'string')
+        )
+        {
+          groupState = 'parent';
+        }
 
-            obj[key].occurrences.push({
+        if (groupables[step.action])
+          groupState = 'child';
+
+        // we use the serialized step string as an identifier
+        // to catch duplicated steps
+
+        // if step is not a duplicate
+        // create a new entry for it
+        if (obj[key] === undefined)
+        {
+          obj[key] = {
+            root,
+
+            title,
+            titleTestIndex,
+
+            groupState,
+
+            action: step.action,
+            value: step.value,
+
+            occurrences: [ {
               testIndex,
               stepIndex
-            });
+            } ]
+          };
+        }
+        // but if a step is a duplicate
+        // we should push new occurrence to the array
+        else
+        {
+          if (
+            obj[key].title === undefined &&
+            title !== undefined
+          )
+          {
+            obj[key].title = title;
+            obj[key].titleTestIndex = titleTestIndex;
           }
 
-          parent = obj[key];
+          obj[key].occurrences.push({
+            testIndex,
+            stepIndex
+          });
         }
+
+        // set this step as the new parent
+        // going forward in a path until the last step in the test
+        parent = obj[key];
       });
     });
 
@@ -783,9 +776,7 @@ class Mindmap extends React.Component
         // if the original test
         // is untitled with and no children
         // then replace it with the new test instead
-        if (
-          (children === 0 && !original.title)
-        )
+        if (children === 0 && !original.title)
         {
           data[occurrences[0].testIndex] = test;
         }
@@ -825,7 +816,7 @@ class Mindmap extends React.Component
   {
     const data = this.state.data;
 
-    const step = { action: 'select', value: '' };
+    const step = { action: 'wait', value: '' };
 
     // emits when the step edit dialogue is done
     const done = (action, value) =>
@@ -917,10 +908,7 @@ class Mindmap extends React.Component
     // removes each occurrence of the required step
     occurrences.forEach((occurrence) =>
     {
-      /**
-      * @type { Array }
-      */
-      const steps = data[occurrence.testIndex].steps;
+      const { title, steps } = data[occurrence.testIndex];
 
       // there's two ways to delete items
   
@@ -958,8 +946,9 @@ class Mindmap extends React.Component
     * @param { FamilizedItem } item
     * @param { 'mini' | 'full' } mode
     * @param { string } highlight
+    * @param { boolean } group
     */
-    const handlePreLines = (children, index, item, mode, highlight) =>
+    const handlePreLines = (children, index, item, mode, highlight, group) =>
     {
       // if parent had no children
       // or if only has one child (then the parent will connect
@@ -980,7 +969,7 @@ class Mindmap extends React.Component
             <div/>
         }
 
-        <Horizontal mode={ mode } highlight={ highlight }/>
+        <Horizontal mode={ mode } highlight={ highlight } group={ group }/>
       </div>;
     };
 
@@ -988,15 +977,16 @@ class Mindmap extends React.Component
     * @param { string[] } children
     * @param { 'mini' | 'full' } mode
     * @param { string } highlight
+    * @param { boolean } group
     */
-    const handlePostLines = (children, mode, highlight) =>
+    const handlePostLines = (children, mode, highlight, group) =>
     {
       // post lines are only drawn to connect to the pre-lines of the next step in the map
       // that means that there need to be pre-lines
       if (!children || children.length <= 1)
         return <div/>;
 
-      return <Horizontal mode={ mode } highlight={ highlight }/>;
+      return <Horizontal mode={ mode } highlight={ highlight } group={ group }/>;
     };
 
     // using the familized data
@@ -1006,6 +996,48 @@ class Mindmap extends React.Component
     // this always for better UX since no repeated steps are rendered
     // and the user can add new tests where-ever they need them without needing
     // to copy steps from previous tests
+
+    const handleHover = (hover) =>
+    {
+      let carried, highlight, postLinesHighlight, preLinesHighlight;
+
+      if (hover === 'remove-branch')
+      {
+        highlight = 'remove';
+        postLinesHighlight = 'remove';
+        carried = 'remove-branch-carried';
+      }
+      else if (hover === 'remove-branch-carried')
+      {
+        highlight = 'remove';
+        preLinesHighlight = 'remove';
+        carried = 'remove-branch-carried';
+      }
+      else if (hover === 'new-step' || hover === 'insert-step')
+      {
+        highlight = 'add';
+        preLinesHighlight = 'add';
+      }
+      else if (hover === 'parent-new-step')
+      {
+        postLinesHighlight = 'add';
+      }
+      else if (hover === 'remove-step')
+      {
+        highlight = 'remove';
+      }
+      else
+      {
+        highlight = hover;
+      }
+
+      return {
+        carried,
+        highlight,
+        preLinesHighlight,
+        postLinesHighlight
+      };
+    };
 
     /**
     * @param { FamilizedObject } children
@@ -1026,52 +1058,44 @@ class Mindmap extends React.Component
           {
             const item = children[step];
 
-            let highlight, postLinesHighlight, preLinesHighlight;
+            const {
+              carried, highlight,
+              postLinesHighlight, preLinesHighlight
+            } = handleHover(hover || item.hover);
 
-            if (hover === 'remove-branch')
+            let preGroup = false;
+            let postGroup = false;
+
+            if (item.groupState === 'parent')
             {
-              highlight = 'remove';
-              preLinesHighlight = 'remove';
+              postGroup = true;
             }
-            else if (item.hover === 'new-step' || item.hover === 'insert-step')
+            else if (item.groupState === 'child')
             {
-              highlight = 'add';
-              preLinesHighlight = 'add';
-            }
-            else if (item.hover === 'parent-new-step')
-            {
-              postLinesHighlight = 'add';
-            }
-            else if (item.hover === 'remove-branch')
-            {
-              highlight = 'remove';
-              postLinesHighlight = 'remove';
-            }
-            else if (item.hover === 'remove-step')
-            {
-              highlight = 'remove';
-            }
-            else
-            {
-              highlight = item.hover;
+              preGroup = true;
+              postGroup = true;
             }
 
             return <div key={ index } className={ styles.row }>
 
-              {/*
-                A root item is the first item in a branch
-                therefore it has no previous items connected to it
-                and does not need any pre-lines
-              */}
               {
-                (!item.root) ? handlePreLines(keys, index, item, mode, preLinesHighlight) : undefined
+              // A root item is the first item in a branch
+              // therefore it has no previous items connected to it
+              // and does not need any pre-lines
+              }
+              {
+                (!item.root) ? handlePreLines(keys, index, item, mode, preLinesHighlight, preGroup) : undefined
               }
 
-              <Item mindmap={ this } mode={ mode } content={ step } highlight={ highlight } item={ item }/>
+              <div className={ styles.column }>
+                <Item mindmap={ this } mode={ mode } content={ step } highlight={ highlight } item={ item }/>
+              </div>
 
-              { handlePostLines(Object.keys(item.children || {}), mode, postLinesHighlight) }
+              {
+                handlePostLines(Object.keys(item.children || {}), mode, postLinesHighlight, postGroup)
+              }
 
-              { handleItems(item.children, mode, hover || item.hover) }
+              { handleItems(item.children, mode, carried) }
             </div>;
           })
         }
