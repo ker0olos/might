@@ -753,13 +753,15 @@ class Mindmap extends React.Component
   {
     const data = this.state.data;
 
-    const step = { action: 'select', value: '' };
+    const referrer = data[occurrences[0].testIndex].steps[occurrences[0].stepIndex];
     
     // emits when the step edit dialogue is done
     const done = (action, value) =>
     {
-      if (action !== undefined)
-        step.action = action;
+      const step = {
+        action,
+        value
+      };
 
       if (value !== undefined)
         step.value = value;
@@ -816,23 +818,20 @@ class Mindmap extends React.Component
     };
 
     // open dialog to edit the new step
-    ReactDOM.render(<Dialogue type={ 'new-step' } step={ step } done={ done }/>, document.querySelector('#dialogue'));
+    ReactDOM.render(<Dialogue type={ 'new-step' } referrer={ referrer } done={ done }/>, document.querySelector('#dialogue'));
   }
 
   addNewStep()
   {
     const data = this.state.data;
 
-    const step = { action: 'wait', value: '' };
-
     // emits when the step edit dialogue is done
     const done = (action, value) =>
     {
-      if (action !== undefined)
-        step.action = action;
-
-      if (value !== undefined)
-        step.value = value;
+      const step = {
+        action,
+        value
+      };
 
       const test = {
         title: '',
@@ -848,7 +847,7 @@ class Mindmap extends React.Component
       this.loadMap(data);
     };
 
-    ReactDOM.render(<Dialogue type={ 'new-step' } step={ step } done={ done }/>, document.querySelector('#dialogue'));
+    ReactDOM.render(<Dialogue type={ 'new-step' } done={ done }/>, document.querySelector('#dialogue'));
   }
 
   /**

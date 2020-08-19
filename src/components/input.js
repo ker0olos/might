@@ -29,7 +29,17 @@ const Input = ({ inputRef, defaultValue, valid, autoFocus, onChange }) =>
   };
 
   return <div className={ styles.container }>
-    <input ref={ inputRef } valid={ valid.toString() } autoFocus={ autoFocus } className={ styles.input } spellCheck={ false } defaultValue={ defaultValue } type={ 'text' }  onInput={ change }/>
+    <input
+      ref={ inputRef }
+      valid={ valid.toString() }
+      spellCheck={ false }
+      autoComplete={ 'false' }
+      autoFocus={ autoFocus }
+      className={ styles.input }
+      defaultValue={ defaultValue }
+      type={ 'text' }
+      onInput={ change }
+    />
   </div>;
 };
 

@@ -5,10 +5,14 @@ Performance Issues and Bugs:
 Documentation:
 
 UI/UX:
+  ☐ value auto-complete for predictable actions:
+    - click
+    - media
+
   ☐ warning system: @low 
     - warn users about useless steps
     - incorrect steps
-  
+
   ☐ searching for tests using their titles for actions @low
     - scrolls to the first result but highlight all results in both maps
 

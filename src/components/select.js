@@ -21,11 +21,12 @@ class Select extends React.Component
     this.state = {
       shown: false,
 
-      query: undefined,
       index: undefined,
-      value: options[defaultIndex ?? 0],
 
-      mainGroupText: 'All'
+      suggestions: [],
+      other: [],
+
+      value: options[defaultIndex ?? 0]
     };
 
     this.toggle = this.toggle.bind(this);
@@ -38,8 +39,16 @@ class Select extends React.Component
   {
     window.addEventListener('keydown', this.onKeyDown);
 
-    if (this.props.autoFocus)
-      this.toggle(true);
+    const { suggestions, other } = this.getItems([]);
+
+    this.setState({
+      suggestions,
+      other
+    }, () =>
+    {
+      if (this.props.autoFocus)
+        this.toggle(true);
+    });
   }
 
   componentWillUnmount()
@@ -51,11 +60,14 @@ class Select extends React.Component
   {
     const { shown } = this.state;
     
+    const { suggestions, other } = this.getItems([]);
+
     this.setState({
       shown: (typeof force === 'boolean') ? force : !shown,
-
-      query: undefined,
-      index: undefined
+      index: undefined,
+      // reset results if the menu is toggled
+      suggestions,
+      other
     }, () =>
     {
       if (inputRef.current)
@@ -78,22 +90,85 @@ class Select extends React.Component
     });
   }
 
-  highlight(i)
+  /**
+  * @param { string } queryString
+  */
+  getItems(queryString)
   {
-    let { options } = this.props;
+    /**
+    * @type { string[] }
+    */
+    const options = this.props.options;
 
-    const { query } = this.state;
+    /**
+    * @type { string[] }
+    */
+    const suggestions = this.props.suggestions;
 
-    if (query)
-      options = query;
+    if (queryString)
+    {
+      const query = options.filter(s => s.includes(queryString));
 
-    if (options.length <= 0)
+      return {
+        suggestions: suggestions.filter((s) => query.includes(s)),
+        other: query.filter((s) => !suggestions.includes(s)).sort()
+      };
+    }
+    else
+    {
+      // remove suggestions, and sort alphabetically
+      return {
+        suggestions,
+        other: options.filter((s) => !suggestions.includes(s)).sort()
+      };
+    }
+  }
+
+  /**
+  * @param { KeyboardEvent } e
+  */
+  onKeyDown(e)
+  {
+    const { shown, index, other, suggestions } = this.state;
+
+    if (!shown)
       return;
 
-    if (i >= options.length)
+    // disable dialogue controls
+    e.stopImmediatePropagation();
+
+    if (e.key === 'Enter' && index !== undefined)
+    {
+      const all = suggestions.concat(other);
+
+      if (index < all.length)
+        // eslint-disable-next-line security/detect-object-injection
+        this.onChange(all[index]);
+    }
+
+    else if (e.key === 'Escape')
+      this.toggle();
+   
+    else if (e.key === 'ArrowUp')
+      this.highlight((index ?? 0) - 1);
+   
+    else if (e.key === 'ArrowDown')
+      this.highlight((index ?? -1) + 1);
+  }
+
+  highlight(i)
+  {
+    const { other, suggestions } = this.state;
+
+    const length = suggestions.length + other.length;
+
+    if (length <= 0)
+      return;
+
+    if (i >= length)
       i = 0;
     else if (i <= -1)
-      i = options.length - 1;
+      i = length - 1;
 
     this.setState({
       index: i
@@ -104,67 +179,18 @@ class Select extends React.Component
         block: 'nearest'
       });
     });
-
-  }
-
-  /**
-  * @param { KeyboardEvent } e
-  */
-  onKeyDown(e)
-  {
-    let { options } = this.props;
-
-    const { shown, query, index } = this.state;
-
-    if (!shown)
-      return;
-
-    if (query)
-      options = query;
-
-    // disable dialogue controls
-    e.stopImmediatePropagation();
-
-    if (e.key === 'Enter' && index !== undefined && options.length > index)
-      // eslint-disable-next-line security/detect-object-injection
-      this.onChange(options[index]);
-
-    else if (e.key === 'Escape')
-      this.toggle();
-    
-    else if (e.key === 'ArrowUp')
-      this.highlight((index ?? 0) - 1);
-    
-    else if (e.key === 'ArrowDown')
-      this.highlight((index ?? -1) + 1);
   }
 
   onSearch()
   {
-    const { options } = this.props;
-
     const queryString = inputRef.current?.value;
 
-    const query = (queryString) ? options.filter(s => s.includes(queryString)) : undefined;
-
-    let mainGroupText;
-
-    if (queryString)
-    {
-      if (query.length)
-        mainGroupText = `Results (${query.length})`;
-      else
-        mainGroupText = 'No results';
-    }
-    else
-    {
-      mainGroupText = 'All';
-    }
+    const { suggestions, other } = this.getItems(queryString);
 
     this.setState({
       index: 0,
-      mainGroupText,
-      query
+      suggestions,
+      other
     });
   }
 
@@ -181,14 +207,11 @@ class Select extends React.Component
 
   render()
   {
-    const { shown, value, query, index } = this.state;
-    
-    const { options } = this.props;
+    const { shown, value, other, suggestions, index } = this.state;
 
     return <div shown={ shown.toString() } className={ styles.container } onClick={ this.toggle }>
-
       <div className={ styles.search }>
-        <input ref={ inputRef } defaultValue={ value } onInput={ this.onSearch }/>
+        <input ref={ inputRef } defaultValue={ value } spellCheck={ false } autoComplete={ 'false' } onInput={ this.onSearch }/>
       </div>
 
       <DownIcon className={ styles.extend }/>
@@ -197,15 +220,36 @@ class Select extends React.Component
 
       <div shown={ shown.toString() } className={ styles.menu }>
 
-        <div className={ styles.title }>
-          { this.state.mainGroupText }
-        </div>
+        {
+          (suggestions.length && other.length) ? <div className={ styles.title }>Suggestions</div> : <div/>
+        }
+
+        {
+          (!suggestions.length && !other.length) ? <div className={ styles.title }>No Results</div> : <div/>
+        }
 
         <div className={ styles.options }>
           {
-            (query ?? options).map((opt, i) =>
+            suggestions.map((opt, i) =>
             {
               const highlighted = index === i;
+
+              return <div key={ i } highlighted={ highlighted.toString() } className={ styles.option } onClick={ () => this.onChange(opt) }>
+                { opt }
+              </div>;
+            })
+          }
+        </div>
+
+        {
+          (suggestions.length && other.length) ? <div className={ styles.title }>Other</div> : <div/>
+        }
+
+        <div className={ styles.options }>
+          {
+            other.map((opt, i) =>
+            {
+              const highlighted = index === (i + suggestions.length);
 
               return <div key={ i } highlighted={ highlighted.toString() } className={ styles.option } onClick={ () => this.onChange(opt) }>
                 { opt }
@@ -222,6 +266,7 @@ Select.propTypes = {
   autoFocus: PropTypes.bool,
   defaultIndex: PropTypes.number,
   options: PropTypes.arrayOf(PropTypes.string).isRequired,
+  suggestions: PropTypes.arrayOf(PropTypes.string).isRequired,
   onChange: PropTypes.func
 };
 
@@ -312,8 +357,8 @@ const styles = createStyle({
     top: '50px',
     left: '-5px',
 
-    minHeight: '30px',
-    maxHeight: 'calc((50px * 4) + 30px)',
+    minHeight: '25px',
+    maxHeight: 'calc((50px * 4) + 50px)',
 
     width: 'calc(100% + 10px)',
     height: 'auto',
@@ -339,9 +384,9 @@ const styles = createStyle({
     alignItems: 'center',
     color: colors.accent,
 
-    height: '30px',
+    height: '25px',
 
-    fontSize: '11px',
+    fontSize: '9px',
     textTransform: 'uppercase',
 
     padding: '0 15px'

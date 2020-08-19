@@ -73,27 +73,56 @@ class Dialogue extends React.Component
     if (e.key === 'Escape')
       unmount();
 
-    if (
-      e.key === 'Enter' &&
-      // not the best way to check if apply is enabled or not
-      // but the least headache-y, someone should probably change it in the future
-      !document.querySelector(`.${styles.button}[invalid="true"]`)
-    )
+    if (e.key === 'Enter' && this.isValid())
       this.done();
+  }
+
+  /**
+  * @param { Step } referrer
+  */
+  getSuggestions(referrer)
+  {
+    // new root step
+    if (!referrer)
+    {
+      return [ 'wait', 'select', 'goto' ];
+    }
+    else if (referrer.action === 'wait' && typeof referrer.value === 'number')
+    {
+      return [ 'select' ];
+    }
+    else if (referrer.action === 'wait' || referrer.action === 'select')
+    {
+      return [ 'click', 'type', 'drag' ];
+    }
+
+    return [ 'wait', 'select' ];
   }
 
   done()
   {
-    const { toggles, action } = this.state;
+    const { toggles } = this.state;
 
     let { value } = this.state;
+
+    let step;
+
+    // if editing step, default value is the step being edited
+    if (this.props.type === 'edit-step')
+      step = this.props.step;
+    // if new step then default value is the first suggestion
+    else
+      step = {
+        action: this.getSuggestions(this.props.referrer)[0] ?? actions[0],
+        value: ''
+      };
 
     /**
     * @type { Step }
     */
     const s = {
-      action: (this.state.action === undefined) ? this.props.step?.action : this.state.action,
-      value: (this.state.value === undefined) ? this.props.step?.value : this.state.value
+      action: this.state.action ?? step.action,
+      value: this.state.value ?? step.value
     };
 
     // handle how the toggles effect the end value
@@ -123,12 +152,21 @@ class Dialogue extends React.Component
     // trim value if it's a string
     if (value?.trim)
       value = value.trim();
-    
+
     // send the final results of the dialogue to the parent
-    this.props.done?.call(undefined, action, value);
+    this.props.done?.call(undefined, s.action, value ?? s.value);
     
     // remove this dialogue element from dom
     unmount();
+  }
+
+  isValid()
+  {
+    // not the best way to check if apply is enabled or not
+    // but the least headache-y, someone should probably change it in the future
+    const valid = !document.querySelector(`.${styles.button}[invalid="true"]`);
+
+    return valid;
   }
 
   parseNumber(s)
@@ -137,7 +175,8 @@ class Dialogue extends React.Component
 
     if (
       !isNaN(number) &&
-      number.toString().length === s.length
+      number.toString().length === s.length &&
+      number > -1
     )
       return number;
     else
@@ -160,7 +199,8 @@ class Dialogue extends React.Component
 
     if (
       !isNaN(number) &&
-      number.toString().length === s.length
+      number.toString().length === s.length &&
+      number > -1
     )
       return true;
     else
@@ -185,13 +225,27 @@ class Dialogue extends React.Component
   {
     /**
     * @type { {
-    * type: 'edit-test' | 'edit-step'
+    * type: 'edit-test' | 'new-step' | 'edit-step'
     * title: string
     * step: Step
     * done: () => void
     * } }
     */
-    const { type, title, step } = this.props;
+    const { type, title } = this.props;
+
+    let step;
+    
+    const suggestions = this.getSuggestions(this.props.referrer ?? this.props.step);
+
+    // if editing step, default value is the step being edited
+    if (type === 'edit-step')
+      step = this.props.step;
+    // if new step
+    else
+      step = {
+        action: suggestions[0] ?? actions[0],
+        value: ''
+      };
 
     // Types of Dialogue
 
@@ -229,8 +283,8 @@ class Dialogue extends React.Component
       * @type { Step }
       */
       const s = {
-        action: (this.state.action === undefined) ? step.action : this.state.action,
-        value: (this.state.value === undefined) ? step.value : this.state.value
+        action: this.state.action ?? step.action,
+        value: this.state.value ?? step.value
       };
 
       const { toggles } = this.state;
@@ -251,8 +305,7 @@ class Dialogue extends React.Component
       // reset value and toggles every new select
       const onSelect = (action) =>
       {
-        const oldAction = this.state.action ?? step.action;
-        const oldValue = this.state.value ?? step.value;
+        const oldAction = s.action, oldValue = s.value;
 
         let value = '';
 
@@ -260,8 +313,10 @@ class Dialogue extends React.Component
         // or if the action did not change
         if (
           (oldAction === action) ||
-          (oldAction === 'select' && action === 'wait') ||
-          (oldAction === 'wait' && action === 'select')
+          // go from select to wait but only if value is valid
+          (oldAction === 'select' && action === 'wait' && this.isValid()) ||
+          // go from wait (for elements) to select
+          (oldAction === 'wait' && typeof oldValue === 'string' && action === 'select')
         )
           value = oldValue;
 
@@ -278,14 +333,17 @@ class Dialogue extends React.Component
           pure: value || undefined
         }, () =>
         {
+          const input = this.inputRef.current;
+
+          // auto focus on input after selection
+          input?.focus();
+
           if (!value)
             return;
           
           // if value was not cleared post-select
           // then select all the text to make it easier
           // for the user to clear if not required
-
-          const input = this.inputRef.current;
 
           input?.setSelectionRange(0, value.length);
         });
@@ -543,6 +601,7 @@ class Dialogue extends React.Component
               autoFocus={ autoFocusSelect }
               defaultIndex={ defaultAction }
               options={ actions }
+              suggestions={ suggestions }
               onChange={ onSelect }
             />
           </div>
@@ -610,6 +669,7 @@ Dialogue.propTypes = {
   type: PropTypes.string.isRequired,
   title: PropTypes.string,
   step: PropTypes.object,
+  referrer: PropTypes.object,
   done: PropTypes.func
 };
 
