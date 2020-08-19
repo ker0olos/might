@@ -223,6 +223,8 @@ class Dialogue extends React.Component
     {
       let defaultAction = 0;
 
+      const autoFocusSelect = (type === 'new-step');
+
       /**
       * @type { Step }
       */
@@ -255,7 +257,9 @@ class Dialogue extends React.Component
         let value = '';
 
         // select and wait are allowed to exchange values
+        // or if the action did not change
         if (
+          (oldAction === action) ||
           (oldAction === 'select' && action === 'wait') ||
           (oldAction === 'wait' && action === 'select')
         )
@@ -535,7 +539,12 @@ class Dialogue extends React.Component
           <div className={ styles.actionLabel }>Action</div>
 
           <div className={ styles.option }>
-            <Select defaultIndex={ defaultAction } options={ actions } onChange={ onSelect }/>
+            <Select
+              autoFocus={ autoFocusSelect }
+              defaultIndex={ defaultAction }
+              options={ actions }
+              onChange={ onSelect }
+            />
           </div>
 
           {
@@ -558,7 +567,7 @@ class Dialogue extends React.Component
                     inputRef = { this.inputRef }
                     valid={ field.valid }
                     defaultValue={ s.value }
-                    autoFocus={ true }
+                    autoFocus={ !autoFocusSelect }
                     onChange={ onInput }
                   />
 
@@ -592,7 +601,7 @@ class Dialogue extends React.Component
     };
 
     return <div className={ styles.wrapper }>
-      { (type === 'edit-step') ? Step() : Test() }
+      { type.includes('step') ? Step() : Test() }
     </div>;
   }
 }

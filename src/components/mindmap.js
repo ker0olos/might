@@ -816,7 +816,7 @@ class Mindmap extends React.Component
     };
 
     // open dialog to edit the new step
-    ReactDOM.render(<Dialogue type={ 'edit-step' } step={ step } done={ done }/>, document.querySelector('#dialogue'));
+    ReactDOM.render(<Dialogue type={ 'new-step' } step={ step } done={ done }/>, document.querySelector('#dialogue'));
   }
 
   addNewStep()
@@ -848,7 +848,7 @@ class Mindmap extends React.Component
       this.loadMap(data);
     };
 
-    ReactDOM.render(<Dialogue type={ 'edit-step' } step={ step } done={ done }/>, document.querySelector('#dialogue'));
+    ReactDOM.render(<Dialogue type={ 'new-step' } step={ step } done={ done }/>, document.querySelector('#dialogue'));
   }
 
   /**

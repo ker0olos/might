@@ -20,8 +20,12 @@ class Select extends React.Component
 
     this.state = {
       shown: false,
+
+      query: undefined,
       index: undefined,
-      value: options[defaultIndex ?? 0]
+      value: options[defaultIndex ?? 0],
+
+      mainGroupText: 'All'
     };
 
     this.toggle = this.toggle.bind(this);
@@ -33,6 +37,9 @@ class Select extends React.Component
   componentDidMount()
   {
     window.addEventListener('keydown', this.onKeyDown);
+
+    if (this.props.autoFocus)
+      this.toggle(true);
   }
 
   componentWillUnmount()
@@ -40,12 +47,13 @@ class Select extends React.Component
     window.removeEventListener('keydown', this.onKeyDown);
   }
 
-  toggle()
+  toggle(force)
   {
     const { shown } = this.state;
     
     this.setState({
-      shown: !shown,
+      shown: (typeof force === 'boolean') ? force : !shown,
+
       query: undefined,
       index: undefined
     }, () =>
@@ -57,7 +65,15 @@ class Select extends React.Component
 
         // auto-focus on search input
         if (this.state.shown)
+        {
           inputRef.current?.focus();
+        }
+        else
+        {
+          inputRef.current.value = this.state.value;
+
+          inputRef.current?.blur();
+        }
       }
     });
   }
@@ -127,11 +143,28 @@ class Select extends React.Component
   {
     const { options } = this.props;
 
-    const query = inputRef.current?.value;
+    const queryString = inputRef.current?.value;
+
+    const query = (queryString) ? options.filter(s => s.includes(queryString)) : undefined;
+
+    let mainGroupText;
+
+    if (queryString)
+    {
+      if (query.length)
+        mainGroupText = `Results (${query.length})`;
+      else
+        mainGroupText = 'No results';
+    }
+    else
+    {
+      mainGroupText = 'All';
+    }
 
     this.setState({
       index: 0,
-      query: (query) ? options.filter(s => s.includes(query)) : undefined
+      mainGroupText,
+      query
     });
   }
 
@@ -140,9 +173,8 @@ class Select extends React.Component
     const { onChange } = this.props;
 
     this.setState({
-      shown: false,
       value: opt
-    });
+    }, () => this.toggle(false));
 
     onChange?.call(undefined, opt);
   }
@@ -155,7 +187,9 @@ class Select extends React.Component
 
     return <div shown={ shown.toString() } className={ styles.container } onClick={ this.toggle }>
 
-      <div className={ styles.selected }>{ value }</div>
+      <div className={ styles.search }>
+        <input ref={ inputRef } defaultValue={ value } onInput={ this.onSearch }/>
+      </div>
 
       <DownIcon className={ styles.extend }/>
 
@@ -163,10 +197,8 @@ class Select extends React.Component
 
       <div shown={ shown.toString() } className={ styles.menu }>
 
-        <div className={ styles.search } onClick={ (e) => e.stopPropagation() }>
-          <input ref={ inputRef } onInput={ this.onSearch }/>
-          
-          <div className={ styles.border }/>
+        <div className={ styles.title }>
+          { this.state.mainGroupText }
         </div>
 
         <div className={ styles.options }>
@@ -182,12 +214,12 @@ class Select extends React.Component
           }
         </div>
       </div>
-
     </div>;
   }
 }
 
 Select.propTypes = {
+  autoFocus: PropTypes.bool,
   defaultIndex: PropTypes.number,
   options: PropTypes.arrayOf(PropTypes.string).isRequired,
   onChange: PropTypes.func
@@ -220,12 +252,26 @@ const styles = createStyle({
     }
   },
 
-  selected: {
+  search: {
     flexGrow: 1,
-    textTransform: 'capitalize',
+    margin: 'auto 10px',
 
-    fontSize: '14px',
-    margin: 'auto 10px'
+    '> input': {
+      color: colors.blackText,
+
+      fontSize: '14px',
+      fontFamily: 'Noto Sans',
+      fontWeight: 700,
+
+      textTransform: 'capitalize',
+
+      width: '100%',
+      height: '100%',
+
+      border: 0,
+      outline: 0,
+      padding: 0
+    }
   },
 
   extend: {
@@ -242,7 +288,7 @@ const styles = createStyle({
     justifyContent: 'center',
     alignItems: 'center',
 
-    backgroundColor: opacity(colors.blackBackground, 0.25),
+    backgroundColor: colors.transparent,
 
     top: 0,
     left: 0,
@@ -266,8 +312,8 @@ const styles = createStyle({
     top: '50px',
     left: '-5px',
 
-    minHeight: '40px',
-    maxHeight: '240px',
+    minHeight: '30px',
+    maxHeight: 'calc((50px * 4) + 30px)',
 
     width: 'calc(100% + 10px)',
     height: 'auto',
@@ -288,36 +334,17 @@ const styles = createStyle({
     }
   },
 
-  search: {
+  title: {
+    display: 'flex',
+    alignItems: 'center',
+    color: colors.accent,
+
     height: '30px',
-    margin: '5px 0',
 
-    '> input': {
-      color: colors.accent,
+    fontSize: '11px',
+    textTransform: 'uppercase',
 
-      fontSize: '12px',
-      fontFamily: 'Noto Sans',
-      fontWeight: 700,
-
-      textAlign: 'center',
-
-      width: '100%',
-      height: '100%',
-
-      border: 0,
-      outline: 0,
-      padding: 0
-    }
-  },
-
-  border: {
-    position: 'relative',
-    backgroundColor: colors.accent,
-
-    width: '60%',
-    height: '1px',
-    
-    margin: '0 auto'
+    padding: '0 15px'
   },
 
   options: {
@@ -338,7 +365,7 @@ const styles = createStyle({
 
     ':hover': {
       color: colors.whiteText,
-      backgroundColor: colors.accent
+      backgroundColor: opacity(colors.accent, 0.65)
     },
 
     '[highlighted="true"]': {
