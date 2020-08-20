@@ -211,7 +211,7 @@ class Select extends React.Component
 
     return <div shown={ shown.toString() } className={ styles.container } onClick={ this.toggle }>
       <div className={ styles.search }>
-        <input ref={ inputRef } defaultValue={ value } spellCheck={ false } autoComplete={ 'false' } onInput={ this.onSearch }/>
+        <input ref={ inputRef } defaultValue={ value } spellCheck={ false } autoComplete={ 'off' } onInput={ this.onSearch }/>
       </div>
 
       <DownIcon className={ styles.extend }/>

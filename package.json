@@ -4,7 +4,7 @@
   "description": "A no-code solution for performing end-to-end tests",
   "scripts": {
     "prepare": "npm run build",
-    "prepublishOnly": "npm version patch",
+    "prepublishOnly": "npm version major",
     "svgo": "svgo --config='{ \"plugins\": [ { \"removeAttrs\": { \"attrs\": \"(fill|stroke)\" } }, { \"removeViewBox\": false } ] }' icons",
     "build": "webpack --config webpack.config.prod.js --mode production",
     "start": "webpack-dev-server --config webpack.config.dev.js --mode development"
@@ -14,14 +14,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ItsKerolos/Might.git"
+    "url": "git+https://github.com/ker0olos/Might.git"
   },
   "author": "Kerolos Zaki",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ItsKerolos/Might/issues"
+    "url": "https://github.com/ker0olos/Might/issues"
   },
-  "homepage": "https://github.com/ItsKerolos/Might#readme",
+  "homepage": "https://github.com/ker0olos/Might#readme",
   "keywords": [
     "testing",
     "end-to-end-testing",
@@ -34,7 +34,7 @@
     "dexie": "^3.0.2",
     "express": "^4.17.1",
     "flcss": "^0.1.2",
-    "might-core": "^0.3.5",
+    "might-core": "^0.3.6",
     "open": "^7.1.0",
     "prop-types": "^15.7.2",
     "react": "^16.13.1",

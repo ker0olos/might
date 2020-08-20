@@ -33,7 +33,7 @@ const Input = ({ inputRef, defaultValue, valid, autoFocus, onChange }) =>
       ref={ inputRef }
       valid={ valid.toString() }
       spellCheck={ false }
-      autoComplete={ 'false' }
+      autoComplete={ 'off' }
       autoFocus={ autoFocus }
       className={ styles.input }
       defaultValue={ defaultValue }

@@ -11,6 +11,8 @@ import LoadIcon from '../../icons/load.svg';
 import UndoIcon from '../../icons/undo.svg';
 import RedoIcon from '../../icons/redo.svg';
 
+import GitHubIcon from '../../icons/github.svg';
+
 const colors = getTheme();
 
 class TopBar extends React.Component
@@ -26,25 +28,29 @@ class TopBar extends React.Component
 
     return (
       <div className={ styles.container }>
-        <div dirty={ this.props.dirty.toString() } className={ styles.button } title={ 'Ctrl+S' } onClick={ this.props.onFileSave }>
+        <div dirty={ this.props.dirty.toString() } className={ styles.button } title={ 'Save File (Ctrl+S)' } onClick={ this.props.onFileSave }>
           <SaveIcon className={ styles.icon }/>
           <div className={ styles.title }>Save</div>
         </div>
 
-        <div className={ styles.button } title={ 'Ctrl+O' } onClick={ this.props.onFileLoad }>
+        <div className={ styles.button } title={ 'Load File (Ctrl+O)' } onClick={ this.props.onFileLoad }>
           <LoadIcon className={ styles.icon }/>
           <div className={ styles.title }>Load</div>
         </div>
 
-        <div className={ styles.button } title={ 'Ctrl+Z' } disabled={ !stack.undo } onClick={ this.props.onUndo }>
+        <div className={ styles.button } title={ 'Undo (Ctrl+Z)' } disabled={ !stack.undo } onClick={ this.props.onUndo }>
           <UndoIcon className={ styles.icon }/>
           <div className={ styles.title }>Undo</div>
         </div>
 
-        <div className={ styles.button } title={ 'Ctrl+Y' } disabled={ !stack.redo } onClick={ this.props.onRedo }>
+        <div className={ styles.button } title={ 'Redo (Ctrl+Y)' } disabled={ !stack.redo } onClick={ this.props.onRedo }>
           <RedoIcon className={ styles.icon }/>
           <div className={ styles.title }>Redo</div>
         </div>
+
+        <a style={ { margin: '0 0 0 auto' } } title={ 'Might\'s GitHub page' } className={ styles.button } href={ 'https://github.com/ker0olos/Might' } rel={ 'noreferrer' } target={ '_blank' }>
+          <GitHubIcon className={ styles.icon }/>
+        </a>
       </div>
     );
   }
@@ -128,14 +134,15 @@ const styles = createStyle({
   },
 
   title: {
-    margin: '0 5px 0 0'
+    ':not(:empty)': {
+      
+      margin: '0 5px'
+    }
   },
 
   icon: {
     width: '20px',
-    height: '20px',
-
-    margin: '0 5px 0 0'
+    height: '20px'
   }
 });
 
