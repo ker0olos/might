@@ -6,6 +6,4 @@ An element needs to be previously selected with the **Select** action, (clicks o
 
 - left
 
-- middle
-
 - right

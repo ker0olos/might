@@ -1,15 +1,12 @@
 Performance Issues and Bugs:
-  ☐ auto expanding map sizes @high
+  ☐ auto expanding map sizes
     - little hard since flcss does not support hot-reloading
 
 Documentation:
+  ☐ update screenshots
 
 UI/UX:
-  ☐ value auto-complete for predictable actions:
-    - click
-    - media
-
-  ☐ warning system: @low 
+  ☐ linter-esque system: @low 
     - warn users about useless steps
     - incorrect steps
 

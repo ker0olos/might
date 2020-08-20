@@ -42,12 +42,20 @@ const unmount = () => ReactDOM.unmountComponentAtNode(document.querySelector('#d
 
 class Dialogue extends React.Component
 {
-  constructor()
+  constructor({ step, referrer })
   {
     super();
 
     this.state = {
       masterKey: 0,
+      
+      action: step?.action ?? this.getSuggestions(referrer)[0] ?? actions[0],
+      value: step?.value ?? '',
+      pure: step?.value ?? '',
+
+      autoCompletePossibilities: [],
+      autoCompleteSteps: [],
+
       toggles: {}
     };
 
@@ -61,6 +69,21 @@ class Dialogue extends React.Component
   componentDidMount()
   {
     window.addEventListener('keydown', this.onKeyDown);
+
+    const { step } = this.props;
+
+    if (!step)
+      return;
+
+    const {
+      autoCompletePossibilities,
+      autoCompleteSteps
+    } = this.getAutoComplete(step);
+
+    this.setState({
+      autoCompletePossibilities,
+      autoCompleteSteps
+    });
   }
 
   componentWillUnmount()
@@ -72,6 +95,9 @@ class Dialogue extends React.Component
   {
     if (e.key === 'Escape')
       unmount();
+
+    if (e.key === 'ArrowRight')
+      this.doAutoComplete(0);
 
     if (e.key === 'Enter' && this.isValid())
       this.done();
@@ -99,36 +125,107 @@ class Dialogue extends React.Component
     return [ 'wait', 'select' ];
   }
 
+  /**
+  * @param { Step } step
+  */
+  getAutoComplete({ action, value })
+  {
+    if (action === 'click')
+    {
+      const returnPossibilities =
+        [
+          'left',
+          'middle',
+          'right'
+        ].filter((s) => s.startsWith(value) && s !== value);
+      
+      return {
+        autoCompletePossibilities: returnPossibilities,
+        autoCompleteSteps: returnPossibilities
+      };
+    }
+    else if (action === 'media')
+    {
+      const returnPossibilities = [
+        'prefers-color-scheme: dark',
+        'prefers-color-scheme: light',
+        'prefers-reduced-motion: reduce',
+        'prefers-reduced-motion: no-preference'
+      ].filter((s) => s.startsWith(value) && s !== value);
+        
+      return {
+        autoCompletePossibilities: returnPossibilities,
+        autoCompleteSteps: returnPossibilities.map(s => s.split(' '))
+      };
+    }
+
+    return {
+      autoCompletePossibilities: [],
+      autoCompleteSteps: []
+    };
+  }
+
+  /**
+  * @param { number } index
+  * @param { boolean } full
+  */
+  doAutoComplete(index, full)
+  {
+    const input = this.inputRef.current;
+    
+    // eslint-disable-next-line security/detect-object-injection
+    if (!input || !this.state.autoCompleteSteps || !this.state.autoCompleteSteps[index])
+      return;
+    
+    let value;
+
+    // eslint-disable-next-line security/detect-object-injection
+    const steps = this.state.autoCompleteSteps[index];
+
+    const current = input.value;
+
+    if (full)
+    {
+      value = steps.join?.(' ') ?? steps;
+    }
+    else
+    {
+      for (let i = 0; i < steps.length; i++)
+      {
+        // eslint-disable-next-line security/detect-object-injection
+        const step = steps[i];
+        
+        if (current.startsWith(step))
+          continue;
+        
+        value = steps?.slice(0, i + 1).join?.(' ') ?? steps;
+    
+        break;
+      }
+    }
+
+    const event = new Event('input', {
+      bubbles: true,
+      cancelable: true
+    });
+
+    input.value = value;
+
+    input.dispatchEvent(event);
+  }
+
   done()
   {
     const { toggles } = this.state;
 
     let { value } = this.state;
 
-    let step;
-
-    // if editing step, default value is the step being edited
-    if (this.props.type === 'edit-step')
-      step = this.props.step;
-    // if new step then default value is the first suggestion
-    else
-      step = {
-        action: this.getSuggestions(this.props.referrer)[0] ?? actions[0],
-        value: ''
-      };
-
-    /**
-    * @type { Step }
-    */
-    const s = {
-      action: this.state.action ?? step.action,
-      value: this.state.value ?? step.value
-    };
+    const { action } = this.state;
 
     // handle how the toggles effect the end value
-    if (s.action === 'viewport')
+    if (action === 'viewport')
     {
-      let v = s.value;
+      let v = value;
 
       if (toggles['touch'])
         v = v.includes('t') ? v : (v + 't');
@@ -144,9 +241,9 @@ class Dialogue extends React.Component
     }
 
     // handle converting coords to an array
-    if (s.action === 'drag' || s.action === 'swipe')
+    if (action === 'drag' || action === 'swipe')
     {
-      value = s.value.split(',').map(s => s.trim());
+      value = value.split(',').map(s => s.trim());
     }
 
     // trim value if it's a string
@@ -154,7 +251,7 @@ class Dialogue extends React.Component
       value = value.trim();
 
     // send the final results of the dialogue to the parent
-    this.props.done?.call(undefined, s.action, value ?? s.value);
+    this.props.done?.call(undefined, action, value);
     
     // remove this dialogue element from dom
     unmount();
@@ -233,19 +330,10 @@ class Dialogue extends React.Component
     */
     const { type, title } = this.props;
 
-    let step;
+    const action = this.state.action;
+    let value = this.state.value;
     
     const suggestions = this.getSuggestions(this.props.referrer ?? this.props.step);
-
-    // if editing step, default value is the step being edited
-    if (type === 'edit-step')
-      step = this.props.step;
-    // if new step
-    else
-      step = {
-        action: suggestions[0] ?? actions[0],
-        value: ''
-      };
 
     // Types of Dialogue
 
@@ -275,37 +363,27 @@ class Dialogue extends React.Component
 
     const Step = () =>
     {
-      let defaultAction = 0;
-
       const autoFocusSelect = (type === 'new-step');
-
-      /**
-      * @type { Step }
-      */
-      const s = {
-        action: this.state.action ?? step.action,
-        value: this.state.value ?? step.value
-      };
 
       const { toggles } = this.state;
 
       // determine if toggles should be enabled
       // at the very start of the dialogue
-      if (s.action === 'viewport')
+      if (action === 'viewport')
       {
-        if (toggles['touch'] === undefined && s.value.includes('t'))
+        if (toggles['touch'] === undefined && value.includes('t'))
           toggles['touch'] = true;
 
-        if (toggles['full'] === undefined && s.value.includes('f'))
+        if (toggles['full'] === undefined && value.includes('f'))
           toggles['full'] = true;
 
-        s.value = s.value.replace(/t/g, '').replace(/f/g, '');
+        value = value.replace(/t/g, '').replace(/f/g, '');
       }
 
       // reset value and toggles every new select
       const onSelect = (action) =>
       {
-        const oldAction = s.action, oldValue = s.value;
+        const oldAction = this.state.action, oldValue = this.state.value;
 
         let value = '';
 
@@ -320,17 +398,22 @@ class Dialogue extends React.Component
         )
           value = oldValue;
 
-        // click action gets the default value of 'left'
-        // on select
-        if (action === 'click')
-          value = 'left';
+        const {
+          autoCompletePossibilities,
+          autoCompleteSteps
+        } = this.getAutoComplete({ action, value });
 
         this.setState({
           action,
           value,
+          pure: value,
+
           masterKey: this.state.masterKey + 1,
-          toggles: {},
-          pure: value || undefined
+
+          autoCompletePossibilities,
+          autoCompleteSteps,
+
+          toggles: {}
         }, () =>
         {
           const input = this.inputRef.current;
@@ -363,31 +446,46 @@ class Dialogue extends React.Component
 
       const onInput = (value) =>
       {
+        let pure;
+        
+        const {
+          autoCompletePossibilities,
+          autoCompleteSteps
+        } = this.getAutoComplete({ action, value });
+
         // we need to parse the value here because
         // the runner decides what to wait for based on the value type
-        if (s.action === 'wait')
-          this.setState({ value: this.parseNumber(value) });
+        if (action === 'wait')
+          pure = value = this.parseNumber(value);
         else
-          this.setState({ value, pure: value });
+          pure = value;
+
+        this.setState({
+          value,
+          pure,
+
+          autoCompletePossibilities,
+          autoCompleteSteps
+        });
       };
 
       // set hints & validate value
 
       let field = {};
 
-      if (s.action === 'wait')
+      if (action === 'wait')
       {
-        const duration = (typeof s.value === 'number');
+        const duration = (typeof value === 'number');
 
         field = {
           label: (duration) ? 'Duration' : 'Selector',
-          valid: (!duration) ? this.testSelector(s.value) : true,
+          valid: (!duration) ? this.testSelector(value) : true,
           hint: WaitAction
         };
       }
-      else if (s.action === 'viewport')
+      else if (action === 'viewport')
       {
-        const v = this.state.pure ?? s.value;
+        const v = this.state.pure ?? value;
 
         const dimensions = v.split('x');
 
@@ -427,18 +525,18 @@ class Dialogue extends React.Component
           hint: ViewportAction
         };
       }
-      else if (s.action === 'goto')
+      else if (action === 'goto')
       {
         field = {
-          valid: (s.value.length > 0),
+          valid: (value.length > 0),
           label: 'URL',
 
           hint: GotoAction
         };
       }
-      else if (s.action === 'media')
+      else if (action === 'media')
       {
-        const value = (this.state.pure ?? s.value).split(':');
+        const value = (this.state.pure ?? value).split(':');
 
         const valid = (
           value.length === 2 &&
@@ -452,24 +550,24 @@ class Dialogue extends React.Component
           hint: MediaAction
         };
       }
-      else if (s.action === 'select')
+      else if (action === 'select')
       {
         field = {
           label: 'Selector',
-          valid: this.testSelector(s.value),
+          valid: this.testSelector(value),
           hint: SelectAction
         };
       }
-      else if (s.action === 'hover')
+      else if (action === 'hover')
       {
         field = {
           valid: true,
           hint: HoverAction
         };
       }
-      else if (s.action === 'click')
+      else if (action === 'click')
       {
-        const value = this.state.pure ?? s.value;
+        const value = this.state.pure ?? value;
 
         const valid = (
           value === 'left' ||
@@ -483,12 +581,12 @@ class Dialogue extends React.Component
           hint: ClickAction
         };
       }
-      else if (s.action === 'drag')
+      else if (action === 'drag')
       {
         const coordinates =
-        Array.isArray(s.value) ?
-          s.value :
-          (this.state.pure ?? s.value).split(',');
+        Array.isArray(value) ?
+          value :
+          (this.state.pure ?? value).split(',');
 
         let valid = true;
 
@@ -514,12 +612,12 @@ class Dialogue extends React.Component
           hint: DragAction
         };
       }
-      else if (s.action === 'swipe')
+      else if (action === 'swipe')
       {
         const coordinates =
-        Array.isArray(s.value) ?
-          s.value :
-          (this.state.pure ?? s.value).split(',');
+        Array.isArray(value) ?
+          value :
+          (this.state.pure ?? value).split(',');
 
         let valid = true;
 
@@ -545,11 +643,11 @@ class Dialogue extends React.Component
           hint: SwipeAction
         };
       }
-      else if (s.action === 'keyboard')
+      else if (action === 'keyboard')
       {
         let valid = true;
 
-        const split = (this.state.pure ?? s.value).replace('++', '+NumpadAdd').split('+');
+        const split = (this.state.pure ?? value).replace('++', '+NumpadAdd').split('+');
 
         if (split.length <= 0)
           valid = false;
@@ -566,7 +664,7 @@ class Dialogue extends React.Component
           hint: KeyboardAction
         };
       }
-      else if (s.action === 'type')
+      else if (action === 'type')
       {
         field = {
           label: 'Value',
@@ -580,15 +678,9 @@ class Dialogue extends React.Component
       if (!field.valid)
         field.label  = `Invalid ${field.label}`;
 
-      // when the dialog is first opened
-      // it has no action or value
-      // so we use this defaults from the parent
-      if (step)
-        defaultAction = actions.indexOf(step.action);
-
       // prettify the default value of arrays
-      if (Array.isArray(s.value))
-        s.value = s.value.join(', ');
+      if (Array.isArray(value))
+        value = value.join(', ');
 
       return <div className={ styles.container }>
         <div className={ styles.title }>Step</div>
@@ -599,7 +691,7 @@ class Dialogue extends React.Component
           <div className={ styles.option }>
             <Select
               autoFocus={ autoFocusSelect }
-              defaultIndex={ defaultAction }
+              defaultIndex={ actions.indexOf(action) }
               options={ actions }
               suggestions={ suggestions }
               onChange={ onSelect }
@@ -625,7 +717,7 @@ class Dialogue extends React.Component
                   <Input
                     inputRef = { this.inputRef }
                     valid={ field.valid }
-                    defaultValue={ s.value }
+                    defaultValue={ value }
                     autoFocus={ !autoFocusSelect }
                     onChange={ onInput }
                   />
@@ -649,6 +741,22 @@ class Dialogue extends React.Component
               </div> : <div/>
           }
 
+          <div className={ styles.autoCompleteContainer }>
+            {
+              this.state.autoCompletePossibilities.map((s, i) =>
+              {
+                const current = (this.state.pure ?? value)?.toString();
+
+                return <div key={ i } className={ styles.autoComplete } onClick={ () => this.doAutoComplete(i, true) }>
+                  <div className={ styles.autoCompleteProgress }>{ current }</div>
+                  <div className={ styles.autoCompleteLeft }>
+                    { s.substring(current?.length) }
+                  </div>
+                </div>;
+              })
+            }
+          </div>
+
           <Markdown className={ styles.hint } source={ field.hint }/>
         </div>
 
@@ -660,7 +768,7 @@ class Dialogue extends React.Component
     };
 
     return <div className={ styles.wrapper }>
-      { type.includes('step') ? Step() : Test() }
+      { type.endsWith('step') ? Step() : Test() }
     </div>;
   }
 }
@@ -806,6 +914,35 @@ const styles = createStyle({
   option: {
     display: 'flex',
     margin: '15px'
+  },
+
+  autoCompleteContainer: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    
+    margin: '0 15px'
+  },
+
+  autoComplete: {
+    cursor: 'pointer',
+
+    display: 'flex',
+    width: 'auto',
+
+    fontSize: '11px',
+    textTransform: 'uppercase',
+
+    margin: '0 15px 5px 0'
+  },
+
+  autoCompleteProgress: {
+    whiteSpace: 'pre-wrap',
+    color: colors.blackText
+  },
+
+  autoCompleteLeft: {
+    whiteSpace: 'pre-wrap',
+    color: colors.accent
   },
   
   buttons: {
