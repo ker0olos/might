@@ -144,6 +144,19 @@ class Dialogue extends React.Component
         autoCompleteSteps: returnPossibilities
       };
     }
+    else if (action === 'goto')
+    {
+      const returnPossibilities =
+        [
+          'back',
+          'forward'
+        ].filter((s) => s.startsWith(value) && s !== value);
+      
+      return {
+        autoCompletePossibilities: returnPossibilities,
+        autoCompleteSteps: returnPossibilities
+      };
+    }
     else if (action === 'media')
     {
       const returnPossibilities = [

@@ -1,6 +1,8 @@
 Navigate to a different URL. 
 
-This should be rarely used, users mostly navigate trough web apps with buttons and gestures, and those should be tested instead.
+This should NOT be used to navigate, users mostly navigate trough web apps with buttons and gestures, and those should be tested instead.
+
+This should be used to give your app some parameters to enable mocks or skip some steps if you already tested the navigation buttons.
 
 #### Examples
 
