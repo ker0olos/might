@@ -346,7 +346,7 @@ class Dialogue extends React.Component
     const action = this.state.action;
     let value = this.state.value;
     
-    const suggestions = this.getSuggestions(this.props.referrer ?? this.props.step);
+    const suggestions =  (type === 'new-step') ? this.getSuggestions(this.props.referrer) : [];
 
     // Types of Dialogue
 

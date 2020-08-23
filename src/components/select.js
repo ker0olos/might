@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 import { createStyle } from 'flcss';
 
-import getTheme, { opacity } from '../colors.js';
+import getTheme from '../colors.js';
 
 import DownIcon from '../../icons/down.svg';
 
@@ -21,7 +21,7 @@ class Select extends React.Component
     this.state = {
       shown: false,
 
-      index: undefined,
+      index: defaultIndex ?? 0,
 
       suggestions: [],
       other: [],
@@ -58,13 +58,13 @@ class Select extends React.Component
 
   toggle(force)
   {
-    const { shown } = this.state;
+    const { shown, value } = this.state;
     
     const { suggestions, other } = this.getItems([]);
 
     this.setState({
       shown: (typeof force === 'boolean') ? force : !shown,
-      index: undefined,
+      index: suggestions.concat(other).indexOf(value),
       // reset results if the menu is toggled
       suggestions,
       other
@@ -74,6 +74,11 @@ class Select extends React.Component
       {
         // clear search
         inputRef.current.value = '';
+
+        // scroll to the new selected option
+        document.body.querySelector(`.${styles.option}[highlighted="true"]`).scrollIntoView({
+          block: 'nearest'
+        });
 
         // auto-focus on search input
         if (this.state.shown)
@@ -137,7 +142,7 @@ class Select extends React.Component
     // disable dialogue controls
     e.stopImmediatePropagation();
 
-    if (e.key === 'Enter' && index !== undefined)
+    if (e.key === 'Enter')
     {
       const all = suggestions.concat(other);
 
@@ -150,13 +155,13 @@ class Select extends React.Component
       this.toggle();
    
     else if (e.key === 'ArrowUp')
-      this.highlight((index ?? 0) - 1);
+      this.press(index - 1);
    
     else if (e.key === 'ArrowDown')
-      this.highlight((index ?? -1) + 1);
+      this.press(index+ 1);
   }
 
-  highlight(i)
+  press(i)
   {
     const { other, suggestions } = this.state;
 
@@ -178,6 +183,13 @@ class Select extends React.Component
       document.body.querySelector(`.${styles.option}[highlighted="true"]`).scrollIntoView({
         block: 'nearest'
       });
+    });
+  }
+
+  hover(i)
+  {
+    this.setState({
+      index: i
     });
   }
 
@@ -251,7 +263,7 @@ class Select extends React.Component
             {
               const highlighted = index === (i + suggestions.length);
 
-              return <div key={ i } highlighted={ highlighted.toString() } className={ styles.option } onClick={ () => this.onChange(opt) }>
+              return <div key={ i } highlighted={ highlighted.toString() } className={ styles.option } onMouseOver={ () => this.hover(i) } onClick={ () => this.onChange(opt) }>
                 { opt }
               </div>;
             })
@@ -407,11 +419,6 @@ const styles = createStyle({
     textTransform: 'capitalize',
 
     padding: '0 15px',
-
-    ':hover': {
-      color: colors.whiteText,
-      backgroundColor: opacity(colors.accent, 0.65)
-    },
 
     '[highlighted="true"]': {
       color: colors.whiteText,
