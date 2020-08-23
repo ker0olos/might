@@ -291,10 +291,11 @@ class Mindmap extends React.Component
         // wait for user activation then show load dialogue
         if (err.message?.startsWith('User activation'))
         {
-          window.addEventListener('click', () =>
+          document.body.addEventListener('click', (e) =>
           {
+            e.stopImmediatePropagation();
+
             this.loadHandle();
-            
           }, { once: true });
         }
 
