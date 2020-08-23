@@ -286,6 +286,19 @@ class Mindmap extends React.Component
         {
           this.db.table('files').delete(0);
         }
+      }).catch((err) =>
+      {
+        // wait for user activation then show load dialogue
+        if (err.message?.startsWith('User activation'))
+        {
+          window.addEventListener('click', () =>
+          {
+            this.loadHandle();
+            
+          }, { once: true });
+        }
+
+        console.error(err);
       });
     }).catch(() => undefined);
   }

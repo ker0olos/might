@@ -374,8 +374,6 @@ const styles = createStyle({
     width: '100%',
     height: '100%',
 
-    overflow: 'hidden',
-
     borderRadius: '3px',
     border: `${colors.accent} 1px solid`,
 
@@ -403,7 +401,6 @@ const styles = createStyle({
     maxHeight: '45px',
     
     overflow: 'hidden',
-    textOverflow: 'ellipsis',
 
     fontSize: '10px',
     margin: '5px 10px'

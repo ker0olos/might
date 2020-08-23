@@ -75,7 +75,7 @@ class Select extends React.Component
         // clear search
         inputRef.current.value = '';
 
-        // scroll to the new selected option
+        // scroll to the current selected option
         document.body.querySelector(`.${styles.option}[highlighted="true"]`).scrollIntoView({
           block: 'nearest'
         });
