@@ -244,9 +244,9 @@ class Select extends React.Component
           {
             suggestions.map((opt, i) =>
             {
-              const highlighted = index === i;
+              const highlighted = (index === i);
 
-              return <div key={ i } highlighted={ highlighted.toString() } className={ styles.option } onClick={ () => this.onChange(opt) }>
+              return <div key={ i } highlighted={ highlighted.toString() } className={ styles.option }onMouseOver={ () => this.hover(i) } onClick={ () => this.onChange(opt) }>
                 { opt }
               </div>;
             })
@@ -261,9 +261,10 @@ class Select extends React.Component
           {
             other.map((opt, i) =>
             {
-              const highlighted = index === (i + suggestions.length);
+              const ii = i + suggestions.length;
+              const highlighted = (index === ii);
 
-              return <div key={ i } highlighted={ highlighted.toString() } className={ styles.option } onMouseOver={ () => this.hover(i) } onClick={ () => this.onChange(opt) }>
+              return <div key={ i } highlighted={ highlighted.toString() } className={ styles.option } onMouseOver={ () => this.hover(ii) } onClick={ () => this.onChange(opt) }>
                 { opt }
               </div>;
             })
