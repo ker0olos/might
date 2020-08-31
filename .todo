@@ -1,6 +1,5 @@
 Performance Issues and Bugs:
   ☐ auto expanding map sizes
-    - little hard since flcss does not support hot-reloading
 
 Documentation:
 
@@ -8,8 +7,5 @@ UI/UX:
   ☐ linter-esque system: @low 
     - warn users about useless steps
     - incorrect steps
-
-  ☐ searching for tests using their titles for actions @low
-    - scrolls to the first result but highlight all results in both maps
 
 General:

@@ -40,10 +40,7 @@ class Minimap extends React.Component
     /**
     * @type { HTMLElement }
     */
-    const mindMapRef = this.props?.mindMapRef?.current;
-
-    if (!mindMapRef)
-      return;
+    const { mindmap } = this.props;
 
     const miniMapWidth = 260;
     const miniMapHeight = 157;
@@ -72,11 +69,7 @@ class Minimap extends React.Component
     x = x - window.innerWidth;
     y = y - window.innerHeight;
 
-    mindMapRef.parentElement.scrollTo({
-      left: x,
-      top: y,
-      behavior: (smooth) ? 'smooth' : 'auto'
-    });
+    mindmap.scrollTo(x, y, smooth);
   }
 
   onMouseDown()
@@ -145,7 +138,7 @@ class Minimap extends React.Component
 }
 
 Minimap.propTypes = {
-  mindMapRef: PropTypes.object.isRequired,
+  mindmap: PropTypes.object.isRequired,
   onContextMenu: PropTypes.func,
   children: PropTypes.oneOfType([
     PropTypes.node,

@@ -36,6 +36,7 @@ const mindMapRef = React.createRef();
 /**
 * @typedef { Object } FamilizedItem
 * @property { boolean } root
+* @property { boolean } invisible
 * @property { string } title
 * @property { number } titleTestIndex
 * @property { 'parent' | 'child' | '' } groupState
@@ -114,18 +115,8 @@ class Mindmap extends React.Component
 
   componentDidMount()
   {
-    const miniMapWidth = 260;
-    const miniMapHeight = 157;
-
-    const mapWidth = miniMapWidth * 20 -  window.innerWidth;
-    const mapHeight = miniMapHeight * 20 -  window.innerHeight;
-
     // scroll to center of the map on start
-    mindMapRef.current.parentElement.scrollTo({
-      left: mapWidth / 2,
-      top: mapHeight / 2,
-      behavior: 'auto'
-    });
+    this.scrollToCenter();
 
     window.addEventListener('beforeunload', this.onBeforeUnload);
     document.body.addEventListener('keydown', this.onKeyDown);
@@ -136,6 +127,7 @@ class Mindmap extends React.Component
 
     // REMOVE (for testing purposes)
     // this.loadMap(JSON.parse('{"data":[{"steps":[{"action":"wait","value":0},{"action":"select","value":"body"},{"action":"click","value":"left"}]}]}').data, true);
+    this.loadMap(JSON.parse('{"data":[{"title": "White Card", "steps":[{"action":"wait","value":0},{"action":"select","value":"body"},{"action":"click","value":"left"}]}, {"title": "Black Card", "steps":[{"action":"wait","value":0},{"action":"select","value":"container"},{"action":"click","value":"right"}]}]}').data, true);
   }
 
   componentWillUnmount()
@@ -181,10 +173,18 @@ class Mindmap extends React.Component
     }
 
     if (e.ctrlKey && e.key.toLowerCase() === 'z')
+    {
+      e.preventDefault();
+
       this.undo();
+    }
 
     if (e.ctrlKey && e.key.toLowerCase() === 'y')
+    {
+      e.preventDefault();
+
       this.redo();
+    }
   }
 
   onMouseDown()
@@ -232,23 +232,54 @@ class Mindmap extends React.Component
     const x = e.clientX;
     const y = e.clientY;
 
+    if (this.lastX !== undefined && this.lastY !== undefined)
+    {
+      const deltaX = this.lastX - x;
+      const deltaY = this.lastY - y;
+
+      this.scrollToDelta(deltaX, deltaY);
+    }
+
+    this.lastX = x, this.lastY = y;
+  }
+
+  scrollTo(x, y, smooth)
+  {
     /**
     * @type { HTMLElement }
     */
     const element = mindMapRef.current;
 
-    if (this.lastX !== undefined && this.lastY !== undefined)
-    {
-      const deltaX = this.lastX - x;
-      const deltaY = this.lastY - y;
-      
-      element.parentElement.scrollTo({
-        left: element.parentElement.scrollLeft + deltaX,
-        top: element.parentElement.scrollTop + deltaY
-      });
-    }
+    element.parentElement.scrollTo({
+      behavior: smooth ? 'smooth' : 'auto',
+      left: x,
+      top: y
+    });
+  }
 
-    this.lastX = x, this.lastY = y;
+  scrollToCenter()
+  {
+    const miniMapWidth = 260;
+    const miniMapHeight = 157;
+
+    const mapWidth = miniMapWidth * 20 -  window.innerWidth;
+    const mapHeight = miniMapHeight * 20 -  window.innerHeight;
+
+    // scroll to center of the map on start
+    this.scrollTo(mapWidth / 2, mapHeight / 2);
+  }
+
+  scrollToDelta(deltaX, deltaY)
+  {
+    /**
+    * @type { HTMLElement }
+    */
+    const element = mindMapRef.current;
+
+    element.parentElement.scrollTo({
+      left: element.parentElement.scrollLeft + deltaX,
+      top: element.parentElement.scrollTop + deltaY
+    });
   }
 
   storeHandle(fileHandle)
@@ -462,7 +493,7 @@ class Mindmap extends React.Component
       stackIndex,
       dirty: true,
       data: this.changeStack[stackIndex].data,
-      familizedData: this.changeStack[stackIndex].familizedData
+      familizedData: this.rememberProperties(this.changeStack[stackIndex].familizedData, this.state.familizedData)
     });
   }
 
@@ -484,7 +515,7 @@ class Mindmap extends React.Component
       stackIndex,
       dirty: true,
       data: this.changeStack[stackIndex].data,
-      familizedData: this.changeStack[stackIndex].familizedData
+      familizedData: this.rememberProperties(this.changeStack[stackIndex].familizedData, this.state.familizedData)
     });
   }
 
@@ -649,10 +680,44 @@ class Mindmap extends React.Component
 
     this.setState({
       data,
-      familizedData,
+      // rememberProperties is sett here instead when creating the acutal data
+      // to avoid recording properties like invisible
+      familizedData: (file) ? familizedData : this.rememberProperties(familizedData, this.state.familizedData),
       stackIndex: undefined,
       dirty: (file) ? false : true
     });
+  }
+
+  /**
+  * @param { FamilizedObject } data
+  * @param { FamilizedObject } oldData
+  */
+  rememberProperties(data, oldData)
+  {
+    /**
+    * @param { FamilizedObject } children
+    * @param { FamilizedObject } oldChildren
+    */
+    const recursive = (children, oldChildren) =>
+    {
+
+      for (const key in children)
+      {
+        const item = children[key];
+        const oldItem = oldChildren?.[key];
+
+        // carry invisible status from old data
+        item.invisible = oldItem?.invisible;
+
+        // children loop
+        recursive(item.children, oldItem?.children);
+      }
+    };
+
+    // start loop
+    recursive(data, oldData);
+
+    return data;
   }
 
   /**
@@ -991,12 +1056,12 @@ class Mindmap extends React.Component
     * @param { string } highlight
     * @param { boolean } group
     */
-    const handlePreLines = (children, index, item, mode, highlight, group) =>
+    const handlePreLines = (length, index, item, mode, highlight, group) =>
     {
       // if parent had no children
       // or if only has one child (then the parent will connect
       // with that child using a post-line only)
-      if (!children)
+      if (length <= 0)
         return <div/>;
 
       // first child lines are reversed in direction
@@ -1004,11 +1069,11 @@ class Mindmap extends React.Component
 
         {
           // if there's only one child then not show any vertical lines
-          (children.length > 1) ?
+          (length > 1) ?
             // first line should be rotated upside down (reversed)
             // first and last child get half vertical lines
             // all other children get full vertical lines
-            <Vertical reverse={ index === 0 } half={ index === 0 || index === children.length - 1 } highlight={ highlight }/> :
+            <Vertical reverse={ index === 0 } half={ index === 0 || index === length - 1 } highlight={ highlight }/> :
             <div/>
         }
 
@@ -1022,11 +1087,11 @@ class Mindmap extends React.Component
     * @param { string } highlight
     * @param { boolean } group
     */
-    const handlePostLines = (children, mode, highlight, group) =>
+    const handlePostLines = (length, mode, highlight, group) =>
     {
       // post lines are only drawn to connect to the pre-lines of the next step in the map
       // that means that there need to be pre-lines
-      if (!children || children.length <= 1)
+      if (length <= 1)
         return <div/>;
 
       return <Horizontal mode={ mode } highlight={ highlight } group={ group }/>;
@@ -1093,13 +1158,18 @@ class Mindmap extends React.Component
       if (!children)
         return <div/>;
 
-      const keys = Object.keys(children);
+      const keys = Object.keys(children).filter(key => !children[key].invisible);
 
       return <div className={ styles.column }>
         {
           keys.map((step, index) =>
           {
             const item = children[step];
+
+            if (item.invisible === true)
+              return <div key={ index }/>;
+            else
+              length = length + 1;
 
             const {
               carried, highlight,
@@ -1119,15 +1189,16 @@ class Mindmap extends React.Component
               postGroup = true;
             }
 
+            const childrenLength = Object.keys(item.children ?? {}).filter(key => !item.children[key].invisible).length;
+            
             return <div key={ index } className={ styles.row }>
-
               {
               // A root item is the first item in a branch
               // therefore it has no previous items connected to it
               // and does not need any pre-lines
               }
               {
-                (!item.root) ? handlePreLines(keys, index, item, mode, preLinesHighlight, preGroup) : undefined
+                (!item.root) ? handlePreLines(keys.length, index, item, mode, preLinesHighlight, preGroup) : undefined
               }
 
               <div className={ styles.column }>
@@ -1135,7 +1206,7 @@ class Mindmap extends React.Component
               </div>
 
               {
-                handlePostLines(Object.keys(item.children || {}), mode, postLinesHighlight, postGroup)
+                handlePostLines(childrenLength, mode, postLinesHighlight, postGroup)
               }
 
               { handleItems(item.children, mode, carried) }
@@ -1150,24 +1221,26 @@ class Mindmap extends React.Component
     const undo = (stackIndex - 1 > -1);
     const redo = (stackIndex + 1 < this.changeStack.length);
 
+    let length = 0;
+
+    const fullItems = handleItems(this.state.familizedData, 'full', false);
+
+    const empty = length <= 0 ;
+
+    const miniItems = handleItems(this.state.familizedData, 'mini', false);
+
     return <div ref={ mindMapRef } className={ styles.wrapper }>
 
-      <TopBar
-        dirty={ this.state.dirty }
-        stack={ { undo, redo } }
-        onFileSave={ this.saveFile }
-        onFileLoad={ this.loadFile }
-        onUndo={ this.undo }
-        onRedo={ this.redo }
-      />
+      <TopBar mindmap={ this } dirty={ this.state.dirty } stack={ { undo, redo } }/>
 
       {/* Mini-map */}
-      <Minimap mindMapRef={ mindMapRef } onContextMenu={ this.onContextMenu }>
-        { handleItems(this.state.familizedData, 'mini', false) }
+      <Minimap mindmap={ this } onContextMenu={ this.onContextMenu }>
+        { miniItems }
       </Minimap>
 
       {/* Full-map */}
       <div
+        empty={ empty.toString() }
         className={ styles.container }
 
         onMouseUp={ this.onMouseUp }
@@ -1178,7 +1251,7 @@ class Mindmap extends React.Component
         
         onContextMenu={ this.onContextMenu }
       >
-        { handleItems(this.state.familizedData, 'full', false) }
+        { fullItems }
       </div>
 
     </div>;
@@ -1203,7 +1276,19 @@ const styles = createStyle({
     fontWeight: 700,
 
     width: '100%',
-    height: '100%'
+    height: '100%',
+
+    '[empty="true"]': {
+      ':after': {
+        content: '"No results"',
+
+        color: colors.accent,
+
+        fontFamily: 'Noto Sans',
+        fontWeight: 700,
+        fontSize: '12px'
+      }
+    }
   },
 
   row: {
