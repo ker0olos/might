@@ -127,7 +127,6 @@ class Mindmap extends React.Component
 
     // REMOVE (for testing purposes)
     // this.loadMap(JSON.parse('{"data":[{"steps":[{"action":"wait","value":0},{"action":"select","value":"body"},{"action":"click","value":"left"}]}]}').data, true);
-    this.loadMap(JSON.parse('{"data":[{"title": "White Card", "steps":[{"action":"wait","value":0},{"action":"select","value":"body"},{"action":"click","value":"left"}]}, {"title": "Black Card", "steps":[{"action":"wait","value":0},{"action":"select","value":"container"},{"action":"click","value":"right"}]}]}').data, true);
   }
 
   componentWillUnmount()
@@ -680,7 +679,7 @@ class Mindmap extends React.Component
 
     this.setState({
       data,
-      // rememberProperties is sett here instead when creating the acutal data
+      // rememberProperties is sett here instead when creating the actual data
       // to avoid recording properties like invisible
       familizedData: (file) ? familizedData : this.rememberProperties(familizedData, this.state.familizedData),
       stackIndex: undefined,
