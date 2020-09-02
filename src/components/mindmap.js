@@ -116,7 +116,7 @@ class Mindmap extends React.Component
   componentDidMount()
   {
     // scroll to center of the map on start
-    this.scrollToCenter();
+    setTimeout(() => this.scrollToCenter(), 250);
 
     window.addEventListener('beforeunload', this.onBeforeUnload);
     document.body.addEventListener('keydown', this.onKeyDown);

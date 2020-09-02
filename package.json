@@ -1,6 +1,6 @@
 {
   "name": "might-ui",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A no-code solution for performing end-to-end tests",
   "scripts": {
     "prepare": "npm run build",
@@ -32,7 +32,7 @@
   "dependencies": {
     "dexie": "^3.0.2",
     "express": "^4.17.1",
-    "flcss": "2.1.0-0",
+    "flcss": "^2.2.0-0",
     "might-core": "^0.3.7",
     "open": "^7.2.1",
     "prop-types": "^15.7.2",
@@ -47,7 +47,7 @@
     "@svgr/webpack": "^5.4.0",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.1.0",
-    "eslint": "^7.8.0",
+    "eslint": "^7.8.1",
     "eslint-plugin-react": "^7.20.6",
     "eslint-plugin-react-hooks": "^4.1.0",
     "eslint-plugin-security": "^1.4.0",

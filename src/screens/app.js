@@ -27,7 +27,7 @@ class App extends React.Component
 
 const styles = createStyle({
   container: {
-    overflow: 'overlay',
+    overflow: 'scroll',
     backgroundColor: colors.whiteBackground,
     
     width: '100vw',
