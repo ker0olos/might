@@ -1,5 +1,7 @@
 Performance Issues and Bugs:
-  ☐ auto expanding map sizes
+  - improve rendering the mindmap
+    ☐ dynamic sizes
+    ☐ stop handling items twice for the mindmap and minimap
 
 Documentation:
 
