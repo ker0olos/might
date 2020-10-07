@@ -294,8 +294,8 @@ class Mindmap extends React.Component
 
   loadHandle()
   {
-    // auto-loading only works with the ntf api
-    if (typeof window.chooseFileSystemEntries !== 'function')
+    // auto-loading only works with the fsa api
+    if (typeof window.showOpenFilePicker !== 'function')
       return;
 
     // get the stored file handle from a previous session
@@ -339,7 +339,7 @@ class Mindmap extends React.Component
     // pretty-printed json file
     const content = JSON.stringify({ data: this.state.data }, undefined, 2);
     
-    // use the nfs api
+    // use the fsa api
     const getFromHandle = () =>
     {
       if (this.fileHandle)
@@ -355,12 +355,12 @@ class Mindmap extends React.Component
           });
       
       // shows the user the pick file dialogue
-      return window.chooseFileSystemEntries({
-        type: 'save-file',
-        accepts: [ {
+      return window.showSaveFilePicker({
+        types: [ {
           description: 'Might Map File (.json)',
-          extensions: [ 'json' ],
-          mimeTypes: [ 'application/json' ]
+          accept: {
+            'application/json': [ '.json' ]
+          }
         } ]
       })
         // get a writeable stream
@@ -375,7 +375,7 @@ class Mindmap extends React.Component
         });
     };
 
-    // fallback for no having the nfs api enabled
+    // fallback for no having the fsa api enabled
     const getFromBlob = () =>
     {
       const a = document.createElement('a');
@@ -396,7 +396,7 @@ class Mindmap extends React.Component
       return Promise.resolve();
     };
 
-    (typeof window.chooseFileSystemEntries === 'function'
+    (typeof window.showOpenFilePicker === 'function'
       ? getFromHandle()
       : getFromBlob()
     )
@@ -407,7 +407,6 @@ class Mindmap extends React.Component
 
   loadFile(e, fileHandle)
   {
-    // use the nfs api
     const getFromHandle = (fileHandle) =>
     {
       if (fileHandle)
@@ -417,22 +416,21 @@ class Mindmap extends React.Component
           .then(file => file.text());
       
       // shows the user the pick file dialogue
-      return window.chooseFileSystemEntries({
-        type: 'open-file',
-        multiple: false,
-        accepts: [ {
+      return window.showOpenFilePicker({
+        types: [ {
           description: 'Might Map File (.json)',
-          extensions: [ 'json' ],
-          mimeTypes: [ 'application/json' ]
+          accept: {
+            'application/json': [ '.json' ]
+          }
         } ]
       })
         // get a readable stream
-        .then(fileHandle => this.storeHandle(fileHandle).getFile())
+        .then(list => this.storeHandle(list[0]).getFile())
         // get some readable text from the stream
         .then(file => file.text());
     };
 
-    // fallback for no having the nfs api enabled
+    // fallback for no having the fsa api enabled
     const getFromBlob = () =>
     {
       return new Promise((resolve) =>
@@ -459,7 +457,7 @@ class Mindmap extends React.Component
       });
     };
 
-    (typeof window.chooseFileSystemEntries === 'function'
+    (typeof window.showOpenFilePicker === 'function'
       ? getFromHandle(fileHandle)
       : getFromBlob()
     )
