@@ -11,9 +11,7 @@ and [Might CLI](https://github.com/ker0olos/might-cli) runs those tests.
 
 ### Installation
 
-##### For the best possible experience with Might, please use a browser that supports the new [Native File System API](https://web.dev/native-file-system/);
-##### Like Chrome 83+ with `chrome://flags/#native-file-system-api` enabled or [any other browser that supports the api](https://caniuse.com/#feat=native-filesystem-api).
-##### However, Might will work regardless.
+##### For a better experience, use Might with a browser that supports the [Native File System API](https://web.dev/native-file-system/); Chrome/Chromium 86+
 
 </br>
 
