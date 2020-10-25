@@ -152,12 +152,6 @@ class TopBar extends React.Component
     // set query
     mindmap.setState({
       familizedData
-    }, () =>
-    {
-      // scroll to center when a search is performed for the first time
-      // or when a search is cleared
-      if (!previous || (previous && !query))
-        mindmap.scrollToCenter();
     });
   }
 

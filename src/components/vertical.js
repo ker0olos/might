@@ -8,7 +8,7 @@ import getTheme from '../colors.js';
 
 const colors = getTheme();
 
-const Vertical = ({ reverse, half, highlight }) =>
+const Vertical = ({ reverse, half, invisible, highlight }) =>
 {
   let s = styles.container;
 
@@ -17,12 +17,13 @@ const Vertical = ({ reverse, half, highlight }) =>
   else if (half)
     s = styles.half;
 
-  return <div className={ s } highlight={ highlight }/>;
+  return <div className={ s } invisible={ invisible?.toString() ?? 'false' } highlight={ highlight }/>;
 };
 
 Vertical.propTypes = {
   reverse: PropTypes.bool.isRequired,
   half: PropTypes.bool.isRequired,
+  invisible: PropTypes.bool,
   highlight: PropTypes.string
 };
 
@@ -32,6 +33,10 @@ const styles = createStyle({
     backgroundColor: colors.accent,
 
     width: '1px',
+
+    '[invisible="true"]': {
+      opacity: 0.15
+    },
 
     '[highlight="remove"]': {
       backgroundColor: colors.red

@@ -272,15 +272,15 @@ const testRightClick = (e, mindmap, item, testIndex) =>
 const Item = ({ mindmap, mode, content, highlight, item }) =>
 {
   if (mode === 'mini')
-  
     return <div className={ styles.miniItemWrapper } highlight={ highlight }>
       <div className={ styles.miniContainer }>
         <div className={ styles.miniContent }>{ content }</div>
       </div>
     </div>;
 
-
   let untitled;
+
+  const invisible = item.invisible ?? false;
 
   const { titleTestIndex } = item;
 
@@ -300,6 +300,7 @@ const Item = ({ mindmap, mode, content, highlight, item }) =>
       title={ title }
       untitled={ untitled }
       highlight={ highlight }
+      invisible={ invisible.toString() }
       className={ styles.title }
       onClick={ (e) => leftClick(e, mindmap, titleTestIndex, 'test') }
       onContextMenu={ (e) => testRightClick(e, mindmap, item, titleTestIndex) }
@@ -310,6 +311,7 @@ const Item = ({ mindmap, mode, content, highlight, item }) =>
     <div
       title={ content }
       highlight={ highlight }
+      invisible={ invisible.toString() }
       className={ styles.container }
       onClick={ (e) => leftClick(e, mindmap, item, 'item') }
       onContextMenu={ (e) => itemRightClick(e, mindmap, item) }
@@ -377,6 +379,10 @@ const styles = createStyle({
     borderRadius: '3px',
     border: `${colors.accent} 1px solid`,
 
+    '[invisible="true"]': {
+      opacity: 0.15
+    },
+
     '[highlight="remove"]': {
       color: colors.whiteText,
       backgroundColor: colors.red,
@@ -442,6 +448,10 @@ const styles = createStyle({
 
     '[untitled="true"]': {
       fontStyle: 'italic'
+    },
+
+    '[invisible="true"]': {
+      opacity: 0.15
     },
 
     '[highlight="remove"]': {

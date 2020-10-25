@@ -48,7 +48,7 @@
     "object-curly-spacing": ["error", "always"],
     "computed-property-spacing": ["error", "never"],
     "array-bracket-spacing": ["error", "always"],
-    "comma-spacing": ["error", { "after": true }],
+    "comma-spacing": ["error", { "before": false, "after": true }],
     "comma-dangle": ["error", "never"],
     "arrow-spacing": ["error", { "before": true, "after": true }],
     "func-call-spacing": ["error", "never"],

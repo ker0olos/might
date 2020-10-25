@@ -1062,7 +1062,7 @@ class Mindmap extends React.Component
         return <div/>;
 
       // first child lines are reversed in direction
-      return <div className={ (index === 0) ? styles.lines : styles.lines }>
+      return <div className={ styles.lines }>
 
         {
           // if there's only one child then not show any vertical lines
@@ -1070,28 +1070,29 @@ class Mindmap extends React.Component
             // first line should be rotated upside down (reversed)
             // first and last child get half vertical lines
             // all other children get full vertical lines
-            <Vertical reverse={ index === 0 } half={ index === 0 || index === length - 1 } highlight={ highlight }/> :
+            <Vertical reverse={ index === 0 } half={ index === 0 || index === length - 1 } invisible={ item.invisible } highlight={ highlight }/> :
             <div/>
         }
 
-        <Horizontal mode={ mode } highlight={ highlight } group={ group }/>
+        <Horizontal mode={ mode } invisible={ item.invisible } highlight={ highlight } group={ group }/>
       </div>;
     };
 
     /**
     * @param { string[] } children
     * @param { 'mini' | 'full' } mode
+    * @param { boolean } invisible
     * @param { string } highlight
     * @param { boolean } group
     */
-    const handlePostLines = (length, mode, highlight, group) =>
+    const handlePostLines = (length, mode, invisible, highlight, group) =>
     {
       // post lines are only drawn to connect to the pre-lines of the next step in the map
       // that means that there need to be pre-lines
       if (length <= 1)
         return <div/>;
 
-      return <Horizontal mode={ mode } highlight={ highlight } group={ group }/>;
+      return <Horizontal mode={ mode } invisible={ invisible } highlight={ highlight } group={ group }/>;
     };
 
     // using the familized data
@@ -1155,18 +1156,13 @@ class Mindmap extends React.Component
       if (!children)
         return <div/>;
 
-      const keys = Object.keys(children).filter(key => !children[key].invisible);
+      const keys = Object.keys(children);
 
       return <div className={ styles.column }>
         {
           keys.map((step, index) =>
           {
             const item = children[step];
-
-            if (item.invisible === true)
-              return <div key={ index }/>;
-            else
-              length = length + 1;
 
             const {
               carried, highlight,
@@ -1186,8 +1182,8 @@ class Mindmap extends React.Component
               postGroup = true;
             }
 
-            const childrenLength = Object.keys(item.children ?? {}).filter(key => !item.children[key].invisible).length;
-            
+            const childrenLength = Object.keys(item.children ?? {}).length;
+
             return <div key={ index } className={ styles.row }>
               {
               // A root item is the first item in a branch
@@ -1203,7 +1199,7 @@ class Mindmap extends React.Component
               </div>
 
               {
-                handlePostLines(childrenLength, mode, postLinesHighlight, postGroup)
+                handlePostLines(childrenLength, mode, item.invisible, postLinesHighlight, postGroup)
               }
 
               { handleItems(item.children, mode, carried) }
@@ -1218,11 +1214,9 @@ class Mindmap extends React.Component
     const undo = (stackIndex - 1 > -1);
     const redo = (stackIndex + 1 < this.changeStack.length);
 
-    let length = 0;
-
     const fullItems = handleItems(this.state.familizedData, 'full', false);
 
-    const empty = length <= 0 ;
+    const empty = Object.keys(this.state.familizedData).length <= 0 ;
 
     const miniItems = handleItems(this.state.familizedData, 'mini', false);
 

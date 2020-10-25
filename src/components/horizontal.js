@@ -8,18 +8,19 @@ import getTheme from '../colors.js';
 
 const colors = getTheme();
 
-const Horizontal = ({ mode, highlight, group }) =>
+const Horizontal = ({ mode, invisible, highlight, group }) =>
 {
   const s = {
     container: (mode === 'full') ? styles.container : styles.miniContainer,
     title: (mode === 'full') ? styles.title : styles.miniTitle
   };
 
-  return <div className={ s.container } highlight={ highlight } group={ group.toString() }/>;
+  return <div className={ s.container } invisible={ invisible?.toString() ?? 'false' } highlight={ highlight } group={ group.toString() }/>;
 };
 
 Horizontal.propTypes = {
   mode: PropTypes.string.isRequired,
+  invisible: PropTypes.bool,
   highlight: PropTypes.string,
   group: PropTypes.bool
 };
@@ -41,6 +42,10 @@ const styles = createStyle({
     '[group="true"]': {
       width: '5px',
       padding: '0 5px'
+    },
+
+    '[invisible="true"]': {
+      opacity: 0.15
     },
 
     '[highlight="remove"]': {
