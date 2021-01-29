@@ -1,6 +1,6 @@
 {
   "name": "might-ui",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "A no-code solution for performing end-to-end tests",
   "scripts": {
     "prepare": "npm run build",
@@ -30,30 +30,30 @@
     "end-to-end-testing-interface"
   ],
   "dependencies": {
-    "dexie": "^3.0.2",
+    "dexie": "^3.0.3",
     "express": "^4.17.1",
-    "flcss": "2.2.4",
+    "flcss": "^2.2.5",
     "might-core": "^0.3.8",
-    "open": "^7.3.0",
+    "open": "^7.3.1",
     "prop-types": "^15.7.2",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
-    "react-markdown": "^5.0.2"
+    "react-markdown": "^5.0.3"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.3",
-    "@babel/preset-env": "^7.12.1",
-    "@babel/preset-react": "^7.12.1",
-    "@svgr/webpack": "^5.4.0",
+    "@babel/core": "^7.12.10",
+    "@babel/preset-env": "^7.12.11",
+    "@babel/preset-react": "^7.12.10",
+    "@svgr/webpack": "^5.5.0",
     "babel-eslint": "^10.1.0",
     "babel-loader": "~8.1.0",
-    "eslint": "^7.12.0",
-    "eslint-plugin-react": "^7.21.5",
+    "eslint": "^7.18.0",
+    "eslint-plugin-react": "^7.22.0",
     "eslint-plugin-react-hooks": "^4.2.0",
     "eslint-plugin-security": "^1.4.0",
     "raw-loader": "~4.0.2",
     "webpack": "~4.44.2",
     "webpack-cli": "~3.3.12",
-    "webpack-dev-server": "~3.11.0"
+    "webpack-dev-server": "~3.11.2"
   }
 }
