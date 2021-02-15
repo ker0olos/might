@@ -11,7 +11,7 @@ and [Might CLI](https://github.com/ker0olos/might-cli) runs those tests.
 
 ### Installation
 
-##### For a better experience, use Might with a browser that supports the [File System Access API](https://web.dev/file-system-access/); Chrome/Chromium 86+
+> For a better experience, use Might with a browser that supports the [File System Access API](https://web.dev/file-system-access/); Chrome/Chromium 86+
 
 </br>
 

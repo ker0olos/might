@@ -161,9 +161,11 @@ class Dialogue extends React.Component
     {
       const returnPossibilities = [
         'prefers-color-scheme: dark',
-        'prefers-color-scheme: light',
-        'prefers-reduced-motion: reduce',
-        'prefers-reduced-motion: no-preference'
+        'prefers-color-scheme: light'
+        
+        // TODO "prefers-reduced-motion" is no longer supported
+        // 'prefers-reduced-motion: reduce',
+        // 'prefers-reduced-motion: no-preference'
       ].filter((s) => s.startsWith(value) && s !== value);
         
       return {
