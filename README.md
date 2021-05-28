@@ -22,17 +22,17 @@ and [Might CLI](https://github.com/ker0olos/might-cli) runs those tests.
 
 After that it opens automatically in your browser, **(to actually run the tests you need to use [might-cli](https://github.com/ker0olos/might-cli)).**
 
-- [Waiting](https://github.com/ker0olos/Might/blob/master/src/documentation/wait.md)
-- [Changing the Viewport](https://github.com/ker0olos/Might/blob/master/src/documentation/viewport.md)
-- [Going to Different Pages](https://github.com/ker0olos/Might/blob/master/src/documentation/goto.md)
-- [Setting Media Features](https://github.com/ker0olos/Might/blob/master/src/documentation/media.md)
-- [Keypresses](https://github.com/ker0olos/Might/blob/master/src/documentation/keyboard.md)
-- [Hovering](https://github.com/ker0olos/Might/blob/master/src/documentation/hover.md)
-- [Clicking](https://github.com/ker0olos/Might/blob/master/src/documentation/click.md)
-- [Dragging Elements](https://github.com/ker0olos/Might/blob/master/src/documentation/drag.md)
-- [Swiping the Screen](https://github.com/ker0olos/Might/blob/master/src/documentation/swipe.md)
-- [Typing](https://github.com/ker0olos/Might/blob/master/src/documentation/type.md)
+- [Waiting](https://github.com/ker0olos/Might/blob/main/src/documentation/wait.md)
+- [Changing the Viewport](https://github.com/ker0olos/Might/blob/main/src/documentation/viewport.md)
+- [Going to Different Pages](https://github.com/ker0olos/Might/blob/main/src/documentation/goto.md)
+- [Setting Media Features](https://github.com/ker0olos/Might/blob/main/src/documentation/media.md)
+- [Keypresses](https://github.com/ker0olos/Might/blob/main/src/documentation/keyboard.md)
+- [Hovering](https://github.com/ker0olos/Might/blob/main/src/documentation/hover.md)
+- [Clicking](https://github.com/ker0olos/Might/blob/main/src/documentation/click.md)
+- [Dragging Elements](https://github.com/ker0olos/Might/blob/main/src/documentation/drag.md)
+- [Swiping the Screen](https://github.com/ker0olos/Might/blob/main/src/documentation/swipe.md)
+- [Typing](https://github.com/ker0olos/Might/blob/main/src/documentation/type.md)
 
-[![](./screenshots/1.png)](https://github.com/ker0olos/Might/raw/master/screenshots/1.png)
+[![](./screenshots/1.png)](https://github.com/ker0olos/Might/raw/main/screenshots/1.png)
 
-[![](./screenshots/2.png)](https://github.com/ker0olos/Might/raw/master/screenshots/2.png)
+[![](./screenshots/2.png)](https://github.com/ker0olos/Might/raw/main/screenshots/2.png)
