@@ -772,7 +772,8 @@ class Dialogue extends React.Component
             }
           </div>
 
-          <Markdown className={ styles.hint } source={ field.hint }/>
+          {/* eslint-disable-next-line react/no-children-prop */}
+          <Markdown className={ styles.hint } children={ field.hint }/>
         </div>
 
         <div className={ styles.buttons }>
